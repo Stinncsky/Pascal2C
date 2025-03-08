@@ -19,9 +19,11 @@ class Token{
         std::string property; // 词法单元的属性值
         int line, column; // 词法单元在源代码中的位置
 
-        Token(std::string original, TokenType type){
+        Token(std::string original, TokenType type, int line, int column){
             this->type = type;
             this->property = original;
+            this->line = line;
+            this->column = column;
         }
 };
 

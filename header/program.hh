@@ -12,7 +12,7 @@ class Program {
         Lexical lexicalAnalyzer;
         Syntax syntaxAnalyzer;
     public:
-        Program();
+        Program() { tree_root = nullptr; }
         void run();
 };
 

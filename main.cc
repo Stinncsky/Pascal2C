@@ -18,3 +18,12 @@ int main(int argc, char *argv[]) {
 
     return 0;
 }
+
+void Program::run(){
+    std::string source_code;
+    // 读取源代码
+
+    lexicalAnalyzer.load(source_code);
+    lexicalAnalyzer.run();
+    tokens = lexicalAnalyzer.getTokens();
+}
