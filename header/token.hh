@@ -10,7 +10,8 @@ enum class TokenType{
     Char,    // 字符常量
     Keyword, // 关键字
     Operator, // 运算符
-    Delimiters // 分隔符
+    Delimiters, // 分隔符
+    Null // 空
 };
 
 class Token{
@@ -19,7 +20,7 @@ class Token{
         std::string property; // 词法单元的属性值
         int line, column; // 词法单元在源代码中的位置
 
-        Token(std::string original, TokenType type, int line, int column){
+        Token(std::string original = "", TokenType type = TokenType::Null, int line = -1, int column = -1){
             this->type = type;
             this->property = original;
             this->line = line;
