@@ -4,7 +4,7 @@
 #include <vector>
 #include "token.hh"
 
-enum class NoteType{ // 节点类型
+enum class NodeType{ // 节点类型
     Final, // 终结符
 
     // 非终结符
@@ -46,11 +46,47 @@ enum class NoteType{ // 节点类型
 
 class AST {
     public:
-        NoteType type;
+        NodeType type;
 
-        AST(NoteType type = NoteType::Final){
+        AST(NodeType type = NodeType::Final){
             this->type = type;
         }
 };
+
+class FinalNode;
+class ProgramStructNode;
+class ProgramHeadNode;
+class ProgramBodyNode;
+class IdListNode;
+class ConstDeclarationsNode;
+class VarDeclarationsNode;
+class SubprogramDeclarationsNode;
+class CompoundStatementNode;
+class ConstDeclarationNode;
+class ConstValueNode;
+class VarDeclarationNode;
+class TypeNode;
+class BasicTypeNode;
+class PeriodNode;
+class SubprogramNode;
+class SubprogramHeadNode;
+class SubprogramBodyNode;
+class FormalParameterNode;
+class ParameterListNode;
+class ParameterNode;
+class VarParameterNode;
+class ValueParameterNode;
+class StatementListNode;
+class StatementNode;
+class VariableNode;
+class ExpressionNode;
+class ProcedureCallNode;
+class ElsePartNode;
+class VariableListNode;
+class ExpressionListNode;
+class IdVarpartNode;
+class SimpleExpressionNode;
+class TermNode;
+class FactorNode;
 
 #endif
