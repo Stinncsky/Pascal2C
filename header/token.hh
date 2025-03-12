@@ -26,6 +26,10 @@ class Token{
             this->line = line;
             this->column = column;
         }
+
+        bool operator==(const Token &t) const{
+            return this->property == t.property && this->type == t.type;
+        }
 };
 
 #endif
