@@ -69,7 +69,7 @@ class IdListNode : public AST {
             this->id_list = id_list;
         }
 
-        std::string trans() const override;
+        std::string trans(const std::string type = "", const std::string tmp = "", const std::string end = "") const;
 };
 
 class ConstDeclarationsNode : public AST { 
@@ -273,7 +273,7 @@ class ValueParameterNode : public AST {
             this->basic_type = basic_type;
         }
 
-        std::string trans() const override;
+        std::string trans(const bool is_ptr = 0) const;
 };
 
 class SubprogramBodyNode : public AST { 

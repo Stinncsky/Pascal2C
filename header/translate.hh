@@ -5,7 +5,7 @@
 
 class Table{
     public:
-        std::map<FinalNode, std::pair<int,int>> table;
+        std::map<FinalNode, std::pair<int,std::vector<int>>> table;
         FinalNode &now_funcid;
 };
 
