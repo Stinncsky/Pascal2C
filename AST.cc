@@ -69,7 +69,7 @@ class IdListNode : public AST {
             this->id_list = id_list;
         }
 
-        std::string trans() const override;
+        std::string trans(const std::string type = "", const std::string tmp = "", const std::string end = "") const;
 };
 
 class ConstDeclarationsNode : public AST { 
@@ -273,7 +273,7 @@ class ValueParameterNode : public AST {
             this->basic_type = basic_type;
         }
 
-        std::string trans() const override;
+        std::string trans(const bool is_ptr = 0) const;
 };
 
 class SubprogramBodyNode : public AST { 
@@ -315,7 +315,7 @@ class StatementListNode : public AST {
         std::string trans() const override;
 };
 
-class StatementNode : public AST { 
+class StatementNode : public AST {
     public:
         VariableNode *variable = nullptr;
         ExpressionNode *expression = nullptr;
@@ -324,52 +324,63 @@ class StatementNode : public AST {
         CompoundStatementNode *compound_statement = nullptr;
         StatementNode *statement = nullptr;
         ElsePartNode *else_part = nullptr;
-        ExpressionNode *expression_2 = nullptr; // 'for' 
+        ExpressionNode *expression_2 = nullptr; // 'for'
         VariableListNode *variable_list = nullptr;
         ExpressionListNode *expression_list = nullptr;
         FinalNode *w_r = nullptr; // 'write' or 'read'
+        int kind = 0;
 
-        StatementNode() : AST(NodeType::statement){} // statement → ε
+        StatementNode() : AST(NodeType::statement) {
+            this->kind = 1;
+        } // statement → ε
 
-        StatementNode(VariableNode *variable, ExpressionNode *expression) : AST(NodeType::statement){
+        StatementNode(VariableNode *variable, ExpressionNode *expression) : AST(NodeType::statement) {
             this->variable = variable;
             this->expression = expression;
+            this->kind = 2;
         } //  statement → variable := expression
 
-        StatementNode(FinalNode *func_id, ExpressionNode *expression) : AST(NodeType::statement){
+        StatementNode(FinalNode *func_id, ExpressionNode *expression) : AST(NodeType::statement) {
             this->id = func_id;
             this->expression = expression;
+            this->kind = 3;
         } //  statement → func_id := expression
 
-        StatementNode(ProcedureCallNode *procedure_call) : AST(NodeType::statement){
+        StatementNode(ProcedureCallNode *procedure_call) : AST(NodeType::statement) {
             this->procedure_call = procedure_call;
+            this->kind = 4;
         } //  statement → procedure_call
 
-        StatementNode(CompoundStatementNode *compound_statement) : AST(NodeType::statement){
+        StatementNode(CompoundStatementNode *compound_statement) : AST(NodeType::statement) {
             this->compound_statement = compound_statement;
+            this->kind = 5;
         } //  statement → compound_statement
 
-        StatementNode(ExpressionNode *expression, StatementNode *statement, ElsePartNode *else_part) : AST(NodeType::statement){
+        StatementNode(ExpressionNode *expression, StatementNode *statement, ElsePartNode *else_part) : AST(NodeType::statement) {
             this->expression = expression;
             this->statement = statement;
             this->else_part = else_part;
+            this->kind = 6;
         } //  statement → if expression then statement else_part
 
-        StatementNode(FinalNode *id, ExpressionNode *expression, ExpressionNode *expression_2, StatementNode *statement) : AST(NodeType::statement){
+        StatementNode(FinalNode *id, ExpressionNode *expression, ExpressionNode *expression_2, StatementNode *statement) : AST(NodeType::statement) {
             this->id = id;
             this->expression = expression;
             this->expression_2 = expression_2;
             this->statement = statement;
+            this->kind = 7;
         } //  statement → for id := expression to expression_2 do statement
 
-        StatementNode(FinalNode *read, VariableListNode *variable_list) : AST(NodeType::statement){
+        StatementNode(FinalNode *read, VariableListNode *variable_list) : AST(NodeType::statement) {
             this->w_r = read;
             this->variable_list = variable_list;
+            this->kind = 8;
         } //  statement → read ( variable_list )
 
-        StatementNode(FinalNode *write, ExpressionListNode *expression_list) : AST(NodeType::statement){
+        StatementNode(FinalNode *write, ExpressionListNode *expression_list) : AST(NodeType::statement) {
             this->w_r = write;
             this->expression_list = expression_list;
+            this->kind = 9;
         } //  statement → write ( expression_list )
 
         std::string trans() const override;
@@ -498,7 +509,7 @@ class TermNode : public AST {
         std::string trans() const override;
 };
 
-class FactorNode : public AST { 
+class FactorNode : public AST {
     public:
         FinalNode *num;
         FinalNode *id;
@@ -507,28 +518,39 @@ class FactorNode : public AST {
         FinalNode *not_keyword;
         FinalNode *uminus;
         FactorNode *factor;
+        int kind = 0;
 
-        FactorNode(FinalNode *num) : AST(NodeType::factor){
+        FactorNode(FinalNode *num) : AST(NodeType::factor) {
             this->num = num;
+            this->kind = 1;
         } // factor → num
 
-        FactorNode(FinalNode *id, ExpressionListNode *expression_list) : AST(NodeType::factor){
-            this->id = id;
-            this->expression_list = expression_list;
-        } // factor → id ( expression_list )
-
-        FactorNode(VariableNode *variable) : AST(NodeType::factor){
+        FactorNode(VariableNode *variable) : AST(NodeType::factor) {
             this->variable = variable;
+            this->kind = 2;
         } // factor → variable
 
-        FactorNode(FinalNode *not_keyword, FactorNode *factor) : AST(NodeType::factor){
+        FactorNode(ExpressionListNode *expression_list) : AST(NodeType::factor) {
+            this->expression_list = expression_list;
+            this->kind = 3;
+        } // factor → ( expression_list )
+
+        FactorNode(FinalNode *id, ExpressionListNode *expression_list) : AST(NodeType::factor) {
+            this->id = id;
+            this->expression_list = expression_list;
+            this->kind = 4;
+        } // factor → id ( expression_list )
+
+        FactorNode(FinalNode *not_keyword, FactorNode *factor) : AST(NodeType::factor) {
             this->not_keyword = not_keyword;
             this->factor = factor;
+            this->kind = 5;
         } // factor → not factor
 
-        FactorNode(FinalNode *uminus, FactorNode *factor) : AST(NodeType::factor){
+        FactorNode(FinalNode *uminus, FactorNode *factor) : AST(NodeType::factor) {
             this->uminus = uminus;
             this->factor = factor;
+            this->kind = 6;
         } // factor → uminus factor
 
         std::string trans() const override;
