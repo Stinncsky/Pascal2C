@@ -3,8 +3,7 @@
 #include "AST.hh"
 #include <map>
 
-class Table
-{
+class Table {
 public:
     std::map<FinalNode, std::tuple<int, int, std::vector<int>>> table;
     // tuple<int（0int，1double，2char，3string，4数组）, int（0为传值，1为传地址）, vector<int>（数组起始位置）>
