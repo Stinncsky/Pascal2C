@@ -1,4 +1,6 @@
 #include "./header/AST.hh"
+#ifndef __AST_CC__
+#define __AST_CC__
 
 class FinalNode : public AST { // 终结符节点
     public:
@@ -6,6 +8,12 @@ class FinalNode : public AST { // 终结符节点
         FinalNode(Token token) : AST(NodeType::Final){
             this->token = token;
         }
+
+        bool operator==(const FinalNode &f) const{
+            return this->token == f.token;
+        }
+
+        std::string trans() const override;
 };
 
 class ProgramStructNode : public AST { 
@@ -17,6 +25,8 @@ class ProgramStructNode : public AST {
             this->program_head = program_head;
             this->program_body = program_body;
         }
+
+        std::string trans() const override;
 };
 
 class ProgramHeadNode : public AST { 
@@ -28,6 +38,8 @@ class ProgramHeadNode : public AST {
             this->id = id;
             this->id_list = id_list;
         }
+
+        std::string trans() const override;
 };
 
 class ProgramBodyNode : public AST { 
@@ -43,6 +55,8 @@ class ProgramBodyNode : public AST {
             this->subprogram_declarations = subprogram_declarations;
             this->compound_statement = compound_statement;
         }
+
+        std::string trans() const override;
 };
 
 class IdListNode : public AST { 
@@ -54,6 +68,8 @@ class IdListNode : public AST {
             this->id = id;
             this->id_list = id_list;
         }
+
+        std::string trans() const override;
 };
 
 class ConstDeclarationsNode : public AST { 
@@ -63,6 +79,8 @@ class ConstDeclarationsNode : public AST {
         ConstDeclarationsNode(ConstDeclarationNode *const_declaration = nullptr) : AST(NodeType::const_declarations){
             this->const_declaration = const_declaration;
         }
+
+        std::string trans() const override;
 };
 
 class ConstDeclarationNode : public AST { 
@@ -76,6 +94,8 @@ class ConstDeclarationNode : public AST {
             this->const_value = const_value;
             this->const_declaration = const_declaration;
         }
+
+        std::string trans() const override;
 };
 
 class ConstValueNode : public AST { 
@@ -87,6 +107,8 @@ class ConstValueNode : public AST {
             this->op = op;
             this->numletter = numletter;
         }
+
+        std::string trans() const override;
 };
 
 class VarDeclarationsNode : public AST { 
@@ -96,6 +118,8 @@ class VarDeclarationsNode : public AST {
         VarDeclarationsNode(VarDeclarationNode *var_declaration = nullptr) : AST(NodeType::var_declarations){
             this->var_declaration = var_declaration;
         }
+
+        std::string trans() const override;
 };
 
 class VarDeclarationNode : public AST { 
@@ -109,6 +133,8 @@ class VarDeclarationNode : public AST {
             this->type = type;
             this->var_declaration = var_declaration;
         }
+
+        std::string trans() const override;
 };
 
 class TypeNode : public AST { 
@@ -120,6 +146,8 @@ class TypeNode : public AST {
             this->basic_type = basic_type;
             this->period = period;
         }
+
+        std::string trans() const override;
 };
 
 class BasicTypeNode : public AST { 
@@ -129,6 +157,8 @@ class BasicTypeNode : public AST {
         BasicTypeNode(FinalNode *basic_type) : AST(NodeType::basic_type){
             this->basic_type = basic_type;
         }
+
+        std::string trans() const override;
 };
 
 class PeriodNode : public AST { 
@@ -141,6 +171,7 @@ class PeriodNode : public AST {
             this->num2 = num2;
             this->period = period;
         }
+        std::string trans() const override;
 };
 
 class SubprogramDeclarationsNode : public AST { 
@@ -152,6 +183,8 @@ class SubprogramDeclarationsNode : public AST {
             this->subprogram_declarations = subprogram_declarations;
             this->subprogram = subprogram;
         }
+
+        std::string trans() const override;
 };
 
 class SubprogramNode : public AST { 
@@ -163,6 +196,8 @@ class SubprogramNode : public AST {
             this->subprogram_head = subprogram_head;
             this->subprogram_body = subprogram_body;
         }
+
+        std::string trans() const override;
 };
 
 class SubprogramHeadNode : public AST { 
@@ -176,6 +211,8 @@ class SubprogramHeadNode : public AST {
             this->formal_parameter = formal_parameter;
             this->basic_type = basic_type;
         }
+
+        std::string trans() const override;
 };
 
 class FormalParameterNode : public AST { 
@@ -185,6 +222,8 @@ class FormalParameterNode : public AST {
         FormalParameterNode(ParameterListNode *parameter_list = nullptr) : AST(NodeType::formal_parameter){
             this->parameter_list = parameter_list;
         }
+
+        std::string trans() const override;
 };
 
 class ParameterListNode : public AST { 
@@ -196,6 +235,8 @@ class ParameterListNode : public AST {
             this->parameter = parameter;
             this->parameter_list = parameter_list;
         }
+
+        std::string trans() const override;
 };
 
 class ParameterNode : public AST { 
@@ -207,6 +248,8 @@ class ParameterNode : public AST {
             this->var_parameter = var_parameter;
             this->value_parameter = value_parameter;
         }
+
+        std::string trans() const override;
 };
 
 class VarParameterNode : public AST { 
@@ -216,6 +259,8 @@ class VarParameterNode : public AST {
         VarParameterNode(ValueParameterNode *value_parameter) : AST(NodeType::var_parameter){
             this->value_parameter = value_parameter;
         }
+
+        std::string trans() const override;
 };
 
 class ValueParameterNode : public AST { 
@@ -227,6 +272,8 @@ class ValueParameterNode : public AST {
             this->id_list = id_list;
             this->basic_type = basic_type;
         }
+
+        std::string trans() const override;
 };
 
 class SubprogramBodyNode : public AST { 
@@ -240,6 +287,8 @@ class SubprogramBodyNode : public AST {
             this->var_declarations = var_declarations;
             this->compound_statement = compound_statement;
         }
+
+        std::string trans() const override;
 };
 
 class CompoundStatementNode : public AST { 
@@ -249,6 +298,8 @@ class CompoundStatementNode : public AST {
         CompoundStatementNode(StatementListNode *statement_list) : AST(NodeType::compound_statement){
             this->statement_list = statement_list;
         }
+
+        std::string trans() const override;
 };
 
 class StatementListNode : public AST { 
@@ -260,6 +311,8 @@ class StatementListNode : public AST {
             this->statement = statement;
             this->statement_list = statement_list;
         }
+
+        std::string trans() const override;
 };
 
 class StatementNode : public AST { 
@@ -318,6 +371,8 @@ class StatementNode : public AST {
             this->w_r = write;
             this->expression_list = expression_list;
         } //  statement → write ( expression_list )
+
+        std::string trans() const override;
 };
 
 class VariableListNode : public AST { 
@@ -329,6 +384,8 @@ class VariableListNode : public AST {
             this->variable = variable;
             this->variable_list = variable_list;
         }
+
+        std::string trans() const override;
 };
 
 class VariableNode : public AST { 
@@ -340,6 +397,8 @@ class VariableNode : public AST {
             this->id = id;
             this->id_varpart = id_varpart;
         }
+
+        std::string trans() const override;
 };
 
 class IdVarpartNode : public AST { 
@@ -349,6 +408,8 @@ class IdVarpartNode : public AST {
         IdVarpartNode(ExpressionListNode *expression_list = nullptr) : AST(NodeType::id_varpart){
             this->expression_list = expression_list;
         }
+
+        std::string trans() const override;
 };
 
 class ProcedureCallNode : public AST { 
@@ -360,6 +421,8 @@ class ProcedureCallNode : public AST {
             this->id = id;
             this->expression_list = expression_list;
         }
+
+        std::string trans() const override;
 };
 
 class ElsePartNode : public AST { 
@@ -369,6 +432,8 @@ class ElsePartNode : public AST {
         ElsePartNode(StatementNode *statement = nullptr) : AST(NodeType::else_part){
             this->statement = statement;
         }
+
+        std::string trans() const override;
 };
 
 class ExpressionListNode : public AST { 
@@ -380,6 +445,8 @@ class ExpressionListNode : public AST {
             this->expression = expression;
             this->expression_list = expression_list;
         }
+
+        std::string trans() const override;
 };
 
 class ExpressionNode : public AST { 
@@ -397,6 +464,8 @@ class ExpressionNode : public AST {
             this->relop = relop;
             this->simple_expression_2 = simple_expression_2;
         } // expression → simple_expression relop simple_expression
+
+        std::string trans() const override;
 };
 
 class SimpleExpressionNode : public AST { 
@@ -410,6 +479,8 @@ class SimpleExpressionNode : public AST {
             this->addop = addop;
             this->term = term;
         }
+
+        std::string trans() const override;
 };
 
 class TermNode : public AST { 
@@ -423,6 +494,8 @@ class TermNode : public AST {
             this->mulop = mulop;
             this->factor = factor;
         }
+
+        std::string trans() const override;
 };
 
 class FactorNode : public AST { 
@@ -457,4 +530,8 @@ class FactorNode : public AST {
             this->uminus = uminus;
             this->factor = factor;
         } // factor → uminus factor
+
+        std::string trans() const override;
 };
+
+#endif
