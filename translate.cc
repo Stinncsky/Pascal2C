@@ -2,7 +2,58 @@
 #include "AST.cc"
 
 std::string FinalNode::trans() const{
-    return token.property; // 有待修改
+    switch(this->token.type){
+        case TokenType::Number:
+            return this->token.property;
+        case TokenType::Char:
+            return this->token.property;
+        case TokenType::String:
+            return this->token.property;
+        case TokenType::Identifier:
+            return this->token.property;
+        case TokenType::Operator:
+            if (this->token.property == ":=")
+                return "=";
+            else if (this->token.property == "<>")
+                return "!=";
+            else if (this->token.property == "=")
+                return "==";
+            else
+                return this->token.property;
+        case TokenType::Keyword:
+            if (this->token.property == "integer")
+                return "int";
+            else if (this->token.property == "real")
+                return "double";
+            else if (this->token.property == "char")
+                return "char";
+            else if (this->token.property == "boolean")
+                return "int";
+            else if (this->token.property == "true")
+                return "1";
+            else if (this->token.property == "false")
+                return "0";
+            else if (this->token.property == "read")
+                return "scanf";
+            else if (this->token.property == "write")
+                return "printf";
+            else if (this->token.property == "and")
+                return "&&";
+            else if (this->token.property == "or")
+                return "||";
+            else if (this->token.property == "not")
+                return "!";
+            else if (this->token.property == "div")
+                return "/";
+            else if (this->token.property == "mod")
+                return "%";
+            else if (this->token.property == "nil")
+                return "NULL";
+            else
+                return this->token.property;
+        default:
+            return "";
+    }
 }
 
 std::string ProgramStructNode::trans() const{
