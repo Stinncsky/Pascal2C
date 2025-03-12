@@ -139,10 +139,25 @@ void Lexical::run() {
                     i++;
                 }
                 else if(ch == '/'){
-                    Token new_token("/", TokenType::Operator, line_number, column_number);
-                    tokens.push_back(new_token);
-                    column_number++;
-                    i++;
+                    if(i + 1 < code.size() && code[i + 1] == '/'){ // // 类型注释
+                        while(i < code.size()){
+                            ch = std::tolower(code[i]);
+                            if(ch == '\n'){ 
+                                line_number++; 
+                                column_number = 1;
+                                i++;
+                                break;
+                            } else{
+                                column_number++;
+                                i++;
+                            }
+                        }
+                    } else {
+                        Token new_token("/", TokenType::Operator, line_number, column_number);
+                        tokens.push_back(new_token);
+                        column_number++;
+                        i++;
+                    }
                 }
                 else if(ch == '='){
                     Token new_token("=", TokenType::Operator, line_number, column_number);
