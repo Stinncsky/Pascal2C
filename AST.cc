@@ -103,7 +103,7 @@ class ConstValueNode : public AST {
         FinalNode *op;
         FinalNode *numletter;
 
-        ConstValueNode(FinalNode *op = nullptr, FinalNode *numletter) : AST(NodeType::const_value){
+        ConstValueNode(FinalNode *numletter, FinalNode *op = nullptr) : AST(NodeType::const_value){
             this->op = op;
             this->numletter = numletter;
         }
@@ -485,7 +485,7 @@ class SimpleExpressionNode : public AST {
         FinalNode *addop;
         TermNode *term;
 
-        SimpleExpressionNode(SimpleExpressionNode *simple_expression = nullptr, FinalNode *addop = nullptr, TermNode *term) : AST(NodeType::simple_expression){
+        SimpleExpressionNode(TermNode *term, SimpleExpressionNode *simple_expression = nullptr, FinalNode *addop = nullptr) : AST(NodeType::simple_expression){
             this->simple_expression = simple_expression;
             this->addop = addop;
             this->term = term;
@@ -500,7 +500,7 @@ class TermNode : public AST {
         FinalNode *mulop;
         FactorNode *factor;
 
-        TermNode(TermNode *term = nullptr, FinalNode *mulop = nullptr, FactorNode *factor) : AST(NodeType::term){
+        TermNode(FactorNode *factor, TermNode *term = nullptr, FinalNode *mulop = nullptr) : AST(NodeType::term){
             this->term = term;
             this->mulop = mulop;
             this->factor = factor;
@@ -514,9 +514,9 @@ class FactorNode : public AST {
         FinalNode *num;
         FinalNode *id;
         ExpressionListNode *expression_list;
+        ExpressionNode *expression;
         VariableNode *variable;
-        FinalNode *not_keyword;
-        FinalNode *uminus;
+        FinalNode *not_uminus;
         FactorNode *factor;
         int kind = 0;
 
@@ -530,10 +530,10 @@ class FactorNode : public AST {
             this->kind = 2;
         } // factor → variable
 
-        FactorNode(ExpressionListNode *expression_list) : AST(NodeType::factor) {
-            this->expression_list = expression_list;
+        FactorNode(ExpressionNode *expression) : AST(NodeType::factor) {
+            this->expression = expression;
             this->kind = 3;
-        } // factor → ( expression_list )
+        } // factor → ( expression )
 
         FactorNode(FinalNode *id, ExpressionListNode *expression_list) : AST(NodeType::factor) {
             this->id = id;
@@ -541,17 +541,11 @@ class FactorNode : public AST {
             this->kind = 4;
         } // factor → id ( expression_list )
 
-        FactorNode(FinalNode *not_keyword, FactorNode *factor) : AST(NodeType::factor) {
-            this->not_keyword = not_keyword;
+        FactorNode(FinalNode *not_uminus, FactorNode *factor) : AST(NodeType::factor) {
+            this->not_uminus = not_uminus;
             this->factor = factor;
             this->kind = 5;
-        } // factor → not factor
-
-        FactorNode(FinalNode *uminus, FactorNode *factor) : AST(NodeType::factor) {
-            this->uminus = uminus;
-            this->factor = factor;
-            this->kind = 6;
-        } // factor → uminus factor
+        } // factor → not factor | uminus factor
 
         std::string trans() const override;
 };
