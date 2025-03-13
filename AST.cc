@@ -70,6 +70,7 @@ class IdListNode : public AST {
         }
 
         std::string trans(const std::string type = "", const std::string tmp = "", const std::string end = "") const;
+        std::string trans() const override { return "";} // 重载纯虚函数
 };
 
 class ConstDeclarationsNode : public AST { 
@@ -273,7 +274,8 @@ class ValueParameterNode : public AST {
             this->basic_type = basic_type;
         }
 
-        std::string trans(const bool is_ptr = 0) const;
+        std::string trans(const bool is_ptr) const;
+        std::string trans() const override {trans(false); } // 重载纯虚函数
 };
 
 class SubprogramBodyNode : public AST { 

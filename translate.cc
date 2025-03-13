@@ -145,7 +145,7 @@ std::string VarDeclarationNode::trans() const{
     if (this->var_declaration != nullptr){
         res += this->var_declaration->trans();
     }
-    std::string type = this->type->trans();
+    std::string type = this->type->trans() + " ";
     std::string tmp;
     if (this->type->period != nullptr){
         tmp = this->type->period->trans();
@@ -365,14 +365,14 @@ std::string ExpressionNode::trans() const {
 
 std::string SimpleExpressionNode::trans() const {
     if (this->addop == nullptr)
-        return this->simple_expression->trans();
+        return this->term->trans();
     else
         return this->simple_expression->trans() + " " + this->addop->trans() + " " + this->term->trans();
 }
 
 std::string TermNode::trans() const {
     if (this->mulop == nullptr)
-        return this->term->trans();
+        return this->factor->trans();
     else
         return this->term->trans() + " " + this->mulop->trans() + " " + this->factor->trans();
 }
