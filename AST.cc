@@ -386,6 +386,8 @@ class StatementNode : public AST {
         } //  statement → write ( expression_list )
 
         std::string trans() const override;
+
+        std::string trans(Table t) const;
 };
 
 class VariableListNode : public AST { 
@@ -399,6 +401,8 @@ class VariableListNode : public AST {
         }
 
         std::string trans() const override;
+
+        std::string trans(Table t) const;
 };
 
 class VariableNode : public AST { 
@@ -412,6 +416,8 @@ class VariableNode : public AST {
         }
 
         std::string trans() const override;
+
+        std::string trans(Table t) const;
 };
 
 class IdVarpartNode : public AST { 
@@ -423,6 +429,8 @@ class IdVarpartNode : public AST {
         }
 
         std::string trans() const override;
+
+        std::string trans(Table t) const;
 };
 
 class ProcedureCallNode : public AST { 
@@ -436,6 +444,8 @@ class ProcedureCallNode : public AST {
         }
 
         std::string trans() const override;
+
+        std::string trans(Table t) const;
 };
 
 class ElsePartNode : public AST { 
@@ -460,6 +470,8 @@ class ExpressionListNode : public AST {
         }
 
         std::string trans() const override;
+
+        std::string trans(Table t) const;
 };
 
 class ExpressionNode : public AST { 
@@ -479,6 +491,8 @@ class ExpressionNode : public AST {
         } // expression → simple_expression relop simple_expression
 
         std::string trans() const override;
+
+        std::string trans(Table t) const;
 };
 
 class SimpleExpressionNode : public AST { 
@@ -494,6 +508,8 @@ class SimpleExpressionNode : public AST {
         }
 
         std::string trans() const override;
+
+        std::string trans(Table t) const;
 };
 
 class TermNode : public AST { 
@@ -509,12 +525,15 @@ class TermNode : public AST {
         }
 
         std::string trans() const override;
+
+        std::string trans(Table t) const;
 };
 
 class FactorNode : public AST {
     public:
         FinalNode *num;
         FinalNode *id;
+        ExpressionNode *expression;
         ExpressionListNode *expression_list;
         ExpressionNode *expression;
         VariableNode *variable;
@@ -550,6 +569,8 @@ class FactorNode : public AST {
         } // factor → not factor | uminus factor
 
         std::string trans() const override;
+
+        std::string trans(Table t) const;
 };
 
 #endif
