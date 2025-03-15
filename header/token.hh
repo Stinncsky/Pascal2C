@@ -30,6 +30,10 @@ class Token{
         bool operator==(const Token &t) const{
             return this->property == t.property && this->type == t.type;
         }
+
+        bool operator<(const Token &t) const{
+            return this->property < t.property;
+        }
 };
 
 #endif

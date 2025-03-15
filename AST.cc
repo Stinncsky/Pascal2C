@@ -1,4 +1,5 @@
 #include "./header/AST.hh"
+#include "./header/translate.hh"
 #ifndef __AST_CC__
 #define __AST_CC__
 
@@ -11,6 +12,10 @@ class FinalNode : public AST { // 终结符节点
 
         bool operator==(const FinalNode &f) const{
             return this->token == f.token;
+        }
+
+        bool operator<(const FinalNode &f) const{
+            return this->token < f.token;
         }
 
         std::string trans() const override;
@@ -69,8 +74,8 @@ class IdListNode : public AST {
             this->id_list = id_list;
         }
 
-        std::string trans(const std::string type = "", const std::string tmp = "", const std::string end = "") const;
-        std::string trans() const override { return "";} // 重载纯虚函数
+        std::string trans(const std::string type, const std::string tmp = "", const std::string end = "", const std::vector<int> *dim = nullptr, const bool is_cite = false) const;
+        std::string trans() const override { return trans("");} // 重载纯虚函数
 };
 
 class ConstDeclarationsNode : public AST { 
@@ -172,7 +177,8 @@ class PeriodNode : public AST {
             this->num2 = num2;
             this->period = period;
         }
-        std::string trans() const override;
+        std::string trans(std::vector<int> &dim) const;
+        std::string trans() const override{std::vector<int> tmp; return trans(tmp);}
 };
 
 class SubprogramDeclarationsNode : public AST { 
@@ -275,7 +281,7 @@ class ValueParameterNode : public AST {
         }
 
         std::string trans(const bool is_ptr) const;
-        std::string trans() const override {trans(false); } // 重载纯虚函数
+        std::string trans() const override {return trans(false);} // 重载纯虚函数
 };
 
 class SubprogramBodyNode : public AST { 
@@ -386,8 +392,6 @@ class StatementNode : public AST {
         } //  statement → write ( expression_list )
 
         std::string trans() const override;
-
-        std::string trans(Table t) const;
 };
 
 class VariableListNode : public AST { 
@@ -401,8 +405,6 @@ class VariableListNode : public AST {
         }
 
         std::string trans() const override;
-
-        std::string trans(Table t) const;
 };
 
 class VariableNode : public AST { 
@@ -416,8 +418,6 @@ class VariableNode : public AST {
         }
 
         std::string trans() const override;
-
-        std::string trans(Table t) const;
 };
 
 class IdVarpartNode : public AST { 
@@ -429,8 +429,6 @@ class IdVarpartNode : public AST {
         }
 
         std::string trans() const override;
-
-        std::string trans(Table t) const;
 };
 
 class ProcedureCallNode : public AST { 
@@ -444,8 +442,6 @@ class ProcedureCallNode : public AST {
         }
 
         std::string trans() const override;
-
-        std::string trans(Table t) const;
 };
 
 class ElsePartNode : public AST { 
@@ -470,8 +466,6 @@ class ExpressionListNode : public AST {
         }
 
         std::string trans() const override;
-
-        std::string trans(Table t) const;
 };
 
 class ExpressionNode : public AST { 
@@ -491,8 +485,6 @@ class ExpressionNode : public AST {
         } // expression → simple_expression relop simple_expression
 
         std::string trans() const override;
-
-        std::string trans(Table t) const;
 };
 
 class SimpleExpressionNode : public AST { 
@@ -508,8 +500,6 @@ class SimpleExpressionNode : public AST {
         }
 
         std::string trans() const override;
-
-        std::string trans(Table t) const;
 };
 
 class TermNode : public AST { 
@@ -525,8 +515,6 @@ class TermNode : public AST {
         }
 
         std::string trans() const override;
-
-        std::string trans(Table t) const;
 };
 
 class FactorNode : public AST {
@@ -535,7 +523,6 @@ class FactorNode : public AST {
         FinalNode *id;
         ExpressionNode *expression;
         ExpressionListNode *expression_list;
-        ExpressionNode *expression;
         VariableNode *variable;
         FinalNode *not_uminus;
         FactorNode *factor;
@@ -569,8 +556,6 @@ class FactorNode : public AST {
         } // factor → not factor | uminus factor
 
         std::string trans() const override;
-
-        std::string trans(Table t) const;
 };
 
 #endif

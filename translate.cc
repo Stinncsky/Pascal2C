@@ -1,7 +1,7 @@
 #include "./header/translate.hh"
 
 #include "AST.cc"
-
+Table t;
 std::string FinalNode::trans() const{
     switch(this->token.type){
         case TokenType::Number:
@@ -75,16 +75,28 @@ std::string ProgramBodyNode::trans() const{
     res += this->const_declarations->trans();
     res += this->var_declarations->trans();
     res += this->subprogram_declarations->trans();
+    res += "int main()";
     res += this->compound_statement->trans();
     return res;
 }
 
-std::string IdListNode::trans(const std::string type, const std::string tmp, const std::string end) const{
+std::string IdListNode::trans(const std::string type, const std::string tmp, const std::string end, const std::vector<int> *dim, const bool is_cite) const{
     std::string res = "";
     if(this->id_list != nullptr){
-        res += this->id_list->trans(type, tmp, end);
+        res += this->id_list->trans(type, tmp, end, dim, is_cite);
     }
     res += type + this->id->trans() + tmp + end;
+    if (is_cite){
+        auto info = t.table[*id];
+        info = std::make_tuple(std::get<0>(info), 1, std::get<2>(info));
+        t.table[*id] = info;
+    } else if (type == "int " || type == "double "){
+        t.table[*(this->id)] = std::make_tuple(type == "int " ? 0 : 1, 0, *dim);
+    } else if (type == "char "){
+        t.table[*(this->id)] = std::make_tuple(2, 0, *dim);
+    } else if (type == "string "){
+        t.table[*(this->id)] = std::make_tuple(3, 0, *dim);
+    }
     return res;
 }
 
@@ -98,20 +110,26 @@ std::string ConstDeclarationsNode::trans() const{
 
 std::string ConstDeclarationNode::trans() const{
     std::string res = "const ";
+    int type = 0;
     if (this->const_value->numletter->token.type == TokenType::Number){
         if (this->const_value->numletter->token.property.find(".") != std::string::npos){
             res += "double ";
+            type = 1;
         } else {
             res += "int ";
+            type = 0;
         }
+        t.table[*(this->id)] = std::make_tuple(type, 0, std::vector<int>());
         res += this->id->trans() + " = ";
         res += this->const_value->trans() + ";\n";
     } else if (this->const_value->numletter->token.type == TokenType::Char){
         res += "char ";
+        t.table[*(this->id)] = std::make_tuple(2, 0, std::vector<int>());
         res += this->id->trans() + " = ";
         res += "\'" + this->const_value->trans() + "\';\n";
     } else if (this->const_value->numletter->token.type == TokenType::String){
         res += "char *";
+        t.table[*(this->id)] = std::make_tuple(3, 0, std::vector<int>());
         res += this->id->trans() + " = ";
         res += "\"" + this->const_value->trans() + "\";\n";
     }
@@ -147,10 +165,11 @@ std::string VarDeclarationNode::trans() const{
     }
     std::string type = this->type->trans() + " ";
     std::string tmp;
+    std::vector<int> dim;
     if (this->type->period != nullptr){
-        tmp = this->type->period->trans();
+        tmp = this->type->period->trans(dim);
     }
-    res += this->id_list->trans(type, tmp, ";\n");
+    res += this->id_list->trans(type, tmp, ";\n", &dim);
     return res;
 }
 
@@ -166,12 +185,13 @@ std::string BasicTypeNode::trans() const{
     return res;
 }
 
-std::string PeriodNode::trans() const{
+std::string PeriodNode::trans(std::vector<int> &dim) const{
     std::string res = "";
     if (this->period != nullptr){
         res += this->period->trans();
     }
     int start = std::stoi(this->num1->trans());
+    dim.push_back(start);
     int end = std::stoi(this->num2->trans());
     int len = end - start + 1;
     res += "[" + std::to_string(len) + "]";
@@ -190,7 +210,9 @@ std::string SubprogramDeclarationsNode::trans() const{
 std::string SubprogramNode::trans() const{
     std::string res = "";
     res += this->subprogram_head->trans();
+    Table tmp = t;
     res += this->subprogram_body->trans();
+    t = tmp;
     return res;
 }
 
@@ -247,7 +269,7 @@ std::string ValueParameterNode::trans(const bool is_ptr) const{
     if (is_ptr){
         type += "*";
     }
-    res += this->id_list->trans(type, "", ", ");
+    res += this->id_list->trans(type, "", ", ", nullptr, is_ptr);
     res = res.substr(0, res.size() - 2);
     return res;
 }
@@ -299,36 +321,9 @@ std::string StatementNode::trans() const {
                      this->statement->trans() + "}\n";
     } 
     else if (this->kind == 8)
-        return "";
-    else if (this->kind == 9)
-        return "";
-}
-
-std::string StatementNode::trans(Table t) const {
-    if (this->kind == 1)
-        return "\n";
-    else if (this->kind == 2)
-        return this->variable->trans() + " = " + this->expression->trans() + ";\n";
-    else if (this->kind == 3)
-        return "return " + this->expression->trans() + ";\n";
-    else if (this->kind == 4)
-        return this->procedure_call->trans() + ";\n";
-    else if (this->kind == 5)
-        return this->compound_statement->trans();
-    else if (this->kind == 6) {  // 后面用不用考虑变成else if的形式，更工整但可能不是很必要？
-        return "if (" + this->expression->trans() + ") {\n" +
-                     this->statement->trans() + "}" + this->else_part->trans() + "\n";
-    } 
-    else if (this->kind == 7) {
-        std::string i = this->id->trans();
-        return "for (" + i + " = " + this->expression->trans() + "; " + i +
-                     " <= " + this->expression_2->trans() + "; " + i + "++) {\n" +
-                     this->statement->trans() + "}\n";
-    } 
-    else if (this->kind == 8)
-        return this->variable_list->trans(t);
+        return this->variable_list->trans();
     else if (this->kind == 9) {
-        std::string expr_list = this->expression_list->trans(t);
+        std::string expr_list = this->expression_list->trans();
         std::vector<std::string> expr, kind;
         size_t space_pos = expr_list.find(' ');
         while (space_pos != std::string::npos) {
@@ -351,6 +346,7 @@ std::string StatementNode::trans(Table t) const {
         }
         return res;
     }
+    return "";
 }
 
 std::string VariableListNode::trans() const {
@@ -362,20 +358,7 @@ std::string VariableListNode::trans() const {
     return result;
 }
 
-std::string VariableListNode::trans(Table t) const {
-    std::string result = "";
-    if (this->variable_list != nullptr) {
-        result += this->variable_list->trans(t);
-    }
-    result += this->variable->trans(t);
-    return result;
-}
-
 std::string VariableNode::trans() const {
-    return this->id->trans() + this->id_varpart->trans();
-}
-
-std::string VariableNode::trans(Table t) const {
     std::tuple<int, int, std::vector<int>> info = t.table[*id];
     std::string res = "";
     if (std::get<0>(info) == 1) {
@@ -391,7 +374,7 @@ std::string VariableNode::trans(Table t) const {
         res = "scanf(\"%s\", ";
     }
     res += this->id->trans();
-    std::string index = this->id_varpart->trans(t);
+    std::string index = this->id_varpart->trans();
     int i = 0;
     size_t space_pos = index.find(' ');
     while (space_pos != std::string::npos) {
@@ -405,17 +388,11 @@ std::string VariableNode::trans(Table t) const {
     return res;
 }
 
-std::string IdVarpartNode::trans() const {  // 这个方法可能有问题，但理论上不会用到
-    if (this->expression_list == nullptr) 
-        return "";
-    return "[" + this->expression_list->trans() + "]";
-}
-
-std::string IdVarpartNode::trans(Table t) const {
+std::string IdVarpartNode::trans() const {
     if (this->expression_list == nullptr) 
         return "";
     else {
-        std::string expr_list = this->expression_list->trans(t);
+        std::string expr_list = this->expression_list->trans();
         std::string res = "";
         size_t space_pos = expr_list.find(' ');
         while (space_pos != std::string::npos) {
@@ -434,15 +411,8 @@ std::string IdVarpartNode::trans(Table t) const {
 std::string ProcedureCallNode::trans() const {
     if (this->expression_list == nullptr)
         return this->id->trans() + "()";
-    else
-        return this->id->trans() + "(" + this->expression_list->trans() + ")";
-}
-
-std::string ProcedureCallNode::trans(Table t) const {
-    if (this->expression_list == nullptr)
-        return this->id->trans() + "()";
     else {  //找到每一个空格，从空格开始到逗号前的部分都去掉
-        std::string expr_list = this->expression_list->trans(t);
+        std::string expr_list = this->expression_list->trans();
         size_t space_pos = expr_list.find(' ');
         while (space_pos != std::string::npos) {
             size_t del_pos = expr_list.find(',');
@@ -481,30 +451,16 @@ std::string ExpressionListNode::trans() const {
         return this->expression->trans() + "," + this->expression_list->trans();
 }
 
-std::string ExpressionListNode::trans(Table t) const {
-    if (this->expression_list == nullptr)
-        return this->expression->trans(t);
-    else
-        return this->expression->trans(t) + "," + this->expression_list->trans(t);
-}
-
 std::string ExpressionNode::trans() const {
     if (this->relop == nullptr)
         return this->simple_expression->trans();
-    else
-        return this->simple_expression->trans() + this->relop->trans() + this->simple_expression_2->trans();
-}
-
-std::string ExpressionNode::trans(Table t) const {
-    if (this->relop == nullptr)
-        return this->simple_expression->trans(t);
     else {
         std::string op = this->relop->trans();
-        std::string simple_expr = this->simple_expression->trans(t);
+        std::string simple_expr = this->simple_expression->trans();
         size_t simple_expr_space_pos = simple_expr.find(' ');
         std::string simple_expr_content = simple_expr.substr(0, simple_expr_space_pos);
         std::string simple_expr_kind = simple_expr.substr(simple_expr_space_pos + 1);
-        std::string simple_expr_2 = this->simple_expression_2->trans(t);
+        std::string simple_expr_2 = this->simple_expression_2->trans();
         size_t simple_expr_2_space_pos = simple_expr_2.find(' ');
         std::string simple_expr_2_content = simple_expr_2.substr(0, simple_expr_2_space_pos);
         std::string simple_expr_2_kind = simple_expr_2.substr(simple_expr_2_space_pos + 1);
@@ -520,20 +476,13 @@ std::string ExpressionNode::trans(Table t) const {
 std::string SimpleExpressionNode::trans() const {
     if (this->addop == nullptr)
         return this->term->trans();
-    else
-        return this->simple_expression->trans() + this->addop->trans() + this->term->trans();
-}
-
-std::string SimpleExpressionNode::trans(Table t) const {
-    if (this->addop == nullptr)
-        return this->simple_expression->trans(t);
     else {
         std::string op = this->addop->trans();
-        std::string term_expr = this->term->trans(t);
+        std::string term_expr = this->term->trans();
         size_t term_space_pos = term_expr.find(' ');
         std::string term_content = term_expr.substr(0, term_space_pos);
         std::string term_kind = term_expr.substr(term_space_pos + 1);
-        std::string simple_expr = this->simple_expression->trans(t);
+        std::string simple_expr = this->simple_expression->trans();
         size_t simple_expr_space_pos = simple_expr.find(' ');
         std::string simple_expr_content = simple_expr.substr(0, simple_expr_space_pos);
         std::string simple_expr_kind = simple_expr.substr(simple_expr_space_pos + 1);
@@ -549,20 +498,13 @@ std::string SimpleExpressionNode::trans(Table t) const {
 std::string TermNode::trans() const {
     if (this->mulop == nullptr)
         return this->factor->trans();
-    else
-        return this->term->trans() + this->mulop->trans() + this->factor->trans();
-}
-
-std::string TermNode::trans(Table t) const {
-    if (this->mulop == nullptr)
-        return this->term->trans();
     else {
         std::string op = this->mulop->trans();
-        std::string term_expr = this->term->trans(t);
+        std::string term_expr = this->term->trans();
         size_t term_space_pos = term_expr.find(' ');
         std::string term_content = term_expr.substr(0, term_space_pos);
         std::string term_kind = term_expr.substr(term_space_pos + 1);
-        std::string factor_expr = this->factor->trans(t);
+        std::string factor_expr = this->factor->trans();
         size_t factor_space_pos = factor_expr.find(' ');
         std::string factor_content = factor_expr.substr(0, factor_space_pos);
         std::string factor_kind = factor_expr.substr(factor_space_pos + 1);
@@ -576,21 +518,6 @@ std::string TermNode::trans(Table t) const {
 }
 
 std::string FactorNode::trans() const {
-    if (this->kind == 1)
-        return this->num->trans();
-    else if (this->kind == 2)
-        return this->variable->trans();
-    else if (this->kind == 3)
-        return "(" + this->expression_list->trans() + ")";
-    else if (this->kind == 4)
-        return this->id->trans() + "(" + this->expression_list->trans() + ")";
-    else if (this->kind == 5) {
-        std::string op = this->not_uminus->trans();
-        return op + this->factor->trans();
-    }
-}
-
-std::string FactorNode::trans(Table t) const {
     if (this->kind == 1) {
         std::tuple<int, int, std::vector<int>> info = t.table[*num];
         std::string kind = "";
@@ -627,7 +554,7 @@ std::string FactorNode::trans(Table t) const {
         return before_space + after_space;
     }
     else if (this->kind == 4) {  //找到每一个空格，从空格开始到逗号前的部分都去掉
-        std::string expr_list = this->expression_list->trans(t);
+        std::string expr_list = this->expression_list->trans();
         size_t space_pos = expr_list.find(' ');
         while (space_pos != std::string::npos) {
             size_t del_pos = expr_list.find(',');
@@ -654,4 +581,5 @@ std::string FactorNode::trans(Table t) const {
         std::string op = this->not_uminus->trans();
         return op + this->factor->trans();
     }
+    return "";
 }

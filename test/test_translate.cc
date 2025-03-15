@@ -49,9 +49,28 @@ void test_VarDeclarationNode() {
     bool result = expected == actual;
     std::cout << "Result: " << (result ? "PASSED" : "FAILED") << std::endl;
 }
+//数组测试
+FinalNode num_8(Token("8", TokenType::Number));
+FinalNode num_1(Token("1", TokenType::Number));
+FinalNode b(Token("b", TokenType::Identifier));
+IdListNode id_a_b(&b, &id_a);
+PeriodNode period(&num_1, &num_8);
+BasicTypeNode basic_integer_array(&integer);
+TypeNode type_integer_array(&basic_integer_array, &period);
+VarDeclarationNode var_declaration_array(&id_a_b, &type_integer_array);
+void test_array_VarDeclarationNode() {
+    std::string expected = "int a[8];\nint b[8];\n";
+    std::string actual = var_declaration_array.trans();
+    std::cout << "Test VarDeclarationNode: \n";
+    std::cout << "Expected: " << expected << std::endl;
+    std::cout << "Actual: " << actual << std::endl;
+    bool result = expected == actual;
+    std::cout << "Result: " << (result ? "PASSED" : "FAILED") << std::endl;
+}
 int main() {
     test_FinalNode();
     test_StatementNode();
     test_VarDeclarationNode();
+    test_array_VarDeclarationNode();
     return 0;
 }
