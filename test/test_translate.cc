@@ -67,10 +67,58 @@ void test_array_VarDeclarationNode() {
     bool result = expected == actual;
     std::cout << "Result: " << (result ? "PASSED" : "FAILED") << std::endl;
 }
+//多维数组测试 array [1..8, 1..8] of integer
+PeriodNode period_2(&num_1, &num_8, &period);
+TypeNode type_integer_array_2(&basic_integer_array, &period_2);
+VarDeclarationNode var_declaration_array_2(&id_a_b, &type_integer_array_2);
+void test_array_VarDeclarationNode_2(){
+    std::string expected = "int a[8][8];\nint b[8][8];\n";
+    std::string actual = var_declaration_array_2.trans();
+    std::cout << "Test VarDeclarationNode: \n";
+    std::cout << "Expected: " << expected << std::endl;
+    std::cout << "Actual: " << actual << std::endl;
+    bool result = expected == actual;
+    std::cout << "Result: " << (result ? "PASSED" : "FAILED") << std::endl;
+}
+//函数声明测试 function f(a, b: integer): integer
+FinalNode f(Token("f", TokenType::Identifier));
+ValueParameterNode value_parameter(&id_a_b, &basic_integer);
+ParameterNode parameter(&value_parameter);
+ParameterListNode parameter_list(&parameter);
+FormalParameterNode formal_parameter(&parameter_list);
+SubprogramHeadNode subprogram_head(&f, &formal_parameter, &basic_integer);
+void test_subprogram_head(){
+    std::string expected = "int f(int a, int b)";
+    std::string actual = subprogram_head.trans();
+    std::cout << "Test SubprogramHeadNode: \n";
+    std::cout << "Expected: " << expected << std::endl;
+    std::cout << "Actual: " << actual << std::endl;
+    bool result = expected == actual;
+    std::cout << "Result: " << (result ? "PASSED" : "FAILED") << std::endl;
+}
+//过程声明&引用测试 procedure p(var a, b: integer)
+FinalNode p(Token("p", TokenType::Identifier));
+VarParameterNode var_parameter(&value_parameter);
+ParameterNode parameter_2(&var_parameter);
+ParameterListNode parameter_list_2(&parameter_2);
+FormalParameterNode formal_parameter_2(&parameter_list_2);
+SubprogramHeadNode subprogram_head_2(&p, &formal_parameter_2);
+void test_subprogram_head_2(){
+    std::string expected = "void p(int *a, int *b)";
+    std::string actual = subprogram_head_2.trans();
+    std::cout << "Test SubprogramHeadNode: \n";
+    std::cout << "Expected: " << expected << std::endl;
+    std::cout << "Actual: " << actual << std::endl;
+    bool result = expected == actual;
+    std::cout << "Result: " << (result ? "PASSED" : "FAILED") << std::endl;
+}
 int main() {
     test_FinalNode();
     test_StatementNode();
     test_VarDeclarationNode();
     test_array_VarDeclarationNode();
+    test_array_VarDeclarationNode_2();
+    test_subprogram_head();
+    test_subprogram_head_2();
     return 0;
 }

@@ -82,6 +82,10 @@ std::string ProgramBodyNode::trans() const{
 
 std::string IdListNode::trans(const std::string type, const std::string tmp, const std::string end, const std::vector<int> *dim, const bool is_cite) const{
     std::string res = "";
+    if (dim == nullptr){
+        std::vector<int> tmp;
+        dim = &tmp;
+    }
     if(this->id_list != nullptr){
         res += this->id_list->trans(type, tmp, end, dim, is_cite);
     }
@@ -209,8 +213,8 @@ std::string SubprogramDeclarationsNode::trans() const{
 
 std::string SubprogramNode::trans() const{
     std::string res = "";
-    res += this->subprogram_head->trans();
     Table tmp = t;
+    res += this->subprogram_head->trans();
     res += this->subprogram_body->trans();
     t = tmp;
     return res;
@@ -224,6 +228,7 @@ std::string SubprogramHeadNode::trans() const{
         res += this->basic_type->trans() + " ";
     }
     res += this->id->trans();
+    t.now_funcid = this->id;
     res += this->formal_parameter->trans();
     return res;
 }
@@ -265,11 +270,12 @@ std::string VarParameterNode::trans() const{
 
 std::string ValueParameterNode::trans(const bool is_ptr) const{
     std::string res = "";
-    std::string type = this->basic_type->trans();
+    std::string type = this->basic_type->trans() + " ";
     if (is_ptr){
         type += "*";
     }
-    res += this->id_list->trans(type, "", ", ", nullptr, is_ptr);
+    auto nulldim = std::vector<int>();
+    res += this->id_list->trans(type, "", ", ", &nulldim, is_ptr);
     res = res.substr(0, res.size() - 2);
     return res;
 }

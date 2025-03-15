@@ -248,11 +248,13 @@ class ParameterListNode : public AST {
 
 class ParameterNode : public AST { 
     public:
-        VarParameterNode *var_parameter;
-        ValueParameterNode *value_parameter;
+        VarParameterNode *var_parameter = nullptr;
+        ValueParameterNode *value_parameter = nullptr;
 
-        ParameterNode(VarParameterNode *var_parameter = nullptr, ValueParameterNode *value_parameter = nullptr) : AST(NodeType::parameter){
+        ParameterNode(VarParameterNode *var_parameter) : AST(NodeType::parameter){
             this->var_parameter = var_parameter;
+        }
+        ParameterNode(ValueParameterNode *value_parameter) : AST(NodeType::parameter){
             this->value_parameter = value_parameter;
         }
 
