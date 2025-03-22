@@ -34,6 +34,8 @@ class Token{
         bool operator<(const Token &t) const{
             return this->property < t.property;
         }
+
+        int to_yacc_token() const;
 };
 
 #endif
