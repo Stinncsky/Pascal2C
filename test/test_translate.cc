@@ -1,9 +1,4 @@
-#include "../translate.cc"
-#include <iostream>
-#include <iomanip>
-FinalNode a(Token("a", TokenType::Identifier));
-FinalNode integer(Token("integer", TokenType::Keyword));
-FinalNode num_3(Token("3", TokenType::Number));
+#include "test_translate_declaration.hh"
 
 void test_FinalNode() {
     std::string expected_a = "a";
@@ -20,13 +15,7 @@ void test_FinalNode() {
     bool result = expected_a == actual_a && expected_integer == actual_integer && expected_num == actual_num;
     std::cout << "Result: " << (result ? "PASSED" : "FAILED") << std::endl;
 }
-FactorNode factor_num(&num_3);
-TermNode term_num(&factor_num);
-SimpleExpressionNode Sexpression_num(&term_num);
-ExpressionNode expression_num(&Sexpression_num);
-IdVarpartNode id_varpart(nullptr);
-VariableNode variable_a(&a, &id_varpart);
-StatementNode statement_2(&variable_a, &expression_num);
+
 void test_StatementNode() {
     std::string expected = "a = 3;\n";
     std::string actual = statement_2.trans();
@@ -36,10 +25,7 @@ void test_StatementNode() {
     bool result = expected == actual;
     std::cout << "Result: " << (result ? "PASSED" : "FAILED") << std::endl;
 }
-BasicTypeNode basic_integer(&integer);
-TypeNode type_integer(&basic_integer);
-IdListNode id_a(&a);
-VarDeclarationNode var_declaration(&id_a, &type_integer);
+
 void test_VarDeclarationNode() {
     std::string expected = "int a;\n";
     std::string actual = var_declaration.trans();
@@ -50,14 +36,7 @@ void test_VarDeclarationNode() {
     std::cout << "Result: " << (result ? "PASSED" : "FAILED") << std::endl;
 }
 //数组测试
-FinalNode num_8(Token("8", TokenType::Number));
-FinalNode num_1(Token("1", TokenType::Number));
-FinalNode b(Token("b", TokenType::Identifier));
-IdListNode id_a_b(&b, &id_a);
-PeriodNode period(&num_1, &num_8);
-BasicTypeNode basic_integer_array(&integer);
-TypeNode type_integer_array(&basic_integer_array, &period);
-VarDeclarationNode var_declaration_array(&id_a_b, &type_integer_array);
+
 void test_array_VarDeclarationNode() {
     std::string expected = "int a[8];\nint b[8];\n";
     std::string actual = var_declaration_array.trans();
@@ -68,9 +47,7 @@ void test_array_VarDeclarationNode() {
     std::cout << "Result: " << (result ? "PASSED" : "FAILED") << std::endl;
 }
 //多维数组测试 array [1..8, 1..8] of integer
-PeriodNode period_2(&num_1, &num_8, &period);
-TypeNode type_integer_array_2(&basic_integer_array, &period_2);
-VarDeclarationNode var_declaration_array_2(&id_a_b, &type_integer_array_2);
+
 void test_array_VarDeclarationNode_2(){
     std::string expected = "int a[8][8];\nint b[8][8];\n";
     std::string actual = var_declaration_array_2.trans();
@@ -81,12 +58,7 @@ void test_array_VarDeclarationNode_2(){
     std::cout << "Result: " << (result ? "PASSED" : "FAILED") << std::endl;
 }
 //函数声明测试 function f(a, b: integer): integer
-FinalNode f(Token("f", TokenType::Identifier));
-ValueParameterNode value_parameter(&id_a_b, &basic_integer);
-ParameterNode parameter(&value_parameter);
-ParameterListNode parameter_list(&parameter);
-FormalParameterNode formal_parameter(&parameter_list);
-SubprogramHeadNode subprogram_head(&f, &formal_parameter, &basic_integer);
+
 void test_subprogram_head(){
     std::string expected = "int f(int a, int b)";
     std::string actual = subprogram_head.trans();
@@ -97,12 +69,7 @@ void test_subprogram_head(){
     std::cout << "Result: " << (result ? "PASSED" : "FAILED") << std::endl;
 }
 //过程声明&引用测试 procedure p(var a, b: integer)
-FinalNode p(Token("p", TokenType::Identifier));
-VarParameterNode var_parameter(&value_parameter);
-ParameterNode parameter_2(&var_parameter);
-ParameterListNode parameter_list_2(&parameter_2);
-FormalParameterNode formal_parameter_2(&parameter_list_2);
-SubprogramHeadNode subprogram_head_2(&p, &formal_parameter_2);
+
 void test_subprogram_head_2(){
     std::string expected = "void p(int *a, int *b)";
     std::string actual = subprogram_head_2.trans();

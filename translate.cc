@@ -80,26 +80,29 @@ std::string ProgramBodyNode::trans() const{
     return res;
 }
 
-std::string IdListNode::trans(const std::string type, const std::string tmp, const std::string end, const std::vector<int> *dim, const bool is_cite) const{
+std::string IdListNode::trans(const std::string type, const std::string tmp, const std::string end, const std::vector<int> *dim, const bool is_cite, std::vector<int> *func_p_is_cite) const{
     std::string res = "";
     if (dim == nullptr){
         std::vector<int> tmp;
         dim = &tmp;
     }
     if(this->id_list != nullptr){
-        res += this->id_list->trans(type, tmp, end, dim, is_cite);
+        res += this->id_list->trans(type, tmp, end, dim, is_cite, func_p_is_cite);
     }
     res += type + this->id->trans() + tmp + end;
     if (is_cite){
         auto info = t.table[*id];
-        info = std::make_tuple(std::get<0>(info), 1, std::get<2>(info));
+        info = std::make_tuple(std::get<0>(info), std::vector<int>(1,1), std::get<2>(info));
         t.table[*id] = info;
     } else if (type == "int " || type == "double "){
-        t.table[*(this->id)] = std::make_tuple(type == "int " ? 0 : 1, 0, *dim);
+        t.table[*(this->id)] = std::make_tuple(type == "int " ? 0 : 1, std::vector<int>(1,0), *dim);
     } else if (type == "char "){
-        t.table[*(this->id)] = std::make_tuple(2, 0, *dim);
+        t.table[*(this->id)] = std::make_tuple(2, std::vector<int>(1,0), *dim);
     } else if (type == "string "){
-        t.table[*(this->id)] = std::make_tuple(3, 0, *dim);
+        t.table[*(this->id)] = std::make_tuple(3, std::vector<int>(1,0), *dim);
+    }
+    if (func_p_is_cite != nullptr){
+        func_p_is_cite->push_back(is_cite);
     }
     return res;
 }
@@ -123,17 +126,17 @@ std::string ConstDeclarationNode::trans() const{
             res += "int ";
             type = 0;
         }
-        t.table[*(this->id)] = std::make_tuple(type, 0, std::vector<int>());
+        t.table[*(this->id)] = std::make_tuple(type, std::vector<int>(1,0), std::vector<int>());
         res += this->id->trans() + " = ";
         res += this->const_value->trans() + ";\n";
     } else if (this->const_value->numletter->token.type == TokenType::Char){
         res += "char ";
-        t.table[*(this->id)] = std::make_tuple(2, 0, std::vector<int>());
+        t.table[*(this->id)] = std::make_tuple(2, std::vector<int>(1,0), std::vector<int>());
         res += this->id->trans() + " = ";
         res += "\'" + this->const_value->trans() + "\';\n";
     } else if (this->const_value->numletter->token.type == TokenType::String){
         res += "char *";
-        t.table[*(this->id)] = std::make_tuple(3, 0, std::vector<int>());
+        t.table[*(this->id)] = std::make_tuple(3, std::vector<int>(1,0), std::vector<int>());
         res += this->id->trans() + " = ";
         res += "\"" + this->const_value->trans() + "\";\n";
     }
@@ -213,14 +216,17 @@ std::string SubprogramDeclarationsNode::trans() const{
 
 std::string SubprogramNode::trans() const{
     std::string res = "";
+    std::vector<int> func_p_is_cite;
     Table tmp = t;
-    res += this->subprogram_head->trans();
+    res += this->subprogram_head->trans(&func_p_is_cite);
+    FinalNode now_func = *t.now_funcid;
     res += this->subprogram_body->trans();
     t = tmp;
+    t.table[now_func] = std::make_tuple(-1, func_p_is_cite, std::vector<int>());
     return res;
 }
 
-std::string SubprogramHeadNode::trans() const{
+std::string SubprogramHeadNode::trans(std::vector<int> *func_p_is_cite) const{
     std::string res = "";
     if (this->basic_type == nullptr){
         res += "void ";
@@ -229,53 +235,54 @@ std::string SubprogramHeadNode::trans() const{
     }
     res += this->id->trans();
     t.now_funcid = this->id;
-    res += this->formal_parameter->trans();
+    res += this->formal_parameter->trans(func_p_is_cite);
     return res;
 }
 
-std::string FormalParameterNode::trans() const{
+std::string FormalParameterNode::trans(std::vector<int> *func_p_is_cite) const{
     std::string res = "(";
     if (this->parameter_list != nullptr){
-        res += this->parameter_list->trans();
+        res += this->parameter_list->trans(func_p_is_cite);
     }
     res += ")";
     return res;
 }
 
-std::string ParameterListNode::trans() const{
+std::string ParameterListNode::trans(std::vector<int> *func_p_is_cite) const{
     std::string res = "";
     if (this->parameter_list != nullptr){
-        res += this->parameter_list->trans();
+        res += this->parameter_list->trans(func_p_is_cite);
         res += ", ";
     }
-    res += this->parameter->trans();
+    res += this->parameter->trans(func_p_is_cite);
     return res;
 }
 
-std::string ParameterNode::trans() const{
+std::string ParameterNode::trans(std::vector<int> *func_p_is_cite) const{
     std::string res = "";
     if (this->var_parameter != nullptr){
-        res += this->var_parameter->trans();
+        res += this->var_parameter->trans(func_p_is_cite);
     } else if (this->value_parameter != nullptr){
-        res += this->value_parameter->trans();
+        res += this->value_parameter->trans(func_p_is_cite);
     }
+
     return res;
 }
 
-std::string VarParameterNode::trans() const{
+std::string VarParameterNode::trans(std::vector<int> *func_p_is_cite) const{
     std::string res = "";
-    res += this->value_parameter->trans(true);
+    res += this->value_parameter->trans(true, func_p_is_cite);
     return res;
 }
 
-std::string ValueParameterNode::trans(const bool is_ptr) const{
+std::string ValueParameterNode::trans(const bool is_ptr, std::vector<int> *func_p_is_cite) const{
     std::string res = "";
     std::string type = this->basic_type->trans() + " ";
     if (is_ptr){
         type += "*";
     }
     auto nulldim = std::vector<int>();
-    res += this->id_list->trans(type, "", ", ", &nulldim, is_ptr);
+    res += this->id_list->trans(type, "", ", ", &nulldim, is_ptr, func_p_is_cite);
     res = res.substr(0, res.size() - 2);
     return res;
 }
@@ -365,7 +372,7 @@ std::string VariableListNode::trans() const {
 }
 
 std::string VariableNode::trans() const {
-    std::tuple<int, int, std::vector<int>> info = t.table[*id];
+    std::tuple<int, std::vector<int>, std::vector<int>> info = t.table[*id];
     std::string res = "";
     if (std::get<0>(info) == 1) {
         res = "scanf(\"%d\", &";
@@ -425,7 +432,7 @@ std::string ProcedureCallNode::trans() const {
             expr_list = expr_list.erase(space_pos, del_pos - space_pos);
             space_pos = expr_list.find(' ');
         }
-        std::tuple<int, int, std::vector<int>> info = t.table[*id];
+        auto info = t.table[*id];
         std::string kind = "";
         if (std::get<0>(info) == 1) {
             kind = "%d";
@@ -525,7 +532,7 @@ std::string TermNode::trans() const {
 
 std::string FactorNode::trans() const {
     if (this->kind == 1) {
-        std::tuple<int, int, std::vector<int>> info = t.table[*num];
+        auto info = t.table[*num];
         std::string kind = "";
         if (std::get<0>(info) == 1) {
             kind = "%d";
@@ -536,7 +543,7 @@ std::string FactorNode::trans() const {
         return this->num->trans() + " " + kind;
     }
     else if (this->kind == 2) {
-        std::tuple<int, int, std::vector<int>> info = t.table[*id];
+        auto info = t.table[*id];
         std::string kind = "";
         if (std::get<0>(info) == 1) {
             kind = "%d";
@@ -567,7 +574,7 @@ std::string FactorNode::trans() const {
             expr_list = expr_list.erase(space_pos, del_pos - space_pos);
             space_pos = expr_list.find(' ');
         }
-        std::tuple<int, int, std::vector<int>> info = t.table[*id];
+        auto info = t.table[*id];
         std::string kind = "";
         if (std::get<0>(info) == 1) {
             kind = "%d";

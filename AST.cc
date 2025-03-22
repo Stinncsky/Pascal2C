@@ -74,7 +74,7 @@ class IdListNode : public AST {
             this->id_list = id_list;
         }
 
-        std::string trans(const std::string type, const std::string tmp = "", const std::string end = "", const std::vector<int> *dim = nullptr, const bool is_cite = false) const;
+        std::string trans(const std::string type, const std::string tmp = "", const std::string end = "", const std::vector<int> *dim = nullptr, const bool is_cite = false, std::vector<int> *func_p_is_cite = nullptr) const;
         std::string trans() const override { return trans("");} // 重载纯虚函数
 };
 
@@ -218,8 +218,8 @@ class SubprogramHeadNode : public AST {
             this->formal_parameter = formal_parameter;
             this->basic_type = basic_type;
         }
-
-        std::string trans() const override;
+        std::string trans(std::vector<int> *func_p_is_cite) const;
+        std::string trans() const override{return trans(nullptr);};
 };
 
 class FormalParameterNode : public AST { 
@@ -230,7 +230,8 @@ class FormalParameterNode : public AST {
             this->parameter_list = parameter_list;
         }
 
-        std::string trans() const override;
+        std::string trans(std::vector<int> *func_p_is_cite) const;
+        std::string trans() const override{return trans(nullptr);};
 };
 
 class ParameterListNode : public AST { 
@@ -243,7 +244,8 @@ class ParameterListNode : public AST {
             this->parameter_list = parameter_list;
         }
 
-        std::string trans() const override;
+        std::string trans(std::vector<int> *func_p_is_cite) const;
+        std::string trans() const override{return trans(nullptr);};
 };
 
 class ParameterNode : public AST { 
@@ -258,7 +260,8 @@ class ParameterNode : public AST {
             this->value_parameter = value_parameter;
         }
 
-        std::string trans() const override;
+        std::string trans(std::vector<int> *func_p_is_cite) const;
+        std::string trans() const override{return trans(nullptr);};
 };
 
 class VarParameterNode : public AST { 
@@ -269,7 +272,8 @@ class VarParameterNode : public AST {
             this->value_parameter = value_parameter;
         }
 
-        std::string trans() const override;
+        std::string trans(std::vector<int> *func_p_is_cite) const;
+        std::string trans() const override{return trans(nullptr);}
 };
 
 class ValueParameterNode : public AST { 
@@ -282,7 +286,7 @@ class ValueParameterNode : public AST {
             this->basic_type = basic_type;
         }
 
-        std::string trans(const bool is_ptr) const;
+        std::string trans(const bool is_ptr, std::vector<int> *func_p_is_ptr = nullptr) const;
         std::string trans() const override {return trans(false);} // 重载纯虚函数
 };
 
