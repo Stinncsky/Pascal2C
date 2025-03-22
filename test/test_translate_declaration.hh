@@ -13,12 +13,17 @@ FinalNode integer(Token("integer", TokenType::Keyword)); // Keyword 'integer'
 FinalNode num_1(Token("1", TokenType::Number));        // Numeric constant '1'
 FinalNode num_3(Token("3", TokenType::Number));        // Numeric constant '3'
 FinalNode num_8(Token("8", TokenType::Number));        // Numeric constant '8'
+FinalNode minus(Token("-", TokenType::Operator));      // Operator '-'
+FinalNode plus(Token("+", TokenType::Operator));       // Operator '+'
+FinalNode b_char(Token("b", TokenType::Char));         // Character 'b'
 
 // Expression components
 FactorNode factor_num_3(&num_3);                         // Factor containing value 3
 TermNode term_num_3(&factor_num_3);                        // Term containing factor with value 3
 SimpleExpressionNode Sexpression_num_3(&term_num_3);       // Simple expression with term value 3
 ExpressionNode expression_num(&Sexpression_num_3);       // Expression with value 3
+ConstValueNode const_value_num_3(&num_3, &minus);        // Constant value node with value -3
+ConstValueNode const_value_char_b(&b_char);              // Constant value node with value 'b'
 
 // Variable related nodes
 IdVarpartNode id_varpart(nullptr);                     // Empty variable part
@@ -42,6 +47,10 @@ IdListNode id_a_b(&b, &id_a);                          // Identifier list contai
 VarDeclarationNode var_declaration(&id_a, &type_integer); // Variable declaration 'a: integer'
 VarDeclarationNode var_declaration_array(&id_a_b, &type_integer_array); // Variable declaration 'b, a: array[1..8] of integer'
 VarDeclarationNode var_declaration_array_2(&id_a_b, &type_integer_array_2); // Variable declaration 'b, a: array[1..8, 1..8] of integer'
+ConstDeclarationNode const_declaration_a(&a, &const_value_num_3); // Constant declaration 'a = -3'
+ConstDeclarationsNode const_declarations_1(&const_declaration_a); // Constant declarations node
+ConstDeclarationNode const_declaration_a_b(&b, &const_value_char_b, &const_declaration_a); // Constant declaration 'b = 'b'; a = -3'
+ConstDeclarationsNode const_declarations_2(&const_declaration_a_b);// Constant declarations node 'const b = 'b'; a = -3'
 
 // Parameter related nodes
 ValueParameterNode value_parameter(&id_a_b, &basic_integer); // Value parameter 'b, a: integer'
