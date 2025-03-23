@@ -40,8 +40,8 @@ void Program::run(){
     yydebug = 1;
     if(yyparse() == 0)  {
         // 语法分析成功
-        if(syntaxAnalyzer.tree != nullptr) {
-            tree_root = syntaxAnalyzer.tree;
+        if(syntax->tree != nullptr) {
+            tree_root = syntax->tree;
             std::cout << dynamic_cast<ProgramStructNode *>(tree_root)->trans() << std::endl;
 
             printf("Success: 语法分析成功\n");

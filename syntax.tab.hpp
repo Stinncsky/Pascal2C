@@ -58,7 +58,7 @@ extern int yydebug;
     Number = 259,                  /* Number  */
     String_var = 260,              /* String_var  */
     Char_var = 261,                /* Char_var  */
-    Program = 262,                 /* Program  */
+    ProgramKey = 262,              /* ProgramKey  */
     Const = 263,                   /* Const  */
     Var = 264,                     /* Var  */
     Array = 265,                   /* Array  */
@@ -77,17 +77,20 @@ extern int yydebug;
     Write = 278,                   /* Write  */
     Else = 279,                    /* Else  */
     Booltype = 280,                /* Booltype  */
-    bool_Operator = 281,           /* bool_Operator  */
-    Operator = 282,                /* Operator  */
-    Semi = 283,                    /* Semi  */
-    Dot = 284,                     /* Dot  */
-    Lparen = 285,                  /* Lparen  */
-    Rparen = 286,                  /* Rparen  */
-    Lbra = 287,                    /* Lbra  */
-    Rbra = 288,                    /* Rbra  */
-    Colon = 289,                   /* Colon  */
-    Comma = 290,                   /* Comma  */
-    Null = 291                     /* Null  */
+    Relop = 281,                   /* Relop  */
+    Mulop = 282,                   /* Mulop  */
+    Addop = 283,                   /* Addop  */
+    Assignop = 284,                /* Assignop  */
+    Dotdot = 285,                  /* Dotdot  */
+    Semi = 286,                    /* Semi  */
+    Dot = 287,                     /* Dot  */
+    Lparen = 288,                  /* Lparen  */
+    Rparen = 289,                  /* Rparen  */
+    Lbra = 290,                    /* Lbra  */
+    Rbra = 291,                    /* Rbra  */
+    Colon = 292,                   /* Colon  */
+    Comma = 293,                   /* Comma  */
+    Null = 294                     /* Null  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
@@ -101,7 +104,7 @@ union YYSTYPE
     Token* token;
     AST* ast;
 
-#line 105 "syntax.tab.hpp"
+#line 108 "syntax.tab.hpp"
 
 };
 typedef union YYSTYPE YYSTYPE;

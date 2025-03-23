@@ -25,7 +25,7 @@
     AST* ast;
 }
 // **声明终结符**
-%token <token>     Identifier Number String_var Char_var Program Const Var Array Of Basictype Procedure Function Begin End If Then For To Do Read Write Else Booltype bool_Operator Operator Semi Dot Lparen Rparen Lbra Rbra Colon Comma Null 
+%token <token> Identifier Number String_var Char_var ProgramKey Const Var Array Of Basictype Procedure Function Begin End If Then For To Do Read Write Else Booltype Relop Mulop Addop Assignop Dotdot Semi Dot Lparen Rparen Lbra Rbra Colon Comma Null 
 
 
 // **声明非终结符**
@@ -46,10 +46,10 @@ ProgramStructNode: ProgramHeadNode Semi ProgramBodyNode Dot {
 };
 
 
-ProgramHeadNode: Program Identifier {
+ProgramHeadNode: ProgramKey Identifier {
     FinalNode* id = new FinalNode(*$2);
     $$ = new ProgramHeadNode(id);
-} | Program Identifier Lparen IdListNode Rparen {
+} | ProgramKey Identifier Lparen IdListNode Rparen {
     FinalNode* id = new FinalNode(*$2);
     $$ = new ProgramHeadNode(id, dynamic_cast<IdListNode*>($4));
 } 
@@ -80,7 +80,7 @@ ConstDeclarationsNode:
     }
 
 
-ConstDeclarationNode: Identifier Operator ConstValueNode {
+ConstDeclarationNode: Identifier Relop ConstValueNode {
     if($2->property == "=") {
         FinalNode* id = new FinalNode(*$1);
         $$ = new ConstDeclarationNode(id, dynamic_cast<ConstValueNode*>($3));
@@ -90,7 +90,7 @@ ConstDeclarationNode: Identifier Operator ConstValueNode {
         YYERROR;
     }
 }
-| ConstDeclarationNode Semi Identifier Operator ConstValueNode {
+| ConstDeclarationNode Semi Identifier Relop ConstValueNode {
     if($4->property == "=") {
         FinalNode* id = new FinalNode(*$3);
         $$ = new ConstDeclarationNode(id, dynamic_cast<ConstValueNode*>($5), dynamic_cast<ConstDeclarationNode*>($1));
@@ -101,10 +101,15 @@ ConstDeclarationNode: Identifier Operator ConstValueNode {
     }
 }
 
-ConstValueNode: Operator Number {
-    FinalNode* op = new FinalNode(*$1);
-    FinalNode* num = new FinalNode(*$2);
-    $$ = new ConstValueNode(op,num);
+ConstValueNode: Addop Number {
+    if($1->property == "+" || $1->property == "-") {
+        FinalNode* op = new FinalNode(*$1);
+        FinalNode* num = new FinalNode(*$2);
+        $$ = new ConstValueNode(op,num);
+    } else {
+        yyerror("Expected '+' or '-'");
+        YYERROR;
+    }
 } | Number {
     FinalNode* num = new FinalNode(*$1);
     $$ = new ConstValueNode(num);
@@ -156,7 +161,7 @@ BasicTypeNode:
         }
     }
 
-PeriodNode: Number Operator Number {
+PeriodNode: Number Dotdot Number {
     if($2->property == "..") {
         FinalNode* id1 = new FinalNode(*$1);
         FinalNode* id2 = new FinalNode(*$3);
@@ -166,7 +171,7 @@ PeriodNode: Number Operator Number {
         yyerror("Expected '..' operator");
         YYERROR;
     }
-}| Char_var Operator Char_var {
+}| Char_var Dotdot Char_var {
     if($2->property == "..") {
         FinalNode* id1 = new FinalNode(*$1);
         FinalNode* id2 = new FinalNode(*$3);
@@ -176,7 +181,7 @@ PeriodNode: Number Operator Number {
         yyerror("Expected '..' operator");
         YYERROR;
     }
-} | PeriodNode Comma Number Operator Number {
+} | PeriodNode Comma Number Dotdot Number {
     if($4->property == ".." && $2->property == ",") {
         FinalNode* id1 = new FinalNode(*$3);
         FinalNode* id2 = new FinalNode(*$5);
@@ -186,7 +191,7 @@ PeriodNode: Number Operator Number {
         yyerror("Expected '..' or ',' operator");
         YYERROR;
     }
-} | PeriodNode Comma Char_var Operator Char_var {
+} | PeriodNode Comma Char_var Dotdot Char_var {
     if($4->property == ".." && $2->property == ",") {
         FinalNode* id1 = new FinalNode(*$3);
         FinalNode* id2 = new FinalNode(*$5);
@@ -268,7 +273,7 @@ StatementListNode: StatementNode {
 
 StatementNode: {
     $$ = new StatementNode();
-} | VariableNode Operator ExpressionNode {
+} | VariableNode Assignop ExpressionNode {
     if($2->property == ":="){
         $$ = new StatementNode(dynamic_cast<VariableNode*>($1), dynamic_cast<ExpressionNode*>($3));
     }
@@ -276,7 +281,7 @@ StatementNode: {
         yyerror("Expected ':=' operator");
         YYERROR;
     }
-} | Identifier Operator ExpressionNode {
+} | Identifier Assignop ExpressionNode {
     if($2->property == ":="){
         FinalNode* id = new FinalNode(*$1);
         $$ = new StatementNode(id, dynamic_cast<ExpressionNode*>($3));
@@ -291,7 +296,7 @@ StatementNode: {
     $$ = new StatementNode(dynamic_cast<CompoundStatementNode*>($1));
 } | If ExpressionNode Then StatementNode ElsePartNode {
     $$ = new StatementNode(dynamic_cast<ExpressionNode*>($2), dynamic_cast<StatementNode*>($4), dynamic_cast<ElsePartNode*>($5));
-} | For Identifier Operator ExpressionNode To ExpressionNode Do StatementNode {
+} | For Identifier Assignop ExpressionNode To ExpressionNode Do StatementNode {
     if($3->property == ":="){
         FinalNode* id = new FinalNode(*$2);
         $$ = new StatementNode(id, dynamic_cast<ExpressionNode*>($4), dynamic_cast<ExpressionNode*>($6), dynamic_cast<StatementNode*>($8));
@@ -347,30 +352,21 @@ ExpressionListNode: ExpressionNode {
 
 ExpressionNode: SimpleExpressionNode {
     $$ = new ExpressionNode(dynamic_cast<SimpleExpressionNode*>($1));
-} | SimpleExpressionNode Operator SimpleExpressionNode {
-    FinalNode* id = new FinalNode(*$2);
-    $$ = new ExpressionNode(dynamic_cast<SimpleExpressionNode*>($1), id, dynamic_cast<SimpleExpressionNode*>($3));
-} | SimpleExpressionNode bool_Operator SimpleExpressionNode {
+} | SimpleExpressionNode Relop SimpleExpressionNode {
     FinalNode* id = new FinalNode(*$2);
     $$ = new ExpressionNode(dynamic_cast<SimpleExpressionNode*>($1), id, dynamic_cast<SimpleExpressionNode*>($3));
 }
 
 SimpleExpressionNode: TermNode {
     $$ = new SimpleExpressionNode(dynamic_cast<TermNode*>($1));
-} | SimpleExpressionNode Operator TermNode {
-    FinalNode* op = new FinalNode(*$2);
-    $$ = new SimpleExpressionNode(dynamic_cast<TermNode*>($3), dynamic_cast<SimpleExpressionNode*>($1), op);
-} | SimpleExpressionNode bool_Operator TermNode {
+} | SimpleExpressionNode Addop TermNode {
     FinalNode* op = new FinalNode(*$2);
     $$ = new SimpleExpressionNode(dynamic_cast<TermNode*>($3), dynamic_cast<SimpleExpressionNode*>($1), op);
 }
 
 TermNode: FactorNode {
     $$ = new TermNode(dynamic_cast<FactorNode*>($1));
-} | TermNode Operator FactorNode {
-    FinalNode* op = new FinalNode(*$2);
-    $$ = new TermNode(dynamic_cast<FactorNode*>($3), dynamic_cast<TermNode*>($1), op);
-} | TermNode bool_Operator FactorNode {
+} | TermNode Mulop FactorNode {
     FinalNode* op = new FinalNode(*$2);
     $$ = new TermNode(dynamic_cast<FactorNode*>($3), dynamic_cast<TermNode*>($1), op);
 }
@@ -385,7 +381,7 @@ FactorNode: Number {
 } | Identifier Lparen ExpressionListNode Rparen {
     FinalNode* id = new FinalNode(*$1);
     $$ = new FactorNode(id, dynamic_cast<ExpressionListNode*>($3));
-} | bool_Operator FactorNode {
+} | Relop FactorNode {
     if($1->property == "not"){
         FinalNode* id = new FinalNode(*$1);
         $$ = new FactorNode(id, dynamic_cast<FactorNode*>($2));
@@ -394,10 +390,19 @@ FactorNode: Number {
         yyerror("Expected 'not' keyword");
         YYERROR;
     }
-} | Operator FactorNode {
-    FinalNode* op = new FinalNode(*$1);
-    $$ = new FactorNode(op,dynamic_cast<FactorNode*>($2));
-} 
+} | Addop FactorNode {
+    if($1->property == "-"){
+        FinalNode* op = new FinalNode(*$1);
+        $$ = new FactorNode(op,dynamic_cast<FactorNode*>($2));
+    }
+    else {
+        yyerror("Expected '-'");
+        YYERROR;
+    }
+} | Booltype {
+    FinalNode* id = new FinalNode(*$1);
+    $$ = new FactorNode(id);
+}
 
 
 
@@ -409,7 +414,7 @@ int yylex() {
     Token* current = &tokens[tokenIndex];
     yylval.token = current;
 
-    // 将词法分析器的 TokenType 数值 +258 转换为 Bison 的数值
+    // 将词法分析器的 TokenType 数值(1..n) +257 转换为 Bison 的数值
     int bison_type = current->to_yacc_token() + 257;
     tokenIndex++;
     return bison_type;

@@ -324,8 +324,12 @@ std::string StatementNode::trans() const {
         exp = exp.substr(0, space_pos);
         return var + " = " + exp + ";\n";
     }
-    else if (this->kind == 3)
-        return "return " + this->expression->trans() + ";\n";
+    else if (this->kind == 3){
+        if(*(this->id) == *(t.now_funcid))
+            return "return " + this->expression->trans() + ";\n";
+        else
+            return this->id->trans() + " = " + this->expression->trans() + ";\n";
+    }
     else if (this->kind == 4)
         return this->procedure_call->trans() + ";\n";
     else if (this->kind == 5)

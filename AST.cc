@@ -477,8 +477,8 @@ class ExpressionListNode : public AST {
 class ExpressionNode : public AST { 
     public:
         SimpleExpressionNode *simple_expression;
-        FinalNode *relop;
-        SimpleExpressionNode *simple_expression_2;
+        FinalNode *relop = nullptr;
+        SimpleExpressionNode *simple_expression_2 = nullptr;
 
         ExpressionNode(SimpleExpressionNode *simple_expression) : AST(NodeType::expression){
             this->simple_expression = simple_expression;
