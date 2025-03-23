@@ -28,20 +28,4 @@ enum class NumState {
     START, INTEGER, FRACTION_START, FRACTION
 };
 
-bool is_keyword(std::string word){ // Pascal-S
-    std::vector<std::string> keywords = {
-        "and", "array", "begin", "case", "const", "div", "do", "downto", "else", "end", "file", 
-        "for", "function", "goto", "if", "in", "label", "mod", "nil", "not", "of", "or", "packed", "procedure", 
-        "program", "record", "repeat", "set", "then", "to", "type", "until", "var", "while", "with",
-        "integer", "real", "char", "boolean", "string", "true", "false",
-        "read", "write", "writeln", "readln"
-    };
-    for(auto keyword : keywords){
-        if(word == keyword){
-            return true;
-        }
-    }
-    return false;
-}
-
 #endif

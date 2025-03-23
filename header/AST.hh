@@ -55,9 +55,9 @@ class AST {
 };
 
 class FinalNode;
-class ProgramStructNode;
 class ProgramHeadNode;
 class ProgramBodyNode;
+class ProgramStructNode;
 class IdListNode;
 class ConstDeclarationsNode;
 class VarDeclarationsNode;

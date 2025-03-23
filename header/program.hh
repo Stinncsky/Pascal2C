@@ -7,7 +7,7 @@
 class Program {
     private:
         std::string pascal_code, c_code;
-        std::vector<Token> tokens;
+        //std::vector<Token> tokens;
         AST* tree_root;
         Lexical lexicalAnalyzer;
         Syntax syntaxAnalyzer;

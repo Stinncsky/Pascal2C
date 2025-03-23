@@ -1,6 +1,22 @@
 #include "header/lexical.hh"
 #include <cctype>
 
+bool is_keyword(std::string word){ // Pascal-S
+    std::vector<std::string> keywords = {
+        "and", "array", "begin", "case", "const", "div", "do", "downto", "else", "end", "file", 
+        "for", "function", "goto", "if", "in", "label", "mod", "nil", "not", "of", "or", "packed", "procedure", 
+        "program", "record", "repeat", "set", "then", "to", "type", "until", "var", "while", "with",
+        "integer", "real", "char", "boolean", "string", "true", "false",
+        "read", "write", "writeln", "readln"
+    };
+    for(auto keyword : keywords){
+        if(word == keyword){
+            return true;
+        }
+    }
+    return false;
+}
+
 void Lexical::run() {
     int line_number = 1;  // 当前行号
     int column_number = 1;  // 当前列号
@@ -425,4 +441,5 @@ int Token::to_yacc_token() const {
             else if(this->property == ",") return 33;
         case TokenType::Null: return 34;
     }
+    return 34;
 }

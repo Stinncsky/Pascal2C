@@ -493,7 +493,7 @@ std::string ProcedureCallNode::trans() const {
         std::string res = this->id->trans() + "(";
         std::vector<int> cites = std::get<1>(t.table[*this->id]);
         int arg_num = cites.size();
-        std::string expr_list = this->expression_list->trans();
+        expr_list = this->expression_list->trans();
         int k = 0; // 正在判断第k个expression要不要加*
         size_t del_pos = expr_list.find(",");
         while(del_pos != std::string::npos) {
@@ -674,7 +674,7 @@ std::string FactorNode::trans() const {
         std::string res = this->id->trans() + "(";
         std::vector<int> cites = std::get<1>(t.table[*this->id]);
         int arg_num = cites.size();
-        std::string expr_list = this->expression_list->trans();
+        expr_list = this->expression_list->trans();
         int k = 0; // 正在判断第k个expression要不要加*
         size_t del_pos = expr_list.find(",");
         while(del_pos != std::string::npos) {
