@@ -375,7 +375,7 @@ std::string StatementNode::trans() const {
         std::string res = "";
         for (int i = 0; i < n; i++) {
             if (kind[i] != "%s")
-                res += "scanf(" + kind[i] + ", &" + var[i] + ");\n";
+                res += "scanf(\"" + kind[i] + "\", &" + var[i] + ");\n";
             else
                 res += "scanf(\"%s\", " + var[i] + ");\n";
         }
@@ -401,7 +401,7 @@ std::string StatementNode::trans() const {
         int n = expr.size();
         std::string res = "";
         for (int i = 0; i < n; i++) {
-            res += "printf(" + kind[i] + ", " + expr[i] + ");\n";
+            res += "printf(\"" + kind[i] + "\", " + expr[i] + ");\n";
         }
         return res;
     }
