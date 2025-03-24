@@ -297,8 +297,9 @@ std::string SubprogramBodyNode::trans() const {
         return "";
 }
 std::string CompoundStatementNode::trans() const {
-    if (this->statement_list->trans() != "")
-        return "{\n" + this->statement_list->trans() + "}\n";
+    std::string state_ls_str = this->statement_list->trans();
+    if (state_ls_str != "")
+        return "{\n" + state_ls_str + "}\n";
     else
         return "";
 }
@@ -325,10 +326,19 @@ std::string StatementNode::trans() const {
         return var + " = " + exp + ";\n";
     }
     else if (this->kind == 3){
-        if(t.now_funcid != nullptr && *(this->id) == *(t.now_funcid))
-            return "return " + this->expression->trans() + ";\n";
-        else
-            return this->id->trans() + " = " + this->expression->trans() + ";\n";
+        if(t.now_funcid != nullptr && *(this->id) == *(t.now_funcid)) {
+            std::string exp = this->expression->trans();
+            size_t space_pos = exp.find(' ');
+            exp = exp.substr(0, space_pos);
+            return "return " + exp + ";\n";
+        }
+        else {
+            std::string id_str = this->id->trans();
+            std::string exp = this->expression->trans();
+            size_t space_pos = exp.find(' ');
+            exp = exp.substr(0, space_pos);
+            return id_str + " = " + exp + ";\n";
+        }
     }
     else if (this->kind == 4)
         return this->procedure_call->trans() + ";\n";
@@ -415,19 +425,19 @@ std::string VariableListNode::trans() const {
 std::string VariableNode::trans() const {
     auto info = t.table[*id];
     std::string res = this->id->trans();
-    if (std::get<0>(info) == 1) {
+    if (std::get<0>(info) == 0) {
         // res = "scanf(\"%d\", &";
         res += " %d";
     }
-    else if (std::get<0>(info) == 2) {
+    else if (std::get<0>(info) == 1) {
         // res = "scanf(\"%lf\", &";
         res += " %lf";
     }
-    else if (std::get<0>(info) == 3) {
+    else if (std::get<0>(info) == 2) {
         // res = "scanf(\"%c\", &";
         res += " %c";
     }
-    else if (std::get<0>(info) == 4) {
+    else if (std::get<0>(info) == 3) {
         // res = "scanf(\"%s\", ";
         res += " %s";
     }
@@ -482,16 +492,16 @@ std::string ProcedureCallNode::trans() const {
         }
         auto info = t.table[*id];
         std::string kind = "";
-        if (std::get<0>(info) == 1) {
+        if (std::get<0>(info) == 0) {
             kind = "%d";
         }
-        else if (std::get<0>(info) == 2) {
+        else if (std::get<0>(info) == 1) {
             kind = "%lf";
         }
-        else if (std::get<0>(info) == 3) {
+        else if (std::get<0>(info) == 2) {
             kind = "%c";
         }
-        else if (std::get<0>(info) == 4) {
+        else if (std::get<0>(info) == 3) {
             kind = "%s";
         }
         std::string res = this->id->trans() + "(";
@@ -632,32 +642,16 @@ std::string TermNode::trans() const {
 
 std::string FactorNode::trans() const {
     if (this->kind == 1) {
-        auto info = t.table[*num];
+        std::string num_str = this->num->trans();
         std::string kind = "";
-        if (std::get<0>(info) == 1) {
-            kind = "%d";
-        }
-        else if (std::get<0>(info) == 2) {
+        if (num_str.find('.') != std::string::npos)
             kind = "%lf";
-        }
-        return this->num->trans() + " " + kind; // eg: "1 %d"
+        else
+            kind = "%d";
+        return num_str + " " + kind; // eg: "1 %d"
     }
     else if (this->kind == 2) {
-        auto info = t.table[*id];
-        std::string kind = "";
-        if (std::get<0>(info) == 1) {
-            kind = "%d";
-        }
-        else if (std::get<0>(info) == 2) {
-            kind = "%lf";
-        }
-        else if (std::get<0>(info) == 3) {
-            kind = "%c";
-        }
-        else if (std::get<0>(info) == 4) {
-            kind = "%s";
-        }
-        return this->id->trans() + " " + kind; // eg: "a %d"
+        return this->variable->trans(); // eg: "a %d"
     }
     else if (this->kind == 3) {
         std::string expr = this->expression->trans();
@@ -708,16 +702,16 @@ std::string FactorNode::trans() const {
         // 判断函数返回值类型
         auto info = t.table[*id];
         std::string kind = "";
-        if (std::get<0>(info) == 1) {
+        if (std::get<0>(info) == 0) {
             kind = "%d";
         }
-        else if (std::get<0>(info) == 2) {
+        else if (std::get<0>(info) == 1) {
             kind = "%lf";
         }
-        else if (std::get<0>(info) == 3) {
+        else if (std::get<0>(info) == 2) {
             kind = "%c";
         }
-        else if (std::get<0>(info) == 4) {
+        else if (std::get<0>(info) == 3) {
             kind = "%s";
         }
         return res + expr_list + ")" + kind; // eg: f(a,&b)%d
