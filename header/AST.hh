@@ -51,6 +51,7 @@ class AST {
         AST(NodeType type = NodeType::Final){
             this->type = type;
         }
+        ~AST() = default;
         virtual std::string trans() const = 0;
 };
 

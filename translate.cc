@@ -326,7 +326,7 @@ std::string StatementNode::trans() const {
         return var + " = " + exp + ";\n";
     }
     else if (this->kind == 3){
-        if(*(this->id) == *(t.now_funcid)) {
+        if(t.now_funcid != nullptr && *(this->id) == *(t.now_funcid)) {
             std::string exp = this->expression->trans();
             size_t space_pos = exp.find(' ');
             exp = exp.substr(0, space_pos);
