@@ -4,6 +4,11 @@
 #include "token.hh"
 #include "AST.hh"
 
-class Syntax {};
+int yyparse();
+
+class Syntax {
+public:
+    AST* tree;
+};
 
 #endif

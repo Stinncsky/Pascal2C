@@ -1,6 +1,22 @@
 #include "header/lexical.hh"
 #include <cctype>
 
+bool is_keyword(std::string word){ // Pascal-S
+    std::vector<std::string> keywords = {
+        "and", "array", "begin", "case", "const", "div", "do", "downto", "else", "end", "file", 
+        "for", "function", "goto", "if", "in", "label", "mod", "nil", "not", "of", "or", "packed", "procedure", 
+        "program", "record", "repeat", "set", "then", "to", "type", "until", "var", "while", "with",
+        "integer", "real", "char", "boolean", "string", "true", "false",
+        "read", "write", "writeln", "readln"
+    };
+    for(auto keyword : keywords){
+        if(word == keyword){
+            return true;
+        }
+    }
+    return false;
+}
+
 void Lexical::run() {
     int line_number = 1;  // 当前行号
     int column_number = 1;  // 当前列号
@@ -383,4 +399,52 @@ void Lexical::run() {
             temp_token.clear();
         }
     }
+}
+
+int Token::to_yacc_token() const {
+    switch(this->type){
+        case TokenType::Identifier: return 1;
+        case TokenType::Number: return 2;
+        case TokenType::String: return 3;
+        case TokenType::Char: return 4;
+        case TokenType::Keyword: 
+            if(this->property == "program") return 5;
+            else if(this->property == "const") return 6;
+            else if(this->property == "var") return 7;
+            else if(this->property == "array") return 8;
+            else if(this->property == "of") return 9;
+            else if(this->property == "integer" || this->property == "real" || this->property == "boolean" || this->property == "char") return 10;
+            else if(this->property == "procedure") return 11;
+            else if(this->property == "function") return 12;
+            else if(this->property == "begin") return 13;
+            else if(this->property == "end") return 14;
+            else if(this->property == "if") return 15;
+            else if(this->property == "then") return 16;
+            else if(this->property == "for") return 17;
+            else if(this->property == "to") return 18;
+            else if(this->property == "do") return 19;
+            else if(this->property == "read") return 20;
+            else if(this->property == "write") return 21;
+            else if(this->property == "else") return 22;
+            else if(this->property == "true" || this->property == "false") return 23;
+            else if(this->property == "not" || this->property == "or" || this->property == "and") return 24;
+            else if(this->property == "div" || this->property == "mod") return 25;
+        case TokenType::Operator: 
+            if(this->property == "*" || this->property == "/") return 25;
+            else if(this->property == "+" || this->property == "-") return 26;
+            else if(this->property == "<" || this->property == "<=" || this->property == ">" || this->property == ">=" || this->property == "=" || this->property == "<>") return 24;
+            else if(this->property == ":=") return 27;
+            else if(this->property == "..") return 28;
+        case TokenType::Delimiters: 
+            if(this->property == ";") return 29;
+            else if(this->property == ".") return 30;
+            else if(this->property == "(") return 31;
+            else if(this->property == ")") return 32;
+            else if(this->property == "[") return 33;
+            else if(this->property == "]") return 34;
+            else if(this->property == ":") return 35;
+            else if(this->property == ",") return 36;
+        case TokenType::Null: return 36;
+    }
+    return 36;
 }

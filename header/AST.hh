@@ -51,13 +51,14 @@ class AST {
         AST(NodeType type = NodeType::Final){
             this->type = type;
         }
+        ~AST() = default;
         virtual std::string trans() const = 0;
 };
 
 class FinalNode;
-class ProgramStructNode;
 class ProgramHeadNode;
 class ProgramBodyNode;
+class ProgramStructNode;
 class IdListNode;
 class ConstDeclarationsNode;
 class VarDeclarationsNode;
