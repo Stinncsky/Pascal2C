@@ -5,7 +5,7 @@
 
 Syntax* syntax = nullptr;
 std::vector<Token> tokens;
-int tokenIndex = 0;   
+int tokenIndex = 0;
 
 void set_parameter(int argc, char *argv[]) {
     for (int i = 0; i < argc; i++) {
@@ -24,6 +24,7 @@ int main(int argc, char *argv[]) {
     Program program;
     program.run();
 
+    delete syntax;
     return 0;
 }
 

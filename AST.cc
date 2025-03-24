@@ -9,6 +9,7 @@ class FinalNode : public AST { // 终结符节点
         FinalNode(Token token) : AST(NodeType::Final){
             this->token = token;
         }
+        ~FinalNode() = default;
 
         bool operator==(const FinalNode &f) const{
             return this->token == f.token;
@@ -30,6 +31,7 @@ class ProgramStructNode : public AST {
             this->program_head = program_head;
             this->program_body = program_body;
         }
+        ~ProgramStructNode();
 
         std::string trans() const override;
 };
@@ -43,6 +45,7 @@ class ProgramHeadNode : public AST {
             this->id = id;
             this->id_list = id_list;
         }
+        ~ProgramHeadNode();
 
         std::string trans() const override;
 };
@@ -60,6 +63,7 @@ class ProgramBodyNode : public AST {
             this->subprogram_declarations = subprogram_declarations;
             this->compound_statement = compound_statement;
         }
+        ~ProgramBodyNode();
 
         std::string trans() const override;
 };
@@ -73,6 +77,7 @@ class IdListNode : public AST {
             this->id = id;
             this->id_list = id_list;
         }
+        ~IdListNode();
 
         std::string trans(const std::string type, const std::string tmp = "", const std::string end = "", const std::vector<int> *dim = nullptr, const bool is_cite = false, std::vector<int> *func_p_is_cite = nullptr) const;
         std::string trans() const override { return trans("");} // 重载纯虚函数
@@ -85,6 +90,7 @@ class ConstDeclarationsNode : public AST {
         ConstDeclarationsNode(ConstDeclarationNode *const_declaration = nullptr) : AST(NodeType::const_declarations){
             this->const_declaration = const_declaration;
         }
+        ~ConstDeclarationsNode();
 
         std::string trans() const override;
 };
@@ -100,6 +106,7 @@ class ConstDeclarationNode : public AST {
             this->const_value = const_value;
             this->const_declaration = const_declaration;
         }
+        ~ConstDeclarationNode();
 
         std::string trans() const override;
 };
@@ -113,6 +120,7 @@ class ConstValueNode : public AST {
             this->op = op;
             this->numletter = numletter;
         }
+        ~ConstValueNode();
 
         std::string trans() const override;
 };
@@ -124,6 +132,7 @@ class VarDeclarationsNode : public AST {
         VarDeclarationsNode(VarDeclarationNode *var_declaration = nullptr) : AST(NodeType::var_declarations){
             this->var_declaration = var_declaration;
         }
+        ~VarDeclarationsNode();
 
         std::string trans() const override;
 };
@@ -139,6 +148,7 @@ class VarDeclarationNode : public AST {
             this->type = type;
             this->var_declaration = var_declaration;
         }
+        ~VarDeclarationNode();
 
         std::string trans() const override;
 };
@@ -152,6 +162,7 @@ class TypeNode : public AST {
             this->basic_type = basic_type;
             this->period = period;
         }
+        ~TypeNode();
 
         std::string trans() const override;
 };
@@ -163,6 +174,7 @@ class BasicTypeNode : public AST {
         BasicTypeNode(FinalNode *basic_type) : AST(NodeType::basic_type){
             this->basic_type = basic_type;
         }
+        ~BasicTypeNode();
 
         std::string trans() const override;
 };
@@ -177,6 +189,7 @@ class PeriodNode : public AST {
             this->num2 = num2;
             this->period = period;
         }
+        ~PeriodNode();
         std::string trans(std::vector<int> &dim) const;
         std::string trans() const override{std::vector<int> tmp; return trans(tmp);}
 };
@@ -190,6 +203,7 @@ class SubprogramDeclarationsNode : public AST {
             this->subprogram_declarations = subprogram_declarations;
             this->subprogram = subprogram;
         }
+        ~SubprogramDeclarationsNode();
 
         std::string trans() const override;
 };
@@ -203,6 +217,7 @@ class SubprogramNode : public AST {
             this->subprogram_head = subprogram_head;
             this->subprogram_body = subprogram_body;
         }
+        ~SubprogramNode();
 
         std::string trans() const override;
 };
@@ -218,6 +233,7 @@ class SubprogramHeadNode : public AST {
             this->formal_parameter = formal_parameter;
             this->basic_type = basic_type;
         }
+        ~SubprogramHeadNode();
         std::string trans(std::vector<int> *func_p_is_cite) const;
         std::string trans() const override{return trans(nullptr);};
 };
@@ -229,6 +245,7 @@ class FormalParameterNode : public AST {
         FormalParameterNode(ParameterListNode *parameter_list = nullptr) : AST(NodeType::formal_parameter){
             this->parameter_list = parameter_list;
         }
+        ~FormalParameterNode();
 
         std::string trans(std::vector<int> *func_p_is_cite) const;
         std::string trans() const override{return trans(nullptr);};
@@ -243,6 +260,7 @@ class ParameterListNode : public AST {
             this->parameter = parameter;
             this->parameter_list = parameter_list;
         }
+        ~ParameterListNode();
 
         std::string trans(std::vector<int> *func_p_is_cite) const;
         std::string trans() const override{return trans(nullptr);};
@@ -259,6 +277,7 @@ class ParameterNode : public AST {
         ParameterNode(ValueParameterNode *value_parameter) : AST(NodeType::parameter){
             this->value_parameter = value_parameter;
         }
+        ~ParameterNode();
 
         std::string trans(std::vector<int> *func_p_is_cite) const;
         std::string trans() const override{return trans(nullptr);};
@@ -271,6 +290,7 @@ class VarParameterNode : public AST {
         VarParameterNode(ValueParameterNode *value_parameter) : AST(NodeType::var_parameter){
             this->value_parameter = value_parameter;
         }
+        ~VarParameterNode();
 
         std::string trans(std::vector<int> *func_p_is_cite) const;
         std::string trans() const override{return trans(nullptr);}
@@ -285,6 +305,7 @@ class ValueParameterNode : public AST {
             this->id_list = id_list;
             this->basic_type = basic_type;
         }
+        ~ValueParameterNode();
 
         std::string trans(const bool is_ptr, std::vector<int> *func_p_is_ptr = nullptr) const;
         std::string trans() const override {return trans(false);} // 重载纯虚函数
@@ -301,6 +322,7 @@ class SubprogramBodyNode : public AST {
             this->var_declarations = var_declarations;
             this->compound_statement = compound_statement;
         }
+        ~SubprogramBodyNode();
 
         std::string trans() const override;
 };
@@ -312,6 +334,7 @@ class CompoundStatementNode : public AST {
         CompoundStatementNode(StatementListNode *statement_list) : AST(NodeType::compound_statement){
             this->statement_list = statement_list;
         }
+        ~CompoundStatementNode();
 
         std::string trans() const override;
 };
@@ -325,6 +348,7 @@ class StatementListNode : public AST {
             this->statement = statement;
             this->statement_list = statement_list;
         }
+        ~StatementListNode();
 
         std::string trans() const override;
 };
@@ -396,6 +420,7 @@ class StatementNode : public AST {
             this->expression_list = expression_list;
             this->kind = 9;
         } //  statement → write ( expression_list )
+        ~StatementNode();
 
         std::string trans() const override;
 };
@@ -409,6 +434,7 @@ class VariableListNode : public AST {
             this->variable = variable;
             this->variable_list = variable_list;
         }
+        ~VariableListNode();
 
         std::string trans() const override;
 };
@@ -422,6 +448,7 @@ class VariableNode : public AST {
             this->id = id;
             this->id_varpart = id_varpart;
         }
+        ~VariableNode();
 
         std::string trans() const override;
 };
@@ -433,6 +460,7 @@ class IdVarpartNode : public AST {
         IdVarpartNode(ExpressionListNode *expression_list = nullptr) : AST(NodeType::id_varpart){
             this->expression_list = expression_list;
         }
+        ~IdVarpartNode();
 
         std::string trans() const override;
 };
@@ -446,6 +474,7 @@ class ProcedureCallNode : public AST {
             this->id = id;
             this->expression_list = expression_list;
         }
+        ~ProcedureCallNode();
 
         std::string trans() const override;
 };
@@ -457,6 +486,7 @@ class ElsePartNode : public AST {
         ElsePartNode(StatementNode *statement = nullptr) : AST(NodeType::else_part){
             this->statement = statement;
         }
+        ~ElsePartNode();
 
         std::string trans() const override;
 };
@@ -470,6 +500,7 @@ class ExpressionListNode : public AST {
             this->expression = expression;
             this->expression_list = expression_list;
         }
+        ~ExpressionListNode();
 
         std::string trans() const override;
 };
@@ -489,6 +520,7 @@ class ExpressionNode : public AST {
             this->relop = relop;
             this->simple_expression_2 = simple_expression_2;
         } // expression → simple_expression relop simple_expression
+        ~ExpressionNode();
 
         std::string trans() const override;
 };
@@ -504,6 +536,7 @@ class SimpleExpressionNode : public AST {
             this->addop = addop;
             this->term = term;
         }
+        ~SimpleExpressionNode();
 
         std::string trans() const override;
 };
@@ -519,6 +552,7 @@ class TermNode : public AST {
             this->mulop = mulop;
             this->factor = factor;
         }
+        ~TermNode();
 
         std::string trans() const override;
 };
@@ -560,8 +594,162 @@ class FactorNode : public AST {
             this->factor = factor;
             this->kind = 5;
         } // factor → not factor | uminus factor
+        ~FactorNode();
 
         std::string trans() const override;
 };
+
+ProgramStructNode::~ProgramStructNode() {
+    delete program_body;
+    delete program_head;
+}
+ProgramHeadNode::~ProgramHeadNode() {
+    delete id;
+    if(id_list != nullptr) delete id_list;
+}
+ProgramBodyNode::~ProgramBodyNode() {
+    delete const_declarations;
+    delete var_declarations;
+    delete subprogram_declarations;
+    delete compound_statement;
+}
+IdListNode::~IdListNode() {
+    delete id;
+    if(id_list != nullptr) delete id_list;
+}
+ConstDeclarationsNode::~ConstDeclarationsNode() {
+    if(const_declaration != nullptr) delete const_declaration;
+}
+ConstDeclarationNode::~ConstDeclarationNode() {
+    delete id;
+    delete const_value;
+    if(const_declaration != nullptr) delete const_declaration;
+}
+ConstValueNode::~ConstValueNode() {
+    delete numletter;
+    if(op != nullptr) delete op;
+}
+VarDeclarationsNode::~VarDeclarationsNode() {
+    if(var_declaration != nullptr) delete var_declaration;
+}
+VarDeclarationNode::~VarDeclarationNode() {
+    delete id_list;
+    delete type;
+    if(var_declaration != nullptr) delete var_declaration;
+}
+TypeNode::~TypeNode() {
+    delete basic_type;
+    if(period != nullptr) delete period;
+}
+BasicTypeNode::~BasicTypeNode() {
+    delete basic_type;
+}
+PeriodNode::~PeriodNode() {
+    delete num1;
+    delete num2;
+    if(period != nullptr) delete period;
+}
+SubprogramDeclarationsNode::~SubprogramDeclarationsNode() {
+    if(subprogram_declarations != nullptr) delete subprogram_declarations;
+    if(subprogram != nullptr) delete subprogram;
+}
+SubprogramNode::~SubprogramNode() {
+    delete subprogram_head;
+    delete subprogram_body;
+}
+SubprogramHeadNode::~SubprogramHeadNode() {
+    delete id;
+    delete formal_parameter;
+    if(basic_type != nullptr) delete basic_type;
+}
+FormalParameterNode::~FormalParameterNode() {
+    if(parameter_list != nullptr) delete parameter_list;
+}
+ParameterListNode::~ParameterListNode() {
+    delete parameter;
+    if(parameter_list != nullptr) delete parameter_list;
+}
+ParameterNode::~ParameterNode() {
+    if(var_parameter != nullptr) delete var_parameter;
+    if(value_parameter != nullptr) delete value_parameter;
+}
+VarParameterNode::~VarParameterNode() {
+    delete value_parameter;
+}
+ValueParameterNode::~ValueParameterNode() {
+    delete id_list;
+    delete basic_type;
+}
+SubprogramBodyNode::~SubprogramBodyNode() {
+    delete const_declarations;
+    delete var_declarations;
+    delete compound_statement;
+}
+CompoundStatementNode::~CompoundStatementNode() {
+    delete statement_list;
+}
+StatementListNode::~StatementListNode() {
+    delete statement;
+    if(statement_list != nullptr) delete statement_list;
+}
+StatementNode::~StatementNode() {
+    if(variable != nullptr) delete variable;
+    if(expression != nullptr) delete expression;
+    if(id != nullptr) delete id;
+    if(procedure_call != nullptr) delete procedure_call;
+    if(compound_statement != nullptr) delete compound_statement;
+    if(statement != nullptr) delete statement;
+    if(else_part != nullptr) delete else_part;
+    if(expression_2 != nullptr) delete expression_2;
+    if(variable_list != nullptr) delete variable_list;
+    if(expression_list != nullptr) delete expression_list;
+    if(w_r != nullptr) delete w_r;
+}
+VariableListNode::~VariableListNode() {
+    delete variable;
+    if(variable_list != nullptr) delete variable_list;
+}
+VariableNode::~VariableNode() {
+    delete id;
+    delete id_varpart;
+}
+IdVarpartNode::~IdVarpartNode() {
+    if(expression_list != nullptr) delete expression_list;
+}
+ProcedureCallNode::~ProcedureCallNode() {
+    delete id;
+    if(expression_list != nullptr) delete expression_list;
+}
+ElsePartNode::~ElsePartNode() {
+    if(statement != nullptr) delete statement;
+}
+ExpressionListNode::~ExpressionListNode() {
+    delete expression;
+    if(expression_list != nullptr) delete expression_list;
+}
+ExpressionNode::~ExpressionNode() {
+    delete simple_expression;
+    if(relop != nullptr) delete relop;
+    if(simple_expression_2 != nullptr) delete simple_expression_2;
+}
+SimpleExpressionNode::~SimpleExpressionNode()  {
+    delete term;
+    if(addop != nullptr) delete addop;
+    if(simple_expression != nullptr) delete simple_expression;
+}
+TermNode::~TermNode() {
+    delete factor;
+    if(term != nullptr) delete term;
+    if(mulop != nullptr) delete mulop;
+}
+FactorNode::~FactorNode() {
+    if(num != nullptr) delete num;
+    if(id != nullptr) delete id;
+    if(expression != nullptr) delete expression;
+    if(expression_list != nullptr) delete expression_list;
+    if(variable != nullptr) delete variable;
+    if(not_uminus != nullptr) delete not_uminus;
+    if(factor != nullptr) delete factor;
+}
 
 #endif
