@@ -1,8 +1,14 @@
-// 测试样例 00_main.pas
+// 测试样例 07
 program main;
-var
+var 
   a: integer;
+
+function defn: integer;
 begin
-  a := 3;
-  //write(a); 目前存在的问题
+  defn := 4;
+end;
+
+begin
+  a := defn;
+  write(a);
 end.

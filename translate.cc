@@ -263,7 +263,7 @@ std::string ParameterNode::trans(std::vector<int> *func_p_is_cite) const{
     if (this->var_parameter != nullptr){
         res += this->var_parameter->trans(func_p_is_cite);
     } else if (this->value_parameter != nullptr){
-        res += this->value_parameter->trans(func_p_is_cite);
+        res += this->value_parameter->trans(false, func_p_is_cite);
     }
 
     return res;
@@ -336,7 +336,11 @@ std::string StatementNode::trans() const {
             std::string id_str = this->id->trans();
             std::string exp = this->expression->trans();
             size_t space_pos = exp.find(' ');
-            exp = exp.substr(0, space_pos);
+            if(exp[exp.size() - 1] == ')'){
+                exp = exp.substr(0, space_pos) + ")";
+            } else {
+                exp = exp.substr(0, space_pos);
+            }
             return id_str + " = " + exp + ";\n";
         }
     }
@@ -451,7 +455,7 @@ std::string VariableNode::trans() const {
         i++;
         space_pos = index.find(' ');
     }
-    if (std::get<1>(info).back() == 1)
+    if (!std::get<1>(info).empty() && std::get<1>(info).back() == 1)
         res = "&" + res;
     // res += ");\n";
     return res;
@@ -651,7 +655,17 @@ std::string FactorNode::trans() const {
         return num_str + " " + kind; // eg: "1 %d"
     }
     else if (this->kind == 2) {
-        return this->variable->trans(); // eg: "a %d"
+        std::string str = this->variable->trans(); // eg: "a %d"
+        size_t space_pos = str.find(' ');
+        auto tmpstr = str.substr(0, space_pos);
+        auto info = t.table[*this->variable->id]; // 判断是变量还是无参数传递的函数
+        if (std::get<0>(info) == -1) {
+            std::string res = tmpstr + "( )";
+            return res;
+        }
+        else {
+            return str;
+        }
     }
     else if (this->kind == 3) {
         std::string expr = this->expression->trans();

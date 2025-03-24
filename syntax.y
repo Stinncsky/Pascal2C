@@ -143,7 +143,7 @@ TypeNode:
         $$ = new TypeNode(dynamic_cast<BasicTypeNode*>($1));
     }
     | Array Lbra PeriodNode Rbra Of BasicTypeNode {
-        $$ = new TypeNode(dynamic_cast<BasicTypeNode*>($3), dynamic_cast<PeriodNode*>($6));
+        $$ = new TypeNode(dynamic_cast<BasicTypeNode*>($6), dynamic_cast<PeriodNode*>($3));
     }
 
 
