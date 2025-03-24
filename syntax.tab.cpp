@@ -1438,7 +1438,7 @@ yyreduce:
   case 21: /* TypeNode: Array Lbra PeriodNode Rbra Of BasicTypeNode  */
 #line 145 "syntax.y"
                                                   {
-        (yyval.ast) = new TypeNode(dynamic_cast<BasicTypeNode*>((yyvsp[-3].ast)), dynamic_cast<PeriodNode*>((yyvsp[0].ast)));
+        (yyval.ast) = new TypeNode(dynamic_cast<BasicTypeNode*>((yyvsp[0].ast)), dynamic_cast<PeriodNode*>((yyvsp[-3].ast)));
     }
 #line 1444 "syntax.tab.cpp"
     break;
