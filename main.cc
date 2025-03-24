@@ -1,7 +1,14 @@
 #include <cstring>
 #include <iostream>
+#include <fstream>
 #include "header/header.hh"
 #include "AST.cc"
+
+#ifndef FINAL
+    #include "lexical.cc"
+    #include "syntax.tab.cpp"
+    #include "translate.cc"
+#endif
 
 Syntax* syntax = nullptr;
 std::vector<Token> tokens;
@@ -31,25 +38,35 @@ int main(int argc, char *argv[]) {
 void Program::run(){
     std::string source_code;
     // 读取源代码
-    source_code = "program main;\nvar\n  a: integer;\n  b: integer;\n\nfunction func(p: integer): integer;\nbegin\n  p := p - 1;\n  func := p;\nend;\n\nbegin\n  a := 10;\n  b := func(a);\n\n  write(b);\nend.\n";
+    std::ifstream file("input.pas");
+    if (!file.is_open()) {
+        fprintf(stderr, "Error: Open file \"input.pas\" failed\n");
+        return;
+    }
+    std::string line;
+    while (getline(file, line)) {
+        source_code += line + "\n";
+    }
+    file.close();
     
     lexicalAnalyzer.load(source_code);
     lexicalAnalyzer.run();
     tokens = lexicalAnalyzer.getTokens();
 
     extern int yydebug;
-    yydebug = 1;
+    yydebug = 0;
     if(yyparse() == 0)  {
         // 语法分析成功
         if(syntax->tree != nullptr) {
+            printf("Success in Syntax Analysis\n\n");
+
             tree_root = syntax->tree;
             std::cout << dynamic_cast<ProgramStructNode *>(tree_root)->trans() << std::endl;
-
-            printf("Success: 语法分析成功\n");
+            printf("Success in Translation to C-language\n");
         }
         else
-            fprintf(stderr, "Error: 语法分析树为空\n");
+            fprintf(stderr, "Error: No syntax tree\n");
     } else {
-        fprintf(stderr, "Error: 语法分析失败\n");
+        fprintf(stderr, "Error: Syntax Analysis failed\n");
     }
 }
