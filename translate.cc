@@ -94,12 +94,14 @@ std::string IdListNode::trans(const std::string type, const std::string tmp, con
         auto info = t.table[*id];
         info = std::make_tuple(std::get<0>(info), std::vector<int>(1,1), std::get<2>(info));
         t.table[*id] = info;
-    } else if (type == "int " || type == "double "){
-        t.table[*(this->id)] = std::make_tuple(type == "int " ? 0 : 1, std::vector<int>(1,0), *dim);
+    } else if (type == "int "){
+        t.table[*(this->id)] = std::make_tuple(ID_INT, std::vector<int>(1,0), *dim);
+    } else if (type == "double ") {
+        t.table[*(this->id)] = std::make_tuple(ID_DOUBLE, std::vector<int>(1,0), *dim);
     } else if (type == "char "){
-        t.table[*(this->id)] = std::make_tuple(2, std::vector<int>(1,0), *dim);
+        t.table[*(this->id)] = std::make_tuple(ID_CHAR, std::vector<int>(1,0), *dim);
     } else if (type == "string "){
-        t.table[*(this->id)] = std::make_tuple(3, std::vector<int>(1,0), *dim);
+        t.table[*(this->id)] = std::make_tuple(ID_STRING, std::vector<int>(1,0), *dim);
     }
     if (func_p_is_cite != nullptr){
         func_p_is_cite->push_back(is_cite);
@@ -121,22 +123,22 @@ std::string ConstDeclarationNode::trans() const{
     if (this->const_value->numletter->token.type == TokenType::Number){
         if (this->const_value->numletter->token.property.find(".") != std::string::npos){
             res += "double ";
-            type = 1;
+            type = ID_DOUBLE;
         } else {
             res += "int ";
-            type = 0;
+            type = ID_INT;
         }
         t.table[*(this->id)] = std::make_tuple(type, std::vector<int>(1,0), std::vector<int>());
         res += this->id->trans() + " = ";
         res += this->const_value->trans() + ";\n";
     } else if (this->const_value->numletter->token.type == TokenType::Char){
         res += "char ";
-        t.table[*(this->id)] = std::make_tuple(2, std::vector<int>(1,0), std::vector<int>());
+        t.table[*(this->id)] = std::make_tuple(ID_CHAR, std::vector<int>(1,0), std::vector<int>());
         res += this->id->trans() + " = ";
         res += "\'" + this->const_value->trans() + "\';\n";
     } else if (this->const_value->numletter->token.type == TokenType::String){
         res += "char *";
-        t.table[*(this->id)] = std::make_tuple(3, std::vector<int>(1,0), std::vector<int>());
+        t.table[*(this->id)] = std::make_tuple(ID_STRING, std::vector<int>(1,0), std::vector<int>());
         res += this->id->trans() + " = ";
         res += "\"" + this->const_value->trans() + "\";\n";
     }
@@ -449,19 +451,19 @@ std::string VariableListNode::trans() const {
 std::string VariableNode::trans() const {
     auto info = t.table[*id];
     std::string res = this->id->trans();
-    if (std::get<0>(info) == 0) {
+    if (std::get<0>(info) == ID_INT) {
         // res = "scanf(\"%d\", &";
         res += " %d";
     }
-    else if (std::get<0>(info) == 1) {
+    else if (std::get<0>(info) == ID_DOUBLE) {
         // res = "scanf(\"%lf\", &";
         res += " %lf";
     }
-    else if (std::get<0>(info) == 2) {
+    else if (std::get<0>(info) == ID_INT) {
         // res = "scanf(\"%c\", &";
         res += " %c";
     }
-    else if (std::get<0>(info) == 3) {
+    else if (std::get<0>(info) == ID_STRING) {
         // res = "scanf(\"%s\", ";
         res += " %s";
     }
@@ -516,16 +518,16 @@ std::string ProcedureCallNode::trans() const {
         }
         auto info = t.table[*id];
         std::string kind = "";
-        if (std::get<0>(info) == 0) {
+        if (std::get<0>(info) == ID_INT) {
             kind = "%d";
         }
-        else if (std::get<0>(info) == 1) {
+        else if (std::get<0>(info) == ID_DOUBLE) {
             kind = "%lf";
         }
-        else if (std::get<0>(info) == 2) {
+        else if (std::get<0>(info) == ID_CHAR) {
             kind = "%c";
         }
-        else if (std::get<0>(info) == 3) {
+        else if (std::get<0>(info) == ID_STRING) {
             kind = "%s";
         }
         std::string res = this->id->trans() + "(";
@@ -736,16 +738,16 @@ std::string FactorNode::trans() const {
         // 判断函数返回值类型
         auto info = t.table[*id];
         std::string kind = "";
-        if (std::get<0>(info) == 0) {
+        if (std::get<0>(info) == ID_INT) {
             kind = "%d";
         }
-        else if (std::get<0>(info) == 1) {
+        else if (std::get<0>(info) == ID_DOUBLE) {
             kind = "%lf";
         }
-        else if (std::get<0>(info) == 2) {
+        else if (std::get<0>(info) == ID_CHAR) {
             kind = "%c";
         }
-        else if (std::get<0>(info) == 3) {
+        else if (std::get<0>(info) == ID_STRING) {
             kind = "%s";
         }
         return res + expr_list + ")" + kind; // eg: f(a,&b)%d

@@ -3,6 +3,14 @@
 #include "AST.hh"
 #include <map>
 
+#define ID_INT 0
+#define ID_DOUBLE 1
+#define ID_CHAR 2
+#define ID_STRING 3
+#define FUNC_INT 4
+#define FUNC_DOUBLE 5
+#define FUNC_CHAR 6
+#define FUNC_VOID -1
 class Table {
 public:
     std::map<FinalNode, std::tuple<int, std::vector<int>, std::vector<int>>> table;
