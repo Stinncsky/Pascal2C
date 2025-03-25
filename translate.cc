@@ -388,8 +388,8 @@ std::string StatementNode::trans() const {
             exp2 = exp2.substr(0, space_pos);
         }
         std::string i = this->id->trans();
-        return "for (" + i + " = " + exp + "; " + i + " <= " + exp2 + "; " + i + "++) {\n" +
-               this->statement->trans() + "}\n";
+        std::string statement_str = this->statement->trans();
+        return "for (" + i + " = " + exp + "; " + i + " <= " + exp2 + "; " + i + "++) {\n" + statement_str + "}\n";
     }
     else if (this->kind == 8) {
         std::string var_list = this->variable_list->trans();
@@ -462,20 +462,35 @@ std::string VariableListNode::trans() const {
 std::string VariableNode::trans() const {
     auto info = t.table[*id];
     std::string res = this->id->trans();
+    std::string raw_index = this->id_varpart->trans();
+    int i = 0;
+    size_t space_pos = raw_index.find(' ');
+    while (space_pos != std::string::npos) {
+        // int int_index = std::stoi(raw_index.substr(0, space_pos));
+        // int_index -= std::get<2>(info)[i]; // error: 维度要匹配
+        int start_i = std::get<2>(info)[i];
+        std::string index = "";
+        if (start_i > 0)
+            index = raw_index.substr(0, space_pos) + "-" + std::to_string(start_i);
+        else if (start_i < 0)
+            index = raw_index.substr(0, space_pos) + "+" + std::to_string(-start_i);
+        else
+            index = raw_index.substr(0, space_pos);
+        res += "[" + index + "]";
+        i++;
+        raw_index.erase(0, space_pos + 1);
+        space_pos = raw_index.find(' ');
+    }
     if (std::get<0>(info) == ID_INT) {
-        // res = "scanf(\"%d\", &";
         res += " %d";
     }
     else if (std::get<0>(info) == ID_DOUBLE) {
-        // res = "scanf(\"%lf\", &";
         res += " %lf";
     }
     else if (std::get<0>(info) == ID_INT) {
-        // res = "scanf(\"%c\", &";
         res += " %c";
     }
     else if (std::get<0>(info) == ID_STRING) {
-        // res = "scanf(\"%s\", ";
         res += " %s";
     }
     else if (std::get<0>(info) == FUNC_INT) {
@@ -489,16 +504,6 @@ std::string VariableNode::trans() const {
     }
     else if (std::get<0>(info) == FUNC_VOID) {
         res += ""; // error: 
-    }
-    std::string index = this->id_varpart->trans();
-    int i = 0;
-    size_t space_pos = index.find(' ');
-    while (space_pos != std::string::npos) {
-        int int_index = std::stoi(index.substr(0, space_pos));
-        int_index -= std::get<2>(info)[i]; // error: 维度要匹配
-        res += "[" + std::to_string(int_index) + "]";
-        i++;
-        space_pos = index.find(' ');
     }
     if (!std::get<1>(info).empty() && std::get<1>(info).back() == 1)
         res = "&" + res;
