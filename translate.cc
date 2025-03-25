@@ -691,7 +691,7 @@ std::string FactorNode::trans() const {
         size_t space_pos = str.find(' ');
         auto tmpstr = str.substr(0, space_pos);
         auto info = t.table[*this->variable->id]; // 判断是变量还是无参数传递的函数
-        if (std::get<0>(info) == -1) {
+        if (std::get<0>(info) == FUNC_VOID || std::get<0>(info) == FUNC_INT || std::get<0>(info) == FUNC_DOUBLE || std::get<0>(info) == FUNC_CHAR) {
             std::string res = tmpstr + "( )";
             return res;
         }
