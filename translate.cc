@@ -349,13 +349,33 @@ std::string StatementNode::trans() const {
     else if (this->kind == 5)
         return this->compound_statement->trans();
     else if (this->kind == 6) { // 后面用不用考虑变成else if的形式，更工整但可能不是很必要？
-        return "if (" + this->expression->trans() + ") {\n" +
-               this->statement->trans() + "}" + this->else_part->trans() + "\n";
+        std::string exp = this->expression->trans();
+        size_t space_pos = exp.find(' ');
+        if (exp[exp.size() - 1] == ')') {
+            exp = exp.substr(0, space_pos) + ")";
+        } else {
+            exp = exp.substr(0, space_pos);
+        }
+        return "if " + exp + " {\n" + this->statement->trans() + "}" + this->else_part->trans() + "\n";
+        // return "if (" + exp + ") {\n" + this->statement->trans() + "}" + this->else_part->trans() + "\n";
     }
     else if (this->kind == 7) {
+        std::string exp = this->expression->trans();
+        size_t space_pos = exp.find(' ');
+        if (exp[exp.size() - 1] == ')') {
+            exp = exp.substr(0, space_pos) + ")";
+        } else {
+            exp = exp.substr(0, space_pos);
+        }
+        std::string exp2 = this->expression_2->trans();
+        space_pos = exp2.find(' ');
+        if (exp2[exp2.size() - 1] == ')') {
+            exp2 = exp2.substr(0, space_pos) + ")";
+        } else {
+            exp2 = exp2.substr(0, space_pos);
+        }
         std::string i = this->id->trans();
-        return "for (" + i + " = " + this->expression->trans() + "; " + i +
-               " <= " + this->expression_2->trans() + "; " + i + "++) {\n" +
+        return "for (" + i + " = " + exp + "; " + i + " <= " + exp2 + "; " + i + "++) {\n" +
                this->statement->trans() + "}\n";
     }
     else if (this->kind == 8) {

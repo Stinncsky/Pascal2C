@@ -248,8 +248,8 @@ ParameterNode: VarParameterNode {
     $$ = new ParameterNode(dynamic_cast<ValueParameterNode*>($1));
 }
 
-VarParameterNode: Var VarParameterNode {
-    $$ = new VarParameterNode(dynamic_cast<VarParameterNode*>($2));
+VarParameterNode: Var ValueParameterNode {
+    $$ = new VarParameterNode(dynamic_cast<ValueParameterNode*>($2));
 }
 
 ValueParameterNode: IdListNode Colon BasicTypeNode {
