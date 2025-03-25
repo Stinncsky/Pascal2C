@@ -368,7 +368,8 @@ std::string StatementNode::trans() const {
         } else {
             exp = exp.substr(0, space_pos);
         }
-        return "if " + exp + " {\n" + this->statement->trans() + "}" + this->else_part->trans() + "\n";
+        std::string statement_str = this->statement->trans();
+        return "if " + exp + " " + statement_str + this->else_part->trans() + "\n";
         // return "if (" + exp + ") {\n" + this->statement->trans() + "}" + this->else_part->trans() + "\n";
     }
     else if (this->kind == 7) {
@@ -477,6 +478,18 @@ std::string VariableNode::trans() const {
         // res = "scanf(\"%s\", ";
         res += " %s";
     }
+    else if (std::get<0>(info) == FUNC_INT) {
+        res += "() %d";
+    }
+    else if (std::get<0>(info) == FUNC_DOUBLE) {
+        res += "() %lf";
+    }
+    else if (std::get<0>(info) == FUNC_CHAR) {
+        res += "() %c";
+    }
+    else if (std::get<0>(info) == FUNC_VOID) {
+        res += ""; // error: 
+    }
     std::string index = this->id_varpart->trans();
     int i = 0;
     size_t space_pos = index.find(' ');
@@ -570,7 +583,7 @@ std::string ProcedureCallNode::trans() const {
                 std::get<1>(t.table[*need_cite_var->simple_expression->term->factor->id]).push_back(1); // ERROR: 如果出错排查下这，感觉怪怪的
             }
         }
-        return res + expr_list + ")" + kind; // eg: f(a,&b)%d
+        return res + expr_list + ") " + kind; // eg: f(a,&b) %d
     }
 }
 
@@ -688,16 +701,17 @@ std::string FactorNode::trans() const {
     }
     else if (this->kind == 2) {
         std::string str = this->variable->trans(); // eg: "a %d"
-        size_t space_pos = str.find(' ');
-        auto tmpstr = str.substr(0, space_pos);
-        auto info = t.table[*this->variable->id]; // 判断是变量还是无参数传递的函数
-        if (std::get<0>(info) == FUNC_VOID || std::get<0>(info) == FUNC_INT || std::get<0>(info) == FUNC_DOUBLE || std::get<0>(info) == FUNC_CHAR) {
-            std::string res = tmpstr + "( )";
-            return res;
-        }
-        else {
-            return str;
-        }
+        return str;
+        // size_t space_pos = str.find(' ');
+        // auto tmpstr = str.substr(0, space_pos);
+        // auto info = t.table[*this->variable->id]; // 判断是变量还是无参数传递的函数
+        // if (std::get<0>(info) == FUNC_VOID || std::get<0>(info) == FUNC_INT || std::get<0>(info) == FUNC_DOUBLE || std::get<0>(info) == FUNC_CHAR) {
+        //     std::string res = tmpstr + "()";
+        //     return res;
+        // }
+        // else {
+        //     return str;
+        // }
     }
     else if (this->kind == 3) {
         std::string expr = this->expression->trans();
