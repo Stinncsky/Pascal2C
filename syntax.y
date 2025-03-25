@@ -336,6 +336,9 @@ ProcedureCallNode: Identifier {
 } | Identifier Lparen ExpressionListNode Rparen {
     FinalNode* id = new FinalNode(*$1);
     $$ = new ProcedureCallNode(id, dynamic_cast<ExpressionListNode*>($3));
+} | Identifier Lparen Rparen{
+    FinalNode* id = new FinalNode(*$1);
+    $$ = new ProcedureCallNode(id); // 语法拓展：无参数过程调用支持 foo()
 }
 
 ElsePartNode:  {
@@ -402,6 +405,11 @@ FactorNode: Number {
 } | Booltype {
     FinalNode* id = new FinalNode(*$1);
     $$ = new FactorNode(id);
+} | Identifier Lparen Rparen{
+    FinalNode* id = new FinalNode(*$1);
+    IdVarpartNode* fake_idvar = new IdVarpartNode();
+    VariableNode* fake_var = new VariableNode(id, fake_idvar);
+    $$ = new FactorNode(fake_var); // 测试用例21: 无参数函数 a := foo(); write(foo())
 }
 
 
