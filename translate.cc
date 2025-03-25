@@ -224,7 +224,17 @@ std::string SubprogramNode::trans() const{
     FinalNode now_func = *t.now_funcid;
     res += this->subprogram_body->trans();
     t = tmp;
-    t.table[now_func] = std::make_tuple(-1, func_p_is_cite, std::vector<int>());
+    int func_type;
+    if (this->subprogram_head->basic_type == nullptr){
+        func_type = FUNC_VOID;
+    } else if (this->subprogram_head->basic_type->trans() == "int"){
+        func_type = FUNC_INT;
+    } else if (this->subprogram_head->basic_type->trans() == "double"){
+        func_type = FUNC_DOUBLE;
+    } else if (this->subprogram_head->basic_type->trans() == "char"){
+        func_type = FUNC_CHAR;
+    }
+    t.table[now_func] = std::make_tuple(func_type, func_p_is_cite, std::vector<int>());
     return res;
 }
 
