@@ -104,6 +104,17 @@ procedure nullfunc;
 begin
 end;
 
+procedure recursion(n: integer);
+begin
+  if n = 0 then
+    write(0)
+  else
+  begin
+    write(n);
+    //recursion(n - 1); 暂时不能处理递归调用的情况
+  end;
+end;
+
 begin
   write(cb);
   a := defn;

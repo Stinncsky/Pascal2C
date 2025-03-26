@@ -410,7 +410,18 @@ std::string StatementNode::trans() const {
         }
         std::string i = this->id->trans();
         std::string statement_str = this->statement->trans();
-        return "for (" + i + " = " + exp + "; " + i + " <= " + exp2 + "; " + i + "++) {\n" + statement_str + "}\n";
+        int end_index = statement_str.size() - 1;
+        while(end_index > 0){ 
+            if(statement_str[end_index] != '\n' && statement_str[end_index] != ' ' && statement_str[end_index] != '\t'){
+                break;
+            }
+            end_index--;
+        } //去掉结尾的'\n', ' ', '\t'等方便判断是否以'}'结尾
+        if(end_index >= 0 && statement_str[0] == '{' && statement_str[end_index] == '}'){
+            return "for (" + i + " = " + exp + "; " + i + " <= " + exp2 + "; " + i + "++) " + statement_str; //若以{}包裹则不需要再加{}
+        } else {
+            return "for (" + i + " = " + exp + "; " + i + " <= " + exp2 + "; " + i + "++) {\n" + statement_str + "}\n";
+        }
     }
     else if (this->kind == 8) {
         std::string var_list = this->variable_list->trans();
@@ -629,8 +640,21 @@ std::string ProcedureCallNode::trans() const {
 std::string ElsePartNode::trans() const {
     if (this->statement == nullptr)
         return "";
-    else
-        return " else {\n" + this->statement->trans() + "}";
+    else{
+        std::string statement_str = this->statement->trans();
+        int end_index = statement_str.size() - 1;
+        while(end_index > 0){ 
+            if(statement_str[end_index] != '\n' && statement_str[end_index] != ' ' && statement_str[end_index] != '\t'){
+                break;
+            }
+            end_index--;
+        } //去掉结尾的'\n', ' ', '\t'等方便判断是否以'}'结尾
+        if(end_index >= 0 && statement_str[0] == '{' && statement_str[end_index] == '}'){
+            return " else " + this->statement->trans(); //若以{}包裹则不需要再加{}
+        } else {
+            return " else {\n" + this->statement->trans() + "}";
+        }
+    }
 }
 
 std::string ExpressionListNode::trans() const {
