@@ -1,4 +1,4 @@
-// 测试样例 00-27
+// 测试样例 00-27 (28 'not') 29-38
 program main;
 const
   ca = 1;
@@ -6,7 +6,7 @@ const
 var 
   a, input: integer;
   b : array [1..10] of integer;
-  bx: array [0..9, 2..9] of integer;
+  bx: array [1..9, 2..9] of integer;
   tmp: integer;
 
 function func(p: integer): integer;
@@ -53,6 +53,7 @@ begin
   d := 2;
   e := 4;
   flag := false;
+  tmp := ((d mod 2 + 67) + -(a - b) - -((c + 2) mod 2)) * ((d * 1 div 2) + (a - b) - -(c + 3) mod 2);
   if ((a * b / c = e + d) and (a * (a + b) + c <= d + e) or (a - (b * c) = d - a / c) or false) then
   begin
     flag := true;
@@ -61,7 +62,50 @@ begin
     write(1);
 end;
 
+function bubblesort:integer;
+var i,j,n,tmp:integer; arr:array [0..9] of integer;
 begin
+  for i := 0 to n - 2 do
+  begin
+    for j := 0 to (n - 2 - i) do
+    begin
+      if arr[j] > arr[j + 1] then
+      begin
+        tmp := arr[j + 1];
+        arr[j + 1] := arr[j];
+        arr[j] := tmp;
+      end;
+    end;
+  end;
+  bubblesort := 0;
+end;
+
+procedure selectsort;
+var i,j,min,tmp,n: integer; arr: array [0..9] of integer;
+begin
+  for i := 0 to n - 2 do
+  begin
+    min := i;
+    for j := i + 1 to n - 1 do
+    begin
+      if arr[min] > arr[j] then
+        min := j;
+    end;
+    if min <> i then
+    begin
+      tmp := arr[min];
+      arr[min] := arr[i];
+      arr[i] := tmp;
+    end;
+  end;
+end;
+
+procedure nullfunc;
+begin
+end;
+
+begin
+  write(cb);
   a := defn;
   write(ifWhile());
   a := func(a);
@@ -79,13 +123,14 @@ begin
   a := b[1];
   write(a + (-5));
 
-  bx[0, 2] := 1;
-  write(bx[0, 2] + 1); //现在这个顺序反了
+  bx[1, 2] := 1;
+  write(bx[0, 2] + 1);
 
   tmp := not a; //Bool为!，Int为~，尚未实现
 
   tmp := - - -1;
-  tmp := a + +a;
+  tmp := a + +a - -4;
 
+  if 1=1 then ;
   opPriority;
 end.

@@ -306,10 +306,12 @@ std::string ValueParameterNode::trans(const bool is_ptr, std::vector<int> *func_
 }
 
 std::string SubprogramBodyNode::trans() const {
+    std::string constDecl = this->const_declarations->trans();
+    std::string varDecl = this->var_declarations->trans();
     std::string com_state = this->compound_statement->trans();
     if (com_state != "") {
-        com_state.erase(0, 1);
-        return "{\n" + this->const_declarations->trans() + this->var_declarations->trans() + com_state;
+        com_state.erase(0, 1); // 去掉开头的'{'
+        return "{\n" + constDecl + varDecl + com_state;
     }
     else
         return "";
@@ -375,8 +377,21 @@ std::string StatementNode::trans() const {
             exp = exp.substr(0, space_pos);
         }
         std::string statement_str = this->statement->trans();
-        return "if " + exp + " " + statement_str + this->else_part->trans() + "\n";
+        // return "if " + exp + " " + statement_str + this->else_part->trans() + "\n";
         // return "if (" + exp + ") {\n" + this->statement->trans() + "}" + this->else_part->trans() + "\n";
+        int end_index = statement_str.size() - 1;
+        while(end_index > 0){ 
+            if(statement_str[end_index] != '\n' && statement_str[end_index] != ' ' && statement_str[end_index] != '\t'){
+                break;
+            }
+            end_index--;
+        } //去掉结尾的'\n', ' ', '\t'等方便判断是否以'}'结尾
+        if(end_index >= 0 && statement_str[0] == '{' && statement_str[end_index] == '}'){
+            return "if (" + exp + ") " + this->statement->trans() + this->else_part->trans() + "\n"; //若以{}包裹则不需要再加{}
+        }
+        else {
+            return "if (" + exp + ") {\n" + this->statement->trans() + "}" + this->else_part->trans() + "\n";
+        }
     }
     else if (this->kind == 7) {
         std::string exp = this->expression->trans();
@@ -493,7 +508,7 @@ std::string VariableNode::trans() const {
     else if (std::get<0>(info) == ID_DOUBLE) {
         res += " %lf";
     }
-    else if (std::get<0>(info) == ID_INT) {
+    else if (std::get<0>(info) == ID_CHAR) {
         res += " %c";
     }
     else if (std::get<0>(info) == ID_STRING) {
