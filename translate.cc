@@ -98,7 +98,7 @@ std::string IdListNode::trans(const std::string type, const std::string tmp, con
     res += type + this->id->trans() + tmp + end;
     if (is_cite){
         auto info = t.table[*id];
-        info = std::make_tuple(std::get<0>(info), std::vector<int>(1,1), std::get<2>(info));
+        info = std::make_tuple(std::get<0>(info), std::vector<int>(1,CITE), std::get<2>(info));
         t.table[*id] = info;
     } else if (type == "int "){
         t.table[*(this->id)] = std::make_tuple(ID_INT, std::vector<int>(1,0), *dim);
@@ -526,7 +526,7 @@ std::string VariableNode::trans() const {
     else if (std::get<0>(info) == FUNC_VOID) {
         res += ""; // error: 
     }
-    if (!std::get<1>(info).empty() && std::get<1>(info).back() == 1)
+    if (!std::get<1>(info).empty() && std::get<1>(info).back() >= CITE)
         res = "&" + res;
     // res += ");\n";
     return res;
@@ -599,26 +599,26 @@ std::string ProcedureCallNode::trans() const {
         size_t del_pos = expr_list.find(",");
         while(del_pos != std::string::npos) {
             std::string expr = expr_list.substr(0, del_pos);
-            if (cites[k] == 1)
+            if (cites[k] >= CITE)
                 res += "*";
             res += expr + ",";
             k++;
             expr_list.erase(0,del_pos + 1);
             del_pos = expr_list.find(",");
         }
-        if (cites[k] == 1)
+        if (cites[k] >= CITE)
             res += "&";
         res += expr_list + ")";
         // 更新符号表
         for (int i = 0; i < arg_num; i++) {
-            if (cites[i] == 1) {
+            if (cites[i] >= CITE) {
                 ExpressionNode* need_cite_var = nullptr; // error: 这应该得是变量而不应该是表达式的吧，要判断下吧
                 ExpressionListNode* temp_list = nullptr;
                 for (int j = i; j < arg_num; j++) { // 需要访问几次expression_list指针才能访问expression指针
                     temp_list = temp_list->expression_list;
                 }
                 need_cite_var = temp_list->expression;
-                std::get<1>(t.table[*need_cite_var->simple_expression->term->factor->id]).push_back(1); // ERROR: 如果出错排查下这，感觉怪怪的
+                std::get<1>(t.table[*need_cite_var->simple_expression->term->factor->id]).push_back(CITE); // ERROR: 因具体类型而异
             }
         }
         // return res + expr_list + ") " + kind;
@@ -778,26 +778,26 @@ std::string FactorNode::trans() const {
         size_t del_pos = expr_list.find(",");
         while(del_pos != std::string::npos) {
             std::string expr = expr_list.substr(0, del_pos);
-            if (cites[k] == 1)
+            if (cites[k] >= CITE)
                 res += "*";
             res += expr + ",";
             k++;
             expr_list.erase(0,del_pos + 1);
             del_pos = expr_list.find(",");
         }
-        if (cites[k] == 1)
+        if (cites[k] >= CITE)
             res += "&";
         res += expr_list + ")";
         // 更新符号表
         for (int i = 0; i < arg_num; i++) {
-            if (cites[i] == 1) {
+            if (cites[i] >= CITE) {
                 ExpressionNode* need_cite_var = nullptr; // error: 这应该得是变量而不应该是表达式的吧，要判断下吧
                 ExpressionListNode* temp_list = nullptr;
                 for (int j = i; j < arg_num; j++) { // 需要访问几次expression_list指针才能访问expression指针
                     temp_list = temp_list->expression_list;
                 }
                 need_cite_var = temp_list->expression;
-                std::get<1>(t.table[*need_cite_var->simple_expression->term->factor->id]).push_back(1); // ERROR: 如果出错排查下这，感觉怪怪的
+                std::get<1>(t.table[*need_cite_var->simple_expression->term->factor->id]).push_back(CITE); // ERROR: 存入的类型还要细分
             }
         }
         // 判断函数返回值类型
