@@ -76,7 +76,13 @@ std::string ProgramBodyNode::trans() const{
     res += this->var_declarations->trans();
     res += this->subprogram_declarations->trans();
     res += "int main()";
-    res += this->compound_statement->trans();
+    std::string main_func_body = this->compound_statement->trans();
+    if(main_func_body == "") {
+        res +="{\nreturn ;\n}\n";
+    } else {
+        main_func_body.erase(main_func_body.size()-2);// 去掉末尾的 }和 \n
+        res += main_func_body+ "return 0;\n}\n";
+    }
     return res;
 }
 
@@ -558,10 +564,22 @@ std::string ProcedureCallNode::trans() const {
         else if (std::get<0>(info) == ID_STRING) {
             kind = "%s";
         }
+        else if (std::get<0>(info) == FUNC_INT) {
+            kind = "%d";
+        }
+        else if (std::get<0>(info) == FUNC_DOUBLE) {
+            kind = "%lf";
+        }
+        else if (std::get<0>(info) == FUNC_CHAR) {
+            kind = "%c";
+        }
+        else if (std::get<0>(info) == FUNC_VOID) {
+            kind = ""; // error: 
+        }
         std::string res = this->id->trans() + "(";
         std::vector<int> cites = std::get<1>(t.table[*this->id]);
         int arg_num = cites.size();
-        expr_list = this->expression_list->trans();
+        // expr_list = this->expression_list->trans();
         int k = 0; // 正在判断第k个expression要不要加*
         size_t del_pos = expr_list.find(",");
         while(del_pos != std::string::npos) {
@@ -588,7 +606,8 @@ std::string ProcedureCallNode::trans() const {
                 std::get<1>(t.table[*need_cite_var->simple_expression->term->factor->id]).push_back(1); // ERROR: 如果出错排查下这，感觉怪怪的
             }
         }
-        return res + expr_list + ") " + kind; // eg: f(a,&b) %d
+        // return res + expr_list + ") " + kind;
+        return res + " " + kind; // eg: f(a,&b) %d
     }
 }
 
@@ -739,7 +758,7 @@ std::string FactorNode::trans() const {
         std::string res = this->id->trans() + "(";
         std::vector<int> cites = std::get<1>(t.table[*this->id]);
         int arg_num = cites.size();
-        expr_list = this->expression_list->trans();
+        // expr_list = this->expression_list->trans();
         int k = 0; // 正在判断第k个expression要不要加*
         size_t del_pos = expr_list.find(",");
         while(del_pos != std::string::npos) {
@@ -781,7 +800,20 @@ std::string FactorNode::trans() const {
         else if (std::get<0>(info) == ID_STRING) {
             kind = "%s";
         }
-        return res + expr_list + ") " + kind; // eg: f(a,&b) %d
+        else if (std::get<0>(info) == FUNC_INT) {
+            kind = "%d";
+        }
+        else if (std::get<0>(info) == FUNC_DOUBLE) {
+            kind = "%lf";
+        }
+        else if (std::get<0>(info) == FUNC_CHAR) {
+            kind = "%c";
+        }
+        else if (std::get<0>(info) == FUNC_VOID) {
+            kind = ""; // error: 
+        }
+        // return res + expr_list + ") " + kind;
+        return res + " " + kind; // eg: f(a,&b) %d
     }
     else if (this->kind == 5) {
         std::string op = this->not_uminus->trans();
