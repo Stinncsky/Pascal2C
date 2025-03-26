@@ -25,7 +25,7 @@
     AST* ast;
 }
 // **声明终结符**
-%token <token> Identifier Number String_var Char_var ProgramKey Const Var Array Of Basictype Procedure Function Begin End If Then For To Do Read Write Else Booltype Relop Mulop Addop Assignop Dotdot Semi Dot Lparen Rparen Lbra Rbra Colon Comma Null 
+%token <token> Identifier Number String_var Char_var ProgramKey Const Var Array Of Basictype Procedure Function Begin End If Then For To Do Read Write Else Booltype Notop Mulop Addop Relop Assignop Dotdot Semi Dot Lparen Rparen Lbra Rbra Colon Comma
 
 
 // **声明非终结符**
@@ -384,7 +384,7 @@ FactorNode: Number {
 } | Identifier Lparen ExpressionListNode Rparen {
     FinalNode* id = new FinalNode(*$1);
     $$ = new FactorNode(id, dynamic_cast<ExpressionListNode*>($3));
-} | Relop FactorNode {
+} | Notop FactorNode {
     if($1->property == "not"){
         FinalNode* id = new FinalNode(*$1);
         $$ = new FactorNode(id, dynamic_cast<FactorNode*>($2));
@@ -394,12 +394,12 @@ FactorNode: Number {
         YYERROR;
     }
 } | Addop FactorNode {
-    if($1->property == "-"){
+    if($1->property == "-" || $1->property == "+"){
         FinalNode* op = new FinalNode(*$1);
         $$ = new FactorNode(op,dynamic_cast<FactorNode*>($2));
     }
     else {
-        yyerror("Expected '-'");
+        yyerror("Expected '-' or '+'");
         YYERROR;
     }
 } | Booltype {

@@ -427,24 +427,26 @@ int Token::to_yacc_token() const {
             else if(this->property == "write") return 21;
             else if(this->property == "else") return 22;
             else if(this->property == "true" || this->property == "false") return 23;
-            else if(this->property == "not" || this->property == "or" || this->property == "and") return 24;
+            else if(this->property == "not") return 24;
             else if(this->property == "div" || this->property == "mod") return 25;
+            else if(this->property == "or") return 26; // ADDOP
+            else if(this->property == "and") return 25; // MULOP
         case TokenType::Operator: 
             if(this->property == "*" || this->property == "/") return 25;
             else if(this->property == "+" || this->property == "-") return 26;
-            else if(this->property == "<" || this->property == "<=" || this->property == ">" || this->property == ">=" || this->property == "=" || this->property == "<>") return 24;
-            else if(this->property == ":=") return 27;
-            else if(this->property == "..") return 28;
+            else if(this->property == "<" || this->property == "<=" || this->property == ">" || this->property == ">=" || this->property == "=" || this->property == "<>") return 27; //RELOP
+            else if(this->property == ":=") return 28;
+            else if(this->property == "..") return 29;
         case TokenType::Delimiters: 
-            if(this->property == ";") return 29;
-            else if(this->property == ".") return 30;
-            else if(this->property == "(") return 31;
-            else if(this->property == ")") return 32;
-            else if(this->property == "[") return 33;
-            else if(this->property == "]") return 34;
-            else if(this->property == ":") return 35;
-            else if(this->property == ",") return 36;
-        case TokenType::Null: return 36;
+            if(this->property == ";") return 30;
+            else if(this->property == ".") return 31;
+            else if(this->property == "(") return 32;
+            else if(this->property == ")") return 33;
+            else if(this->property == "[") return 34;
+            else if(this->property == "]") return 35;
+            else if(this->property == ":") return 36;
+            else if(this->property == ",") return 37;
+        case TokenType::Null: return 38;
     }
-    return 36;
+    return 38;
 }
