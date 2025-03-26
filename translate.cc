@@ -197,7 +197,7 @@ std::string BasicTypeNode::trans() const{
 std::string PeriodNode::trans(std::vector<int> &dim) const{
     std::string res = "";
     if (this->period != nullptr){
-        res += this->period->trans();
+        res += this->period->trans(dim);
     }
     int start = std::stoi(this->num1->trans());
     dim.push_back(start);
