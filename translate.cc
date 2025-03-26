@@ -603,7 +603,7 @@ std::string ExpressionListNode::trans() const {
     if (this->expression_list == nullptr)
         return this->expression->trans();
     else
-        return this->expression->trans() + "," + this->expression_list->trans();
+        return this->expression_list->trans() + "," + this->expression->trans();
 }
 
 std::string ExpressionNode::trans() const {
