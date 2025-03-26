@@ -654,6 +654,8 @@ std::string SimpleExpressionNode::trans() const {
         //     return std::to_string(term - sim_exp) + kind;
         // else if (op == "or")
         //     return std::to_string(term | sim_exp) + kind;
+        if (term_content != "" && term_content.substr(0, 1) == op)
+            return simple_expr_content + op + "(" + term_content + ") " + kind;
         return simple_expr_content + op + term_content + " " + kind;
         // eg: "1 * 2 + 1 * 2 %d" -> "1*2+1*2 %d"
     }
@@ -705,8 +707,8 @@ std::string FactorNode::trans() const {
         return num_str + " " + kind; // eg: "1 %d"
     }
     else if (this->kind == 2) {
-        std::string str = this->variable->trans(); // eg: "a %d"
-        return str;
+        std::string str = this->variable->trans();
+        return str; // eg: "a %d"
         // size_t space_pos = str.find(' ');
         // auto tmpstr = str.substr(0, space_pos);
         // auto info = t.table[*this->variable->id]; // 判断是变量还是无参数传递的函数
@@ -723,7 +725,7 @@ std::string FactorNode::trans() const {
         size_t space_pos = expr.find(' ');
         std::string before_space = "(" + expr.substr(0, space_pos) + ")";
         std::string after_space = expr.substr(space_pos);
-        return before_space + after_space;
+        return before_space + after_space; // (1+1) %d
     }
     else if (this->kind == 4) { // 找到每一个空格，从空格开始到逗号前的部分都去掉
         std::string expr_list = this->expression_list->trans();
@@ -779,11 +781,18 @@ std::string FactorNode::trans() const {
         else if (std::get<0>(info) == ID_STRING) {
             kind = "%s";
         }
-        return res + expr_list + ")" + kind; // eg: f(a,&b)%d
+        return res + expr_list + ") " + kind; // eg: f(a,&b) %d
     }
     else if (this->kind == 5) {
         std::string op = this->not_uminus->trans();
-        return op + this->factor->trans();
+        std::string factor_str = this->factor->trans();
+        if (factor_str != "" && factor_str.substr(0, 1) == op) {
+            size_t space_pos = factor_str.find(' ');
+            std::string factor_content = factor_str.substr(0, space_pos);
+            std::string factor_kind = factor_str.substr(space_pos);
+            return op + "(" + factor_content + ") " + factor_kind;
+        }
+        return op + factor_str; // -(-1) %d
     }
     return "";
 }
