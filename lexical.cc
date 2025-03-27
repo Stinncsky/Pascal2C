@@ -56,7 +56,7 @@ void Lexical::run() {
                         }
                     }
                 }
-                else if(ch >= 'a' && ch <= 'z'){  // 标识符或关键字
+                else if((ch >= 'a' && ch <= 'z') || ch == '_'){  // 标识符或关键字
                     state = State::IN_WORD;
                     temp_token += ch;
                     column_number++;
@@ -225,7 +225,7 @@ void Lexical::run() {
                 break;
 
             case State::IN_WORD:
-                if((ch >= 'a' && ch <= 'z') || (ch >= '0' && ch <= '9')){
+                if((ch >= 'a' && ch <= 'z') || (ch >= '0' && ch <= '9') || ch == '_'){
                     temp_token += ch;
                     column_number++;
                     i++;

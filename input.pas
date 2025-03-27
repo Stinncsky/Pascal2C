@@ -1,10 +1,11 @@
-// 测试样例 00-27 (28 'not') 29-43
+// 测试样例 00-27 (28 'not') 29-43 (45 Syntax) (56 EXIT) (57 函数传入多参数) (58 While)
 program main;
 const
   ca = 1;
   cb = 'a';
 var 
   a, input: integer;
+  f: real;
   b : array [1..10] of integer;
   bx: array [1..9, 2..9] of integer;
   tmp: integer;
@@ -120,6 +121,11 @@ begin
   write(a, b, c, d, e);
 end;
 
+function funcall(a, b, c, d, e: integer): real;
+begin
+  funcall := a + b + c + d + e;
+end;
+
 function varfunc(a: integer; var b: integer): integer;
 begin
   a := a + 1;
@@ -165,4 +171,7 @@ begin
   call(a, b[1], bx[1, 2], tmp, input);
   varproc(a, a);
   tmp := varfunc(a, a);
+
+  f := funcall(a, b[1], bx[1, 2], tmp, input);
+  write(f);
 end.

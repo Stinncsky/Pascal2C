@@ -797,13 +797,19 @@ std::string FactorNode::trans() const {
     }
     else if (this->kind == 4) { // 找到每一个空格，从空格开始到逗号前的部分都去掉
         std::string expr_list = this->expression_list->trans();
-        // 去掉expr_list中的类型，使"a %d,b %s"变成"a,b"
+        std::string temp = "";
         size_t space_pos = expr_list.find(' ');
         while (space_pos != std::string::npos) {
             size_t del_pos = expr_list.find(',');
-            expr_list = expr_list.erase(space_pos, del_pos - space_pos);
+            temp += expr_list.substr(0, space_pos) + ",";
+            if (del_pos != std::string::npos)
+                expr_list = expr_list.erase(0, del_pos + 1);
+            else
+                expr_list = "";
             space_pos = expr_list.find(' ');
         }
+        if (temp[int(temp.size()) - 1] == ',') temp.erase(int(temp.size()) - 1);
+        expr_list = temp;
         std::string res = this->id->trans() + "(";
         std::vector<int> cites = std::get<1>(t.table[*this->id]);
         int arg_num = cites.size();
