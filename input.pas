@@ -120,9 +120,17 @@ begin
   write(a, b, c, d, e);
 end;
 
-procedure varfunc(var a: integer);
+function varfunc(a: integer; var b: integer): integer;
 begin
   a := a + 1;
+  b := b + 1;
+  varfunc := a;
+end;
+
+procedure varproc(var a: integer; b: integer);
+begin
+  a := a + 1;
+  b := b + 1;
 end;
 
 begin
@@ -155,5 +163,6 @@ begin
   if 1=1 then ;
   opPriority;
   call(a, b[1], bx[1, 2], tmp, input);
-  varfunc(a);
+  varproc(a, a);
+  tmp := varfunc(a, a);
 end.

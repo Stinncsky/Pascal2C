@@ -642,18 +642,6 @@ std::string ProcedureCallNode::trans() const {
         if (cites[k] >= CITE)
             res += "&";
         res += expr_list + ")";
-        // 更新符号表
-        for (int i = 0; i < arg_num; i++) {
-            if (cites[i] >= CITE) {
-                ExpressionNode* need_cite_var = nullptr; // error: 这应该得是变量而不应该是表达式的吧，要判断下吧
-                ExpressionListNode* temp_list = this->expression_list;
-                for (int j = i; j < arg_num - 1; j++) { // 需要访问几次expression_list指针才能访问expression指针
-                    temp_list = temp_list->expression_list;
-                }
-                need_cite_var = temp_list->expression;
-                std::get<1>(t.table[*need_cite_var->simple_expression->term->factor->variable->id]).push_back(CITE); // ERROR: 因具体类型而异
-            }
-        }
         // return res + expr_list + ") " + kind;
         return res + " " + kind; // eg: f(a,&b) %d
     }
@@ -834,18 +822,6 @@ std::string FactorNode::trans() const {
         if (cites[k] >= CITE)
             res += "&";
         res += expr_list + ")";
-        // 更新符号表
-        for (int i = 0; i < arg_num; i++) {
-            if (cites[i] >= CITE) {
-                ExpressionNode* need_cite_var = nullptr; // error: 这应该得是变量而不应该是表达式的吧，要判断下吧
-                ExpressionListNode* temp_list = this->expression_list;
-                for (int j = i; j < arg_num - 1; j++) { // 需要访问几次expression_list指针才能访问expression指针
-                    temp_list = temp_list->expression_list;
-                }
-                need_cite_var = temp_list->expression;
-                std::get<1>(t.table[*need_cite_var->simple_expression->term->factor->variable->id]).push_back(CITE); // ERROR: 因具体类型而异
-            }
-        }
         // 判断函数返回值类型
         auto info = t.table[*id];
         std::string kind = "";
