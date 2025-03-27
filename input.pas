@@ -1,4 +1,4 @@
-// 测试样例 00-27 (28 'not') 29-38
+// 测试样例 00-27 (28 'not') 29-41 (42 多参数函数) (43 传引用调用)
 program main;
 const
   ca = 1;
@@ -111,8 +111,18 @@ begin
   else
   begin
     write(n);
-    //recursion(n - 1); 暂时不能处理递归调用的情况
+    recursion(n - 1);
   end;
+end;
+
+procedure call(a, b, c, d, e: integer);
+begin
+  write(a, b, c, d, e);
+end;
+
+procedure varfunc(var a: integer);
+begin
+  a := a + 1;
 end;
 
 begin
@@ -144,4 +154,6 @@ begin
 
   if 1=1 then ;
   opPriority;
+  call(a, b[1], bx[1, 2], tmp, input);
+  varfunc(a);
 end.

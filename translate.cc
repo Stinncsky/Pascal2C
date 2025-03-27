@@ -228,8 +228,6 @@ std::string SubprogramNode::trans() const{
     Table tmp = t;
     res += this->subprogram_head->trans(&func_p_is_cite);
     FinalNode now_func = *t.now_funcid;
-    res += this->subprogram_body->trans();
-    t = tmp;
     int func_type;
     if (this->subprogram_head->basic_type == nullptr){
         func_type = FUNC_VOID;
@@ -240,7 +238,10 @@ std::string SubprogramNode::trans() const{
     } else if (this->subprogram_head->basic_type->trans() == "char"){
         func_type = FUNC_CHAR;
     }
-    t.table[now_func] = std::make_tuple(func_type, func_p_is_cite, std::vector<int>());
+    t.table[now_func] = std::make_tuple(func_type, func_p_is_cite, std::vector<int>());//自身递归需要
+    res += this->subprogram_body->trans(); //先存符号表，再处理函数体：递归调用自身
+    t = tmp;
+    t.table[now_func] = std::make_tuple(func_type, func_p_is_cite, std::vector<int>());//外部调用需要
     return res;
 }
 
