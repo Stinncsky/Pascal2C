@@ -362,6 +362,9 @@ std::string StatementNode::trans() const {
             } else {
                 exp = exp.substr(0, space_pos);
             }
+            auto info = t.table[*id];
+            if (!std::get<1>(info).empty() && std::get<1>(info).back() >= CITE)
+                id_str = "(*" + id_str + ")";
             return id_str + " = " + exp + ";\n";
         }
     }
@@ -471,6 +474,8 @@ std::string StatementNode::trans() const {
         int n = expr.size();
         std::string res = "";
         for (int i = 0; i < n; i++) {
+            if (kind[i][int(kind[i].size()) - 1] == ',')
+                kind[i].erase(kind[i].end() - 1);
             res += "printf(\"" + kind[i] + "\", " + expr[i] + ");\n";
         }
         return res;
@@ -538,8 +543,12 @@ std::string VariableNode::trans() const {
     else if (std::get<0>(info) == FUNC_VOID) {
         res += ""; // error: 
     }
-    if (!std::get<1>(info).empty() && std::get<1>(info).back() >= CITE)
-        res = "&" + res;
+    if (!std::get<1>(info).empty() && std::get<1>(info).back() >= CITE) {
+        size_t space_pos = res.find(" ");
+        std::string res_content = res.substr(0, space_pos);
+        std::string kind = res.substr(space_pos + 1);
+        res = "(*" + res_content + ") " + kind;
+    }
     // res += ");\n";
     return res;
     // eg: "a[1][2] %d"
@@ -571,12 +580,19 @@ std::string ProcedureCallNode::trans() const {
         return this->id->trans() + "()";
     else { // 找到每一个空格，从空格开始到逗号前的部分都去掉
         std::string expr_list = this->expression_list->trans();
+        std::string temp = "";
         size_t space_pos = expr_list.find(' ');
         while (space_pos != std::string::npos) {
             size_t del_pos = expr_list.find(',');
-            expr_list = expr_list.erase(space_pos, del_pos - space_pos);
+            temp += expr_list.substr(0, space_pos) + ",";
+            if (del_pos != std::string::npos)
+                expr_list = expr_list.erase(0, del_pos + 1);
+            else
+                expr_list = "";
             space_pos = expr_list.find(' ');
         }
+        if (temp[int(temp.size()) - 1] == ',') temp.erase(int(temp.size()) - 1);
+        expr_list = temp;
         auto info = t.table[*id];
         std::string kind = "";
         if (std::get<0>(info) == ID_INT) {
@@ -612,7 +628,7 @@ std::string ProcedureCallNode::trans() const {
         while(del_pos != std::string::npos) {
             std::string expr = expr_list.substr(0, del_pos);
             if (cites[k] >= CITE)
-                res += "*";
+                res += "&";
             res += expr + ",";
             k++;
             expr_list.erase(0,del_pos + 1);
@@ -804,7 +820,7 @@ std::string FactorNode::trans() const {
         while(del_pos != std::string::npos) {
             std::string expr = expr_list.substr(0, del_pos);
             if (cites[k] >= CITE)
-                res += "*";
+                res += "&";
             res += expr + ",";
             k++;
             expr_list.erase(0,del_pos + 1);
