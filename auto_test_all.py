@@ -32,6 +32,22 @@ for pas_file in pas_files:
             break
         else:
             print(f"成功处理 {input_file}")
+
+            try:
+                result = subprocess.run(["gcc", "-o", "output.exe", "output.c"],
+                                  capture_output=True, text=True, check=False)
+                if result.returncode != 0 or result.stderr:
+                    print(f"编译output.c时出错: returncode = {result.returncode}")
+                    print(result.stderr)
+                    print(result.stdout)
+                    all_success = False
+                    break
+                else:
+                    print(f"成功编译output.c")
+            except Exception as e:
+                print(f"发生异常: {e}")
+                all_success = False
+                break
     except Exception as e:
         print(f"发生异常: {e}")
         all_success = False
