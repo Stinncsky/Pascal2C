@@ -466,12 +466,13 @@ std::string StatementNode::trans() const {
         while (space_pos != std::string::npos) {
             size_t del_pos = expr_list.find(',');
             expr.push_back(expr_list.substr(0, space_pos));
+            expr_list.erase(0, space_pos + 1);
             if (del_pos != std::string::npos) {
-                kind.push_back(expr_list.substr(space_pos + 1, del_pos - space_pos));
+                kind.push_back(expr_list.substr(0, del_pos));
                 expr_list = expr_list.erase(0, del_pos + 1);
             }
             else {
-                kind.push_back(expr_list.substr(space_pos + 1));
+                kind.push_back(expr_list);
                 expr_list = "";
             }
             space_pos = expr_list.find(' ');
