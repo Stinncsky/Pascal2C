@@ -33,7 +33,7 @@ void set_parameter(int argc, char *argv[]) {
 }
 
 int main(int argc, char *argv[]) {
-    printf("Pascal2C version %s\n", VERSION.c_str());
+    if(debug_mode) printf("Pascal2C version %s\n", VERSION.c_str());
     set_parameter(argc, argv);
 
     syntax = new Syntax(); // 这里初始化 syntax
@@ -60,7 +60,7 @@ void Program::run(){
     while (getline(file, line)) {
         source_code += line + "\n";
     }
-    printf("Read file %s\n", INPUT_FILE.c_str());
+    if(debug_mode) printf("Read file %s\n", INPUT_FILE.c_str());
     file.close();
     
     lexicalAnalyzer.load(source_code);
@@ -72,16 +72,16 @@ void Program::run(){
     if(yyparse() == 0)  {
         // 语法分析成功
         if(syntax->tree != nullptr) {
-            printf("Success in Syntax Analysis\n\n");
+            if(debug_mode) printf("Success in Syntax Analysis\n\n");
 
             tree_root = syntax->tree;
             std::string output = dynamic_cast<ProgramStructNode *>(tree_root)->trans();
-            printf("Success in Translation to C-language\n");
+            if(debug_mode) printf("Success in Translation to C-language\n");
 
             std::ofstream out(OUTPUT_FILE);
             out << output;
             out.close();
-            printf("Output to file %s\n", OUTPUT_FILE.c_str());
+            if(debug_mode) printf("Output to file %s\n", OUTPUT_FILE.c_str());
         } else {
             fprintf(stderr, "Error: No syntax tree\n");
             exit(1);

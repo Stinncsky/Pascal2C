@@ -420,6 +420,12 @@ class StatementNode : public AST {
             this->expression_list = expression_list;
             this->kind = 9;
         } //  statement → write ( expression_list )
+
+        StatementNode(ExpressionNode *expression, StatementNode *statement) : AST(NodeType::statement) {
+            this->expression = expression;
+            this->statement = statement;
+            this->kind = 10;
+        } //  statement → while expression do statement
         ~StatementNode();
 
         std::string trans() const override;

@@ -90,7 +90,9 @@ extern int yydebug;
     Lbra = 291,                    /* Lbra  */
     Rbra = 292,                    /* Rbra  */
     Colon = 293,                   /* Colon  */
-    Comma = 294                    /* Comma  */
+    Comma = 294,                   /* Comma  */
+    Null = 295,                    /* Null  */
+    While = 296                    /* While  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
@@ -104,7 +106,7 @@ union YYSTYPE
     Token* token;
     AST* ast;
 
-#line 108 "syntax.tab.hpp"
+#line 110 "syntax.tab.hpp"
 
 };
 typedef union YYSTYPE YYSTYPE;

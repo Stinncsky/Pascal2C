@@ -25,7 +25,7 @@
     AST* ast;
 }
 // **声明终结符**
-%token <token> Identifier Number String_var Char_var ProgramKey Const Var Array Of Basictype Procedure Function Begin End If Then For To Do Read Write Else Booltype Notop Mulop Addop Relop Assignop Dotdot Semi Dot Lparen Rparen Lbra Rbra Colon Comma
+%token <token> Identifier Number String_var Char_var ProgramKey Const Var Array Of Basictype Procedure Function Begin End If Then For To Do Read Write Else Booltype Notop Mulop Addop Relop Assignop Dotdot Semi Dot Lparen Rparen Lbra Rbra Colon Comma Null While
 
 
 // **声明非终结符**
@@ -311,7 +311,9 @@ StatementNode: {
 } | Write Lparen ExpressionListNode Rparen {
     FinalNode* Wr = new FinalNode(*$1);
     $$ = new StatementNode(Wr, dynamic_cast<ExpressionListNode*>($3));
-} 
+} | While ExpressionNode Do StatementNode{ // while语句拓展
+    $$ = new StatementNode(dynamic_cast<ExpressionNode*>($2), dynamic_cast<StatementNode*>($4));
+}
 
 VariableListNode: VariableNode {
     $$ = new VariableListNode(dynamic_cast<VariableNode*>($1));

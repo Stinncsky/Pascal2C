@@ -174,4 +174,11 @@ begin
 
   f := funcall(a, b[1], bx[1, 2], tmp, input);
   write(f);
+
+  a := 2;
+  while a > 0 do
+  begin
+    a := a - 1;
+  end;
+  write(a);
 end.

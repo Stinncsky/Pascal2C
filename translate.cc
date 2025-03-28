@@ -485,6 +485,29 @@ std::string StatementNode::trans() const {
         }
         return res;
     }
+    else if(kind == 10){ //  statement → while expression do statement
+        std::string exp = this->expression->trans();
+        size_t space_pos = exp.find(' ');
+        if (exp[exp.size() - 1] == ')') {
+            exp = exp.substr(0, space_pos) + ")";
+        } else {
+            exp = exp.substr(0, space_pos);
+        }
+        const std::string statement_str = this->statement->trans();
+        int end_index = statement_str.size() - 1;
+        while(end_index > 0){ 
+            if(statement_str[end_index] != '\n' && statement_str[end_index] != ' ' && statement_str[end_index] != '\t'){
+                break;
+            }
+            end_index--;
+        } //去掉结尾的'\n', ' ', '\t'等方便判断是否以'}'结尾
+        if(end_index >= 0 && statement_str[0] == '{' && statement_str[end_index] == '}'){
+            return "while (" + exp + ") " + statement_str + "\n"; //若以{}包裹则不需要再加{}
+        }
+        else {
+            return "while (" + exp + ") {\n" + statement_str + "}\n";
+        }
+    }
     return "";
 }
 

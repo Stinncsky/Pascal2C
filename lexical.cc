@@ -431,6 +431,8 @@ int Token::to_yacc_token() const {
             else if(this->property == "div" || this->property == "mod") return 25;
             else if(this->property == "or") return 26; // ADDOP
             else if(this->property == "and") return 25; // MULOP
+            /*拓展语法：while*/
+            else if(this->property == "while") return 39;
         case TokenType::Operator: 
             if(this->property == "*" || this->property == "/") return 25;
             else if(this->property == "+" || this->property == "-") return 26;
