@@ -1,4 +1,4 @@
-// 测试样例 00-27 (28 'not') 29-43 (45 65 Syntax) (49 最后的write()) (56 EXIT TOOLONG) (63 EXIT)
+// 测试样例 00-27 (28 'not') 29-43 (65 函数参数) (49 最后的write()) (56 EXIT TOOLONG) (63 EXIT)
 program main;
 const
   ca = 1;
@@ -101,7 +101,7 @@ begin
   end;
 end;
 
-procedure nullfunc;
+procedure nullfunc();
 begin
 end;
 
@@ -138,6 +138,18 @@ begin
   a := a + 1;
   b := b + 1;
 end;
+
+function ccc(radius: integer):real;
+begin
+  ccc := radius;
+end;
+
+function bbb(a,b: real):integer;
+begin
+  bbb := 0;
+end;
+
+procedure aaa(cond: integer); begin end;
 
 begin
   write(cb);
@@ -183,4 +195,6 @@ begin
   write(a);
 
   func(a);
+  a := (func(func(func(a))));
+  aaa(bbb(ccc(5), ccc(5))); // 错误
 end.

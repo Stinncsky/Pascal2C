@@ -518,16 +518,16 @@ union yyalloc
 /* YYFINAL -- State number of the termination state.  */
 #define YYFINAL  5
 /* YYLAST -- Last index in YYTABLE.  */
-#define YYLAST   178
+#define YYLAST   171
 
 /* YYNTOKENS -- Number of terminals.  */
 #define YYNTOKENS  42
 /* YYNNTS -- Number of nonterminals.  */
 #define YYNNTS  35
 /* YYNRULES -- Number of rules.  */
-#define YYNRULES  79
+#define YYNRULES  80
 /* YYNSTATES -- Number of states.  */
-#define YYNSTATES  172
+#define YYNSTATES  173
 
 /* YYMAXUTOK -- Last valid token kind.  */
 #define YYMAXUTOK   296
@@ -583,11 +583,12 @@ static const yytype_int16 yyrline[] =
        0,    44,    44,    49,    52,    57,    64,    67,    75,    78,
       83,    93,   104,   113,   116,   119,   126,   129,   133,   136,
      142,   145,   151,   164,   174,   184,   194,   207,   209,   213,
-     223,   227,   232,   234,   239,   241,   245,   247,   251,   255,
-     259,   263,   267,   269,   274,   276,   284,   293,   295,   297,
-     299,   308,   311,   314,   318,   320,   324,   329,   331,   335,
-     338,   341,   346,   348,   352,   354,   358,   360,   365,   367,
-     372,   374,   379,   382,   384,   386,   389,   398,   407,   410
+     223,   227,   232,   234,   236,   240,   242,   246,   248,   252,
+     256,   260,   264,   268,   270,   275,   277,   285,   294,   296,
+     298,   300,   309,   312,   315,   319,   321,   325,   330,   332,
+     336,   339,   342,   347,   349,   353,   355,   359,   361,   366,
+     368,   373,   375,   380,   383,   385,   387,   390,   399,   408,
+     411
 };
 #endif
 
@@ -628,7 +629,7 @@ yysymbol_name (yysymbol_kind_t yysymbol)
 }
 #endif
 
-#define YYPACT_NINF (-100)
+#define YYPACT_NINF (-101)
 
 #define yypact_value_is_default(Yyn) \
   ((Yyn) == YYPACT_NINF)
@@ -642,24 +643,24 @@ yysymbol_name (yysymbol_kind_t yysymbol)
    STATE-NUM.  */
 static const yytype_int16 yypact[] =
 {
-      10,    19,    46,    26,    56,  -100,    92,   108,   110,    81,
-     106,  -100,   -25,    87,    85,  -100,   108,  -100,  -100,   115,
-      55,   116,    40,    88,    80,  -100,  -100,  -100,  -100,   117,
-    -100,    93,    17,   108,   121,   122,     1,    94,    95,  -100,
-    -100,    55,    96,  -100,  -100,  -100,    66,    99,    99,    32,
-      47,   125,   101,   102,    47,  -100,    -7,  -100,   100,  -100,
-    -100,    92,  -100,    65,    17,    12,  -100,    91,    47,     9,
-      47,  -100,     2,  -100,  -100,    47,    47,    47,  -100,   113,
-      78,   111,  -100,   107,   136,    47,   119,  -100,     1,    47,
-     106,  -100,   112,   114,    59,  -100,   108,    70,    57,  -100,
-    -100,  -100,   129,  -100,  -100,     6,  -100,    60,    29,  -100,
-    -100,   109,     1,    47,    47,    47,    47,   118,    35,  -100,
-      45,     1,  -100,  -100,   127,   142,   141,   137,    97,  -100,
-     129,    12,  -100,  -100,  -100,    47,  -100,  -100,    52,  -100,
-     126,   111,   123,  -100,   132,  -100,   136,  -100,  -100,  -100,
-    -100,  -100,   129,   124,   128,  -100,  -100,  -100,  -100,     1,
-    -100,    47,  -100,  -100,   145,   147,  -100,   135,  -100,  -100,
-       1,  -100
+       7,    89,    22,    34,    55,  -101,    93,   102,   107,    85,
+     103,  -101,   -10,    90,    88,  -101,   102,  -101,  -101,   118,
+      79,   119,     8,    91,    80,  -101,  -101,  -101,  -101,   121,
+    -101,    97,    45,   102,   124,   125,     1,    98,    99,  -101,
+    -101,    79,    96,  -101,  -101,  -101,    70,    95,    95,   -19,
+      47,   130,   104,   105,    47,  -101,    -6,  -101,   106,  -101,
+    -101,    93,  -101,    58,    45,    24,  -101,   108,    47,     9,
+      47,  -101,    62,  -101,  -101,    47,    47,    47,  -101,   116,
+      86,   110,  -101,   111,   137,    47,   122,  -101,     1,    47,
+     103,  -101,   113,   114,    60,  -101,   102,  -101,    78,    56,
+    -101,  -101,  -101,   135,  -101,  -101,    19,  -101,    63,    35,
+    -101,  -101,   115,     1,    47,    47,    47,    47,   112,    32,
+    -101,    39,     1,  -101,  -101,   127,   145,   146,   140,   100,
+    -101,   135,    27,  -101,  -101,  -101,    47,  -101,  -101,    41,
+    -101,   129,   110,   126,  -101,   136,  -101,   137,  -101,  -101,
+    -101,  -101,  -101,   135,   128,   131,  -101,  -101,  -101,  -101,
+       1,  -101,    47,  -101,  -101,   151,   152,  -101,   139,  -101,
+    -101,     1,  -101
 };
 
 /* YYDEFACT[STATE-NUM] -- Default reduction number in state STATE-NUM.
@@ -670,39 +671,39 @@ static const yytype_int8 yydefact[] =
        0,     0,     0,     0,     3,     1,     8,     0,     0,     0,
       16,     6,     0,     0,     0,     2,     0,    27,     4,     0,
        0,     9,     0,     0,     0,     7,    13,    15,    14,     0,
-      10,     0,     0,    17,     0,     0,    44,     0,     0,     5,
-      12,     0,     0,    22,    18,    20,     0,    32,    32,    59,
-       0,     0,     0,     0,     0,    48,     0,    42,     0,    47,
+      10,     0,     0,    17,     0,     0,    45,     0,     0,     5,
+      12,     0,     0,    22,    18,    20,     0,    32,    32,    60,
+       0,     0,     0,     0,     0,    49,     0,    43,     0,    48,
       28,     8,    11,     0,     0,     0,    30,     0,     0,     0,
-       0,    56,    57,    72,    78,     0,     0,     0,    73,     0,
-      66,    68,    70,     0,     0,     0,     0,    41,    44,     0,
-      16,    29,     0,     0,     0,    19,     0,     0,     0,    34,
-      36,    37,     0,    46,    61,     0,    64,     0,     0,    76,
-      77,     0,    44,     0,     0,     0,     0,    57,     0,    54,
-       0,    44,    43,    45,     0,     0,     0,     0,     0,    38,
-       0,     0,    33,    31,    60,     0,    58,    79,     0,    74,
-      62,    69,    67,    71,     0,    51,     0,    52,    53,    40,
-      23,    24,     0,     0,     0,    39,    35,    65,    75,    44,
-      49,     0,    55,    21,     0,     0,    63,     0,    25,    26,
-      44,    50
+       0,    57,    58,    73,    79,     0,     0,     0,    74,     0,
+      67,    69,    71,     0,     0,     0,     0,    42,    45,     0,
+      16,    29,     0,     0,     0,    19,     0,    34,     0,     0,
+      35,    37,    38,     0,    47,    62,     0,    65,     0,     0,
+      77,    78,     0,    45,     0,     0,     0,     0,    58,     0,
+      55,     0,    45,    44,    46,     0,     0,     0,     0,     0,
+      39,     0,     0,    33,    31,    61,     0,    59,    80,     0,
+      75,    63,    70,    68,    72,     0,    52,     0,    53,    54,
+      41,    23,    24,     0,     0,     0,    40,    36,    66,    76,
+      45,    50,     0,    56,    21,     0,     0,    64,     0,    25,
+      26,    45,    51
 };
 
 /* YYPGOTO[NTERM-NUM].  */
-static const yytype_int16 yypgoto[] =
+static const yytype_int8 yypgoto[] =
 {
-    -100,  -100,  -100,  -100,    49,   103,  -100,   120,    67,  -100,
-      98,   -99,  -100,  -100,  -100,  -100,   130,  -100,    27,  -100,
-      64,  -100,   -22,  -100,   -82,  -100,   -36,  -100,  -100,  -100,
-     -59,   -49,    51,    50,   -68
+    -101,  -101,  -101,  -101,    49,   109,  -101,   120,    67,  -101,
+     101,  -100,  -101,  -101,  -101,  -101,   123,  -101,    31,  -101,
+      68,  -101,   -22,  -101,   -81,  -101,   -36,  -101,  -101,  -101,
+     -64,   -49,    51,    53,   -67
 };
 
 /* YYDEFGOTO[NTERM-NUM].  */
 static const yytype_uint8 yydefgoto[] =
 {
-       0,     2,     3,     9,    97,    10,    14,    30,    17,    23,
-      44,    45,    94,    24,    37,    38,    66,    98,    99,   100,
-     101,    91,    55,    56,    57,   118,    78,    71,    59,   160,
-     105,   106,    80,    81,    82
+       0,     2,     3,     9,    98,    10,    14,    30,    17,    23,
+      44,    45,    94,    24,    37,    38,    66,    99,   100,   101,
+     102,    91,    55,    56,    57,   119,    78,    71,    59,   161,
+     106,   107,    80,    81,    82
 };
 
 /* YYTABLE[YYPACT[STATE-NUM]] -- What to do in state STATE-NUM.  If
@@ -710,46 +711,46 @@ static const yytype_uint8 yydefgoto[] =
    number is the opposite.  If YYTABLE_NINF, syntax error.  */
 static const yytype_uint8 yytable[] =
 {
-      58,    79,    39,   133,    49,    86,   122,   109,   110,    87,
-      18,   107,    72,    73,    19,    11,    36,     1,    50,   103,
-      51,    96,     4,    52,    53,    88,   120,    42,   111,    43,
-     140,   155,    72,    73,    74,    75,   108,    76,    70,   148,
-     123,   134,    54,    77,   104,   135,     5,   143,   119,   138,
-      72,    73,    58,   163,    74,    75,    12,    76,     6,    26,
-      27,    28,    68,    77,   137,    22,    69,   144,    70,    92,
-     145,    93,    74,    75,   146,    76,    58,   166,    32,    19,
-     147,    77,    46,    29,   135,    58,   157,   158,   171,   131,
-       7,   135,   132,    34,    35,    36,   127,   136,   128,   135,
-       8,   153,   149,   154,    64,    19,   113,   114,   130,    19,
-     162,    11,   167,    13,    15,    16,    20,    21,    25,    31,
-      33,    40,    41,    58,    47,    48,    60,    61,    83,   102,
-      89,   112,    63,    65,    58,    84,    85,   116,   115,   117,
-     121,    43,    36,   125,   139,   126,   150,   151,   152,   168,
-     159,   113,   161,   169,    70,   164,   170,   124,   156,   165,
-     129,    62,    95,   141,    90,   142,     0,     0,     0,     0,
-       0,     0,     0,     0,     0,     0,     0,     0,    67
+      58,    79,    39,   134,    49,    86,   108,   123,   110,   111,
+      87,    68,    72,    73,     1,    69,    36,    70,    50,   104,
+      51,   121,     5,    52,    53,    18,    88,    11,   112,    19,
+      11,   156,   141,    96,    74,    75,    96,    76,    72,    73,
+     124,   149,    54,    77,   105,   139,    32,    19,   120,   144,
+      72,    73,    58,   164,   135,    42,    12,    43,   136,    97,
+      74,    75,    92,    76,    93,    22,     6,   146,   145,    77,
+     138,   147,    74,    75,   148,    76,   159,    58,   136,   167,
+     136,    77,    46,    26,    27,    28,    58,   158,   132,     7,
+     172,   133,     4,    34,    35,    36,   109,   128,    70,   129,
+     137,     8,   136,   150,   154,    11,   155,    29,    64,    19,
+      13,   163,    16,   168,   114,   115,   131,    19,    15,    20,
+      21,    25,    31,    33,    58,    40,    41,    47,    48,    65,
+      60,    61,    63,    83,   113,    58,    89,   116,    84,    85,
+     118,   117,    36,   122,   126,   127,   103,    43,    70,   151,
+     140,   153,   152,   160,   114,   169,   162,   125,   170,   165,
+     171,    62,   166,   157,   130,    95,   143,   142,     0,     0,
+      90,    67
 };
 
 static const yytype_int16 yycheck[] =
 {
-      36,    50,    24,   102,     3,    54,    88,    75,    76,    16,
-      35,    70,     3,     4,    39,     3,    15,     7,    17,    68,
-      19,     9,     3,    22,    23,    32,    85,    10,    77,    12,
-     112,   130,     3,     4,    25,    26,    34,    28,    36,   121,
-      89,    35,    41,    34,    35,    39,     0,   115,    84,   108,
-       3,     4,    88,   152,    25,    26,     7,    28,    32,     4,
-       5,     6,    30,    34,    35,    16,    34,   116,    36,     4,
-      35,     6,    25,    26,    39,    28,   112,   159,    38,    39,
-      35,    34,    33,    28,    39,   121,   135,    35,   170,    32,
-      34,    39,    35,    13,    14,    15,    37,    37,    39,    39,
-       8,     4,   124,     6,    38,    39,    28,    29,    38,    39,
-     146,     3,   161,     3,    33,     9,    29,    32,     3,     3,
-      32,     4,    29,   159,     3,     3,    32,    32,     3,    38,
-      30,    18,    36,    34,   170,    34,    34,    30,    27,     3,
-      21,    12,    15,    31,    35,    31,     4,     6,    11,     4,
-      24,    28,    20,     6,    36,    31,    21,    90,   131,    31,
-      96,    41,    64,   113,    61,   114,    -1,    -1,    -1,    -1,
-      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    48
+      36,    50,    24,   103,     3,    54,    70,    88,    75,    76,
+      16,    30,     3,     4,     7,    34,    15,    36,    17,    68,
+      19,    85,     0,    22,    23,    35,    32,     3,    77,    39,
+       3,   131,   113,     9,    25,    26,     9,    28,     3,     4,
+      89,   122,    41,    34,    35,   109,    38,    39,    84,   116,
+       3,     4,    88,   153,    35,    10,     7,    12,    39,    35,
+      25,    26,     4,    28,     6,    16,    32,    35,   117,    34,
+      35,    39,    25,    26,    35,    28,    35,   113,    39,   160,
+      39,    34,    33,     4,     5,     6,   122,   136,    32,    34,
+     171,    35,     3,    13,    14,    15,    34,    37,    36,    39,
+      37,     8,    39,   125,     4,     3,     6,    28,    38,    39,
+       3,   147,     9,   162,    28,    29,    38,    39,    33,    29,
+      32,     3,     3,    32,   160,     4,    29,     3,     3,    34,
+      32,    32,    36,     3,    18,   171,    30,    27,    34,    34,
+       3,    30,    15,    21,    31,    31,    38,    12,    36,     4,
+      35,    11,     6,    24,    28,     4,    20,    90,     6,    31,
+      21,    41,    31,   132,    96,    64,   115,   114,    -1,    -1,
+      61,    48
 };
 
 /* YYSTOS[STATE-NUM] -- The symbol kind of the accessing symbol of
@@ -765,15 +766,15 @@ static const yytype_int8 yystos[] =
       32,    32,    49,    36,    38,    34,    58,    58,    30,    34,
       36,    69,     3,     4,    25,    26,    28,    34,    68,    73,
       74,    75,    76,     3,    34,    34,    73,    16,    32,    30,
-      47,    63,     4,     6,    54,    52,     9,    46,    59,    60,
-      61,    62,    38,    73,    35,    72,    73,    72,    34,    76,
-      76,    73,    18,    28,    29,    27,    30,     3,    67,    68,
-      72,    21,    66,    73,    50,    31,    31,    37,    39,    62,
-      38,    32,    35,    53,    35,    39,    37,    35,    72,    35,
-      66,    75,    74,    76,    73,    35,    39,    35,    66,    64,
-       4,     6,    11,     4,     6,    53,    60,    73,    35,    24,
-      71,    20,    68,    53,    31,    31,    66,    73,     4,     6,
-      21,    66
+      47,    63,     4,     6,    54,    52,     9,    35,    46,    59,
+      60,    61,    62,    38,    73,    35,    72,    73,    72,    34,
+      76,    76,    73,    18,    28,    29,    27,    30,     3,    67,
+      68,    72,    21,    66,    73,    50,    31,    31,    37,    39,
+      62,    38,    32,    35,    53,    35,    39,    37,    35,    72,
+      35,    66,    75,    74,    76,    73,    35,    39,    35,    66,
+      64,     4,     6,    11,     4,     6,    53,    60,    73,    35,
+      24,    71,    20,    68,    53,    31,    31,    66,    73,     4,
+       6,    21,    66
 };
 
 /* YYR1[RULE-NUM] -- Symbol kind of the left-hand side of rule RULE-NUM.  */
@@ -782,11 +783,12 @@ static const yytype_int8 yyr1[] =
        0,    42,    43,    44,    44,    45,    46,    46,    47,    47,
       48,    48,    49,    49,    49,    49,    50,    50,    51,    51,
       52,    52,    53,    54,    54,    54,    54,    55,    55,    56,
-      57,    57,    58,    58,    59,    59,    60,    60,    61,    62,
-      63,    64,    65,    65,    66,    66,    66,    66,    66,    66,
-      66,    66,    66,    66,    67,    67,    68,    69,    69,    70,
-      70,    70,    71,    71,    72,    72,    73,    73,    74,    74,
-      75,    75,    76,    76,    76,    76,    76,    76,    76,    76
+      57,    57,    58,    58,    58,    59,    59,    60,    60,    61,
+      62,    63,    64,    65,    65,    66,    66,    66,    66,    66,
+      66,    66,    66,    66,    66,    67,    67,    68,    69,    69,
+      70,    70,    70,    71,    71,    72,    72,    73,    73,    74,
+      74,    75,    75,    76,    76,    76,    76,    76,    76,    76,
+      76
 };
 
 /* YYR2[RULE-NUM] -- Number of symbols on the right-hand side of rule RULE-NUM.  */
@@ -795,11 +797,12 @@ static const yytype_int8 yyr2[] =
        0,     2,     4,     2,     5,     4,     1,     3,     0,     3,
        3,     5,     2,     1,     1,     1,     0,     3,     3,     5,
        1,     6,     1,     3,     3,     5,     5,     0,     3,     3,
-       3,     5,     0,     3,     1,     3,     1,     1,     2,     3,
-       3,     3,     1,     3,     0,     3,     3,     1,     1,     5,
-       8,     4,     4,     4,     1,     3,     2,     0,     3,     1,
-       4,     3,     0,     2,     1,     3,     1,     3,     1,     3,
-       1,     3,     1,     1,     3,     4,     2,     2,     1,     3
+       3,     5,     0,     3,     2,     1,     3,     1,     1,     2,
+       3,     3,     3,     1,     3,     0,     3,     3,     1,     1,
+       5,     8,     4,     4,     4,     1,     3,     2,     0,     3,
+       1,     4,     3,     0,     2,     1,     3,     1,     3,     1,
+       3,     1,     3,     1,     1,     3,     4,     2,     2,     1,
+       3
 };
 
 
@@ -1267,7 +1270,7 @@ yyreduce:
                                                             {
     syntax->tree = new ProgramStructNode(dynamic_cast<ProgramHeadNode*>((yyvsp[-3].ast)), dynamic_cast<ProgramBodyNode*>((yyvsp[-1].ast)));
 }
-#line 1271 "syntax.tab.cpp"
+#line 1274 "syntax.tab.cpp"
     break;
 
   case 3: /* ProgramHeadNode: ProgramKey Identifier  */
@@ -1276,7 +1279,7 @@ yyreduce:
     FinalNode* id = new FinalNode(*(yyvsp[0].token));
     (yyval.ast) = new ProgramHeadNode(id);
 }
-#line 1280 "syntax.tab.cpp"
+#line 1283 "syntax.tab.cpp"
     break;
 
   case 4: /* ProgramHeadNode: ProgramKey Identifier Lparen IdListNode Rparen  */
@@ -1285,7 +1288,7 @@ yyreduce:
     FinalNode* id = new FinalNode(*(yyvsp[-3].token));
     (yyval.ast) = new ProgramHeadNode(id, dynamic_cast<IdListNode*>((yyvsp[-1].ast)));
 }
-#line 1289 "syntax.tab.cpp"
+#line 1292 "syntax.tab.cpp"
     break;
 
   case 5: /* ProgramBodyNode: ConstDeclarationsNode VarDeclarationsNode SubprogramDeclarationsNode CompoundStatementNode  */
@@ -1296,7 +1299,7 @@ yyreduce:
     dynamic_cast<SubprogramDeclarationsNode*>((yyvsp[-1].ast)),
     dynamic_cast<CompoundStatementNode*>((yyvsp[0].ast)));
 }
-#line 1300 "syntax.tab.cpp"
+#line 1303 "syntax.tab.cpp"
     break;
 
   case 6: /* IdListNode: Identifier  */
@@ -1305,7 +1308,7 @@ yyreduce:
     FinalNode* id = new FinalNode(*(yyvsp[0].token));
     (yyval.ast) = new IdListNode(id);
 }
-#line 1309 "syntax.tab.cpp"
+#line 1312 "syntax.tab.cpp"
     break;
 
   case 7: /* IdListNode: IdListNode Comma Identifier  */
@@ -1315,7 +1318,7 @@ yyreduce:
         IdListNode* idList = dynamic_cast<IdListNode*>((yyvsp[-2].ast));
         (yyval.ast) = new IdListNode(id, idList);
 }
-#line 1319 "syntax.tab.cpp"
+#line 1322 "syntax.tab.cpp"
     break;
 
   case 8: /* ConstDeclarationsNode: %empty  */
@@ -1323,7 +1326,7 @@ yyreduce:
     {
         (yyval.ast) = new ConstDeclarationsNode();
     }
-#line 1327 "syntax.tab.cpp"
+#line 1330 "syntax.tab.cpp"
     break;
 
   case 9: /* ConstDeclarationsNode: Const ConstDeclarationNode Semi  */
@@ -1331,7 +1334,7 @@ yyreduce:
                                       {
         (yyval.ast) = new ConstDeclarationsNode(dynamic_cast<ConstDeclarationNode*>((yyvsp[-1].ast)));
     }
-#line 1335 "syntax.tab.cpp"
+#line 1338 "syntax.tab.cpp"
     break;
 
   case 10: /* ConstDeclarationNode: Identifier Relop ConstValueNode  */
@@ -1346,7 +1349,7 @@ yyreduce:
         YYERROR;
     }
 }
-#line 1350 "syntax.tab.cpp"
+#line 1353 "syntax.tab.cpp"
     break;
 
   case 11: /* ConstDeclarationNode: ConstDeclarationNode Semi Identifier Relop ConstValueNode  */
@@ -1361,7 +1364,7 @@ yyreduce:
         YYERROR;
     }
 }
-#line 1365 "syntax.tab.cpp"
+#line 1368 "syntax.tab.cpp"
     break;
 
   case 12: /* ConstValueNode: Addop Number  */
@@ -1376,7 +1379,7 @@ yyreduce:
         YYERROR;
     }
 }
-#line 1380 "syntax.tab.cpp"
+#line 1383 "syntax.tab.cpp"
     break;
 
   case 13: /* ConstValueNode: Number  */
@@ -1385,7 +1388,7 @@ yyreduce:
     FinalNode* num = new FinalNode(*(yyvsp[0].token));
     (yyval.ast) = new ConstValueNode(num);
 }
-#line 1389 "syntax.tab.cpp"
+#line 1392 "syntax.tab.cpp"
     break;
 
   case 14: /* ConstValueNode: Char_var  */
@@ -1394,7 +1397,7 @@ yyreduce:
     FinalNode* num = new FinalNode(*(yyvsp[0].token));
     (yyval.ast) = new ConstValueNode(num);
 }
-#line 1398 "syntax.tab.cpp"
+#line 1401 "syntax.tab.cpp"
     break;
 
   case 15: /* ConstValueNode: String_var  */
@@ -1403,7 +1406,7 @@ yyreduce:
     FinalNode* num = new FinalNode(*(yyvsp[0].token));
     (yyval.ast) = new ConstValueNode(num);
 }
-#line 1407 "syntax.tab.cpp"
+#line 1410 "syntax.tab.cpp"
     break;
 
   case 16: /* VarDeclarationsNode: %empty  */
@@ -1411,7 +1414,7 @@ yyreduce:
     {
         (yyval.ast) = new VarDeclarationsNode();
     }
-#line 1415 "syntax.tab.cpp"
+#line 1418 "syntax.tab.cpp"
     break;
 
   case 17: /* VarDeclarationsNode: Var VarDeclarationNode Semi  */
@@ -1419,7 +1422,7 @@ yyreduce:
                                   {
         (yyval.ast) = new VarDeclarationsNode(dynamic_cast<VarDeclarationNode*>((yyvsp[-1].ast)));
     }
-#line 1423 "syntax.tab.cpp"
+#line 1426 "syntax.tab.cpp"
     break;
 
   case 18: /* VarDeclarationNode: IdListNode Colon TypeNode  */
@@ -1428,7 +1431,7 @@ yyreduce:
     (yyval.ast) = new VarDeclarationNode(dynamic_cast<IdListNode*>((yyvsp[-2].ast)), dynamic_cast<TypeNode*>((yyvsp[0].ast)));
 
 }
-#line 1432 "syntax.tab.cpp"
+#line 1435 "syntax.tab.cpp"
     break;
 
   case 19: /* VarDeclarationNode: VarDeclarationNode Semi IdListNode Colon TypeNode  */
@@ -1436,7 +1439,7 @@ yyreduce:
                                                       {
     (yyval.ast) = new VarDeclarationNode(dynamic_cast<IdListNode*>((yyvsp[-2].ast)), dynamic_cast<TypeNode*>((yyvsp[0].ast)), dynamic_cast<VarDeclarationNode*>((yyvsp[-4].ast)));
 }
-#line 1440 "syntax.tab.cpp"
+#line 1443 "syntax.tab.cpp"
     break;
 
   case 20: /* TypeNode: BasicTypeNode  */
@@ -1444,7 +1447,7 @@ yyreduce:
                   {
         (yyval.ast) = new TypeNode(dynamic_cast<BasicTypeNode*>((yyvsp[0].ast)));
     }
-#line 1448 "syntax.tab.cpp"
+#line 1451 "syntax.tab.cpp"
     break;
 
   case 21: /* TypeNode: Array Lbra PeriodNode Rbra Of BasicTypeNode  */
@@ -1452,7 +1455,7 @@ yyreduce:
                                                   {
         (yyval.ast) = new TypeNode(dynamic_cast<BasicTypeNode*>((yyvsp[0].ast)), dynamic_cast<PeriodNode*>((yyvsp[-3].ast)));
     }
-#line 1456 "syntax.tab.cpp"
+#line 1459 "syntax.tab.cpp"
     break;
 
   case 22: /* BasicTypeNode: Basictype  */
@@ -1469,7 +1472,7 @@ yyreduce:
             YYERROR; // 强制回溯，避免污染其他规则
         }
     }
-#line 1473 "syntax.tab.cpp"
+#line 1476 "syntax.tab.cpp"
     break;
 
   case 23: /* PeriodNode: Number Dotdot Number  */
@@ -1485,7 +1488,7 @@ yyreduce:
         YYERROR;
     }
 }
-#line 1489 "syntax.tab.cpp"
+#line 1492 "syntax.tab.cpp"
     break;
 
   case 24: /* PeriodNode: Char_var Dotdot Char_var  */
@@ -1501,7 +1504,7 @@ yyreduce:
         YYERROR;
     }
 }
-#line 1505 "syntax.tab.cpp"
+#line 1508 "syntax.tab.cpp"
     break;
 
   case 25: /* PeriodNode: PeriodNode Comma Number Dotdot Number  */
@@ -1517,7 +1520,7 @@ yyreduce:
         YYERROR;
     }
 }
-#line 1521 "syntax.tab.cpp"
+#line 1524 "syntax.tab.cpp"
     break;
 
   case 26: /* PeriodNode: PeriodNode Comma Char_var Dotdot Char_var  */
@@ -1533,7 +1536,7 @@ yyreduce:
         YYERROR;
     }
 }
-#line 1537 "syntax.tab.cpp"
+#line 1540 "syntax.tab.cpp"
     break;
 
   case 27: /* SubprogramDeclarationsNode: %empty  */
@@ -1541,7 +1544,7 @@ yyreduce:
                             {
     (yyval.ast) = new SubprogramDeclarationsNode();
 }
-#line 1545 "syntax.tab.cpp"
+#line 1548 "syntax.tab.cpp"
     break;
 
   case 28: /* SubprogramDeclarationsNode: SubprogramDeclarationsNode SubprogramNode Semi  */
@@ -1549,7 +1552,7 @@ yyreduce:
                                                    {
     (yyval.ast) = new SubprogramDeclarationsNode(dynamic_cast<SubprogramDeclarationsNode*>((yyvsp[-2].ast)), dynamic_cast<SubprogramNode*>((yyvsp[-1].ast)));
 }
-#line 1553 "syntax.tab.cpp"
+#line 1556 "syntax.tab.cpp"
     break;
 
   case 29: /* SubprogramNode: SubprogramHeadNode Semi SubprogramBodyNode  */
@@ -1563,7 +1566,7 @@ yyreduce:
         YYERROR;
     }
 }
-#line 1567 "syntax.tab.cpp"
+#line 1570 "syntax.tab.cpp"
     break;
 
   case 30: /* SubprogramHeadNode: Procedure Identifier FormalParameterNode  */
@@ -1573,7 +1576,7 @@ yyreduce:
     (yyval.ast) = new SubprogramHeadNode(id, dynamic_cast<FormalParameterNode*>((yyvsp[0].ast)));
 
 }
-#line 1577 "syntax.tab.cpp"
+#line 1580 "syntax.tab.cpp"
     break;
 
   case 31: /* SubprogramHeadNode: Function Identifier FormalParameterNode Colon BasicTypeNode  */
@@ -1582,7 +1585,7 @@ yyreduce:
     FinalNode* id = new FinalNode(*(yyvsp[-3].token));
     (yyval.ast) = new SubprogramHeadNode(id, dynamic_cast<FormalParameterNode*>((yyvsp[-2].ast)), dynamic_cast<BasicTypeNode*>((yyvsp[0].ast)));
 }
-#line 1586 "syntax.tab.cpp"
+#line 1589 "syntax.tab.cpp"
     break;
 
   case 32: /* FormalParameterNode: %empty  */
@@ -1590,109 +1593,116 @@ yyreduce:
                      {
     (yyval.ast) = new FormalParameterNode();
 }
-#line 1594 "syntax.tab.cpp"
+#line 1597 "syntax.tab.cpp"
     break;
 
   case 33: /* FormalParameterNode: Lparen ParameterListNode Rparen  */
 #line 234 "syntax.y"
                                     {
     (yyval.ast) = new FormalParameterNode(dynamic_cast<ParameterListNode*>((yyvsp[-1].ast)));
-
 }
-#line 1603 "syntax.tab.cpp"
+#line 1605 "syntax.tab.cpp"
     break;
 
-  case 34: /* ParameterListNode: ParameterNode  */
-#line 239 "syntax.y"
+  case 34: /* FormalParameterNode: Lparen Rparen  */
+#line 236 "syntax.y"
+                  {
+    (yyval.ast) = new FormalParameterNode();
+}
+#line 1613 "syntax.tab.cpp"
+    break;
+
+  case 35: /* ParameterListNode: ParameterNode  */
+#line 240 "syntax.y"
                                  {
     (yyval.ast) = new ParameterListNode(dynamic_cast<ParameterNode*>((yyvsp[0].ast)));
 }
-#line 1611 "syntax.tab.cpp"
+#line 1621 "syntax.tab.cpp"
     break;
 
-  case 35: /* ParameterListNode: ParameterListNode Semi ParameterNode  */
-#line 241 "syntax.y"
+  case 36: /* ParameterListNode: ParameterListNode Semi ParameterNode  */
+#line 242 "syntax.y"
                                          {
     (yyval.ast) = new ParameterListNode(dynamic_cast<ParameterNode*>((yyvsp[0].ast)), dynamic_cast<ParameterListNode*>((yyvsp[-2].ast)));
 }
-#line 1619 "syntax.tab.cpp"
+#line 1629 "syntax.tab.cpp"
     break;
 
-  case 36: /* ParameterNode: VarParameterNode  */
-#line 245 "syntax.y"
+  case 37: /* ParameterNode: VarParameterNode  */
+#line 246 "syntax.y"
                                 {
     (yyval.ast) = new ParameterNode(dynamic_cast<VarParameterNode*>((yyvsp[0].ast)));
 }
-#line 1627 "syntax.tab.cpp"
+#line 1637 "syntax.tab.cpp"
     break;
 
-  case 37: /* ParameterNode: ValueParameterNode  */
-#line 247 "syntax.y"
+  case 38: /* ParameterNode: ValueParameterNode  */
+#line 248 "syntax.y"
                        {
     (yyval.ast) = new ParameterNode(dynamic_cast<ValueParameterNode*>((yyvsp[0].ast)));
 }
-#line 1635 "syntax.tab.cpp"
+#line 1645 "syntax.tab.cpp"
     break;
 
-  case 38: /* VarParameterNode: Var ValueParameterNode  */
-#line 251 "syntax.y"
+  case 39: /* VarParameterNode: Var ValueParameterNode  */
+#line 252 "syntax.y"
                                          {
     (yyval.ast) = new VarParameterNode(dynamic_cast<ValueParameterNode*>((yyvsp[0].ast)));
 }
-#line 1643 "syntax.tab.cpp"
+#line 1653 "syntax.tab.cpp"
     break;
 
-  case 39: /* ValueParameterNode: IdListNode Colon BasicTypeNode  */
-#line 255 "syntax.y"
+  case 40: /* ValueParameterNode: IdListNode Colon BasicTypeNode  */
+#line 256 "syntax.y"
                                                    {
     (yyval.ast) = new ValueParameterNode(dynamic_cast<IdListNode*>((yyvsp[-2].ast)), dynamic_cast<BasicTypeNode*>((yyvsp[0].ast)));
 }
-#line 1651 "syntax.tab.cpp"
+#line 1661 "syntax.tab.cpp"
     break;
 
-  case 40: /* SubprogramBodyNode: ConstDeclarationsNode VarDeclarationsNode CompoundStatementNode  */
-#line 259 "syntax.y"
+  case 41: /* SubprogramBodyNode: ConstDeclarationsNode VarDeclarationsNode CompoundStatementNode  */
+#line 260 "syntax.y"
                                                                                     {
     (yyval.ast) = new SubprogramBodyNode(dynamic_cast<ConstDeclarationsNode*>((yyvsp[-2].ast)), dynamic_cast<VarDeclarationsNode*>((yyvsp[-1].ast)), dynamic_cast<CompoundStatementNode*>((yyvsp[0].ast)));
 }
-#line 1659 "syntax.tab.cpp"
+#line 1669 "syntax.tab.cpp"
     break;
 
-  case 41: /* CompoundStatementNode: Begin StatementListNode End  */
-#line 263 "syntax.y"
+  case 42: /* CompoundStatementNode: Begin StatementListNode End  */
+#line 264 "syntax.y"
                                                    {
     (yyval.ast) = new CompoundStatementNode(dynamic_cast<StatementListNode*>((yyvsp[-1].ast)));
 }
-#line 1667 "syntax.tab.cpp"
+#line 1677 "syntax.tab.cpp"
     break;
 
-  case 42: /* StatementListNode: StatementNode  */
-#line 267 "syntax.y"
+  case 43: /* StatementListNode: StatementNode  */
+#line 268 "syntax.y"
                                  {
     (yyval.ast) = new StatementListNode(dynamic_cast<StatementNode*>((yyvsp[0].ast)));
 }
-#line 1675 "syntax.tab.cpp"
+#line 1685 "syntax.tab.cpp"
     break;
 
-  case 43: /* StatementListNode: StatementListNode Semi StatementNode  */
-#line 269 "syntax.y"
+  case 44: /* StatementListNode: StatementListNode Semi StatementNode  */
+#line 270 "syntax.y"
                                          {
     (yyval.ast) = new StatementListNode(dynamic_cast<StatementNode*>((yyvsp[0].ast)), dynamic_cast<StatementListNode*>((yyvsp[-2].ast)));
 
 }
-#line 1684 "syntax.tab.cpp"
+#line 1694 "syntax.tab.cpp"
     break;
 
-  case 44: /* StatementNode: %empty  */
-#line 274 "syntax.y"
+  case 45: /* StatementNode: %empty  */
+#line 275 "syntax.y"
                {
     (yyval.ast) = new StatementNode();
 }
-#line 1692 "syntax.tab.cpp"
+#line 1702 "syntax.tab.cpp"
     break;
 
-  case 45: /* StatementNode: VariableNode Assignop ExpressionNode  */
-#line 276 "syntax.y"
+  case 46: /* StatementNode: VariableNode Assignop ExpressionNode  */
+#line 277 "syntax.y"
                                          {
     if((yyvsp[-1].token)->property == ":="){
         (yyval.ast) = new StatementNode(dynamic_cast<VariableNode*>((yyvsp[-2].ast)), dynamic_cast<ExpressionNode*>((yyvsp[0].ast)));
@@ -1702,11 +1712,11 @@ yyreduce:
         YYERROR;
     }
 }
-#line 1706 "syntax.tab.cpp"
+#line 1716 "syntax.tab.cpp"
     break;
 
-  case 46: /* StatementNode: Identifier Assignop ExpressionNode  */
-#line 284 "syntax.y"
+  case 47: /* StatementNode: Identifier Assignop ExpressionNode  */
+#line 285 "syntax.y"
                                        {
     if((yyvsp[-1].token)->property == ":="){
         FinalNode* id = new FinalNode(*(yyvsp[-2].token));
@@ -1717,35 +1727,35 @@ yyreduce:
         YYERROR;
     }
 }
-#line 1721 "syntax.tab.cpp"
+#line 1731 "syntax.tab.cpp"
     break;
 
-  case 47: /* StatementNode: ProcedureCallNode  */
-#line 293 "syntax.y"
+  case 48: /* StatementNode: ProcedureCallNode  */
+#line 294 "syntax.y"
                       {
     (yyval.ast) = new StatementNode(dynamic_cast<ProcedureCallNode*>((yyvsp[0].ast)));
 }
-#line 1729 "syntax.tab.cpp"
+#line 1739 "syntax.tab.cpp"
     break;
 
-  case 48: /* StatementNode: CompoundStatementNode  */
-#line 295 "syntax.y"
+  case 49: /* StatementNode: CompoundStatementNode  */
+#line 296 "syntax.y"
                           {
     (yyval.ast) = new StatementNode(dynamic_cast<CompoundStatementNode*>((yyvsp[0].ast)));
 }
-#line 1737 "syntax.tab.cpp"
+#line 1747 "syntax.tab.cpp"
     break;
 
-  case 49: /* StatementNode: If ExpressionNode Then StatementNode ElsePartNode  */
-#line 297 "syntax.y"
+  case 50: /* StatementNode: If ExpressionNode Then StatementNode ElsePartNode  */
+#line 298 "syntax.y"
                                                       {
     (yyval.ast) = new StatementNode(dynamic_cast<ExpressionNode*>((yyvsp[-3].ast)), dynamic_cast<StatementNode*>((yyvsp[-1].ast)), dynamic_cast<ElsePartNode*>((yyvsp[0].ast)));
 }
-#line 1745 "syntax.tab.cpp"
+#line 1755 "syntax.tab.cpp"
     break;
 
-  case 50: /* StatementNode: For Identifier Assignop ExpressionNode To ExpressionNode Do StatementNode  */
-#line 299 "syntax.y"
+  case 51: /* StatementNode: For Identifier Assignop ExpressionNode To ExpressionNode Do StatementNode  */
+#line 300 "syntax.y"
                                                                               {
     if((yyvsp[-5].token)->property == ":="){
         FinalNode* id = new FinalNode(*(yyvsp[-6].token));
@@ -1756,222 +1766,222 @@ yyreduce:
         YYERROR;
     }
 }
-#line 1760 "syntax.tab.cpp"
+#line 1770 "syntax.tab.cpp"
     break;
 
-  case 51: /* StatementNode: Read Lparen VariableListNode Rparen  */
-#line 308 "syntax.y"
+  case 52: /* StatementNode: Read Lparen VariableListNode Rparen  */
+#line 309 "syntax.y"
                                         {
     FinalNode* Re = new FinalNode(*(yyvsp[-3].token));
     (yyval.ast) = new StatementNode(Re, dynamic_cast<VariableListNode*>((yyvsp[-1].ast)));
 }
-#line 1769 "syntax.tab.cpp"
+#line 1779 "syntax.tab.cpp"
     break;
 
-  case 52: /* StatementNode: Write Lparen ExpressionListNode Rparen  */
-#line 311 "syntax.y"
+  case 53: /* StatementNode: Write Lparen ExpressionListNode Rparen  */
+#line 312 "syntax.y"
                                            {
     FinalNode* Wr = new FinalNode(*(yyvsp[-3].token));
     (yyval.ast) = new StatementNode(Wr, dynamic_cast<ExpressionListNode*>((yyvsp[-1].ast)));
 }
-#line 1778 "syntax.tab.cpp"
+#line 1788 "syntax.tab.cpp"
     break;
 
-  case 53: /* StatementNode: While ExpressionNode Do StatementNode  */
-#line 314 "syntax.y"
+  case 54: /* StatementNode: While ExpressionNode Do StatementNode  */
+#line 315 "syntax.y"
                                          { // while语句拓展
     (yyval.ast) = new StatementNode(dynamic_cast<ExpressionNode*>((yyvsp[-2].ast)), dynamic_cast<StatementNode*>((yyvsp[0].ast)));
 }
-#line 1786 "syntax.tab.cpp"
+#line 1796 "syntax.tab.cpp"
     break;
 
-  case 54: /* VariableListNode: VariableNode  */
-#line 318 "syntax.y"
+  case 55: /* VariableListNode: VariableNode  */
+#line 319 "syntax.y"
                                {
     (yyval.ast) = new VariableListNode(dynamic_cast<VariableNode*>((yyvsp[0].ast)));
 }
-#line 1794 "syntax.tab.cpp"
+#line 1804 "syntax.tab.cpp"
     break;
 
-  case 55: /* VariableListNode: VariableListNode Comma VariableNode  */
-#line 320 "syntax.y"
+  case 56: /* VariableListNode: VariableListNode Comma VariableNode  */
+#line 321 "syntax.y"
                                         {
     (yyval.ast) = new VariableListNode(dynamic_cast<VariableNode*>((yyvsp[0].ast)), dynamic_cast<VariableListNode*>((yyvsp[-2].ast)));
 }
-#line 1802 "syntax.tab.cpp"
+#line 1812 "syntax.tab.cpp"
     break;
 
-  case 56: /* VariableNode: Identifier IdVarpartNode  */
-#line 324 "syntax.y"
+  case 57: /* VariableNode: Identifier IdVarpartNode  */
+#line 325 "syntax.y"
                                        {
     FinalNode* id = new FinalNode(*(yyvsp[-1].token));
     (yyval.ast) = new VariableNode(id, dynamic_cast<IdVarpartNode*>((yyvsp[0].ast)));
 }
-#line 1811 "syntax.tab.cpp"
+#line 1821 "syntax.tab.cpp"
     break;
 
-  case 57: /* IdVarpartNode: %empty  */
-#line 329 "syntax.y"
+  case 58: /* IdVarpartNode: %empty  */
+#line 330 "syntax.y"
                {
     (yyval.ast) = new IdVarpartNode();
 }
-#line 1819 "syntax.tab.cpp"
+#line 1829 "syntax.tab.cpp"
     break;
 
-  case 58: /* IdVarpartNode: Lbra ExpressionListNode Rbra  */
-#line 331 "syntax.y"
+  case 59: /* IdVarpartNode: Lbra ExpressionListNode Rbra  */
+#line 332 "syntax.y"
                                  {
     (yyval.ast) = new IdVarpartNode(dynamic_cast<ExpressionListNode*>((yyvsp[-1].ast)));
 }
-#line 1827 "syntax.tab.cpp"
+#line 1837 "syntax.tab.cpp"
     break;
 
-  case 59: /* ProcedureCallNode: Identifier  */
-#line 335 "syntax.y"
+  case 60: /* ProcedureCallNode: Identifier  */
+#line 336 "syntax.y"
                               {
     FinalNode* id = new FinalNode(*(yyvsp[0].token));
     (yyval.ast) = new ProcedureCallNode(id);
 }
-#line 1836 "syntax.tab.cpp"
+#line 1846 "syntax.tab.cpp"
     break;
 
-  case 60: /* ProcedureCallNode: Identifier Lparen ExpressionListNode Rparen  */
-#line 338 "syntax.y"
+  case 61: /* ProcedureCallNode: Identifier Lparen ExpressionListNode Rparen  */
+#line 339 "syntax.y"
                                                 {
     FinalNode* id = new FinalNode(*(yyvsp[-3].token));
     (yyval.ast) = new ProcedureCallNode(id, dynamic_cast<ExpressionListNode*>((yyvsp[-1].ast)));
 }
-#line 1845 "syntax.tab.cpp"
+#line 1855 "syntax.tab.cpp"
     break;
 
-  case 61: /* ProcedureCallNode: Identifier Lparen Rparen  */
-#line 341 "syntax.y"
+  case 62: /* ProcedureCallNode: Identifier Lparen Rparen  */
+#line 342 "syntax.y"
                             {
     FinalNode* id = new FinalNode(*(yyvsp[-2].token));
     (yyval.ast) = new ProcedureCallNode(id); // 语法拓展：无参数过程调用支持 foo()
 }
-#line 1854 "syntax.tab.cpp"
+#line 1864 "syntax.tab.cpp"
     break;
 
-  case 62: /* ElsePartNode: %empty  */
-#line 346 "syntax.y"
+  case 63: /* ElsePartNode: %empty  */
+#line 347 "syntax.y"
                {
     (yyval.ast) = new ElsePartNode();
 }
-#line 1862 "syntax.tab.cpp"
+#line 1872 "syntax.tab.cpp"
     break;
 
-  case 63: /* ElsePartNode: Else StatementNode  */
-#line 348 "syntax.y"
+  case 64: /* ElsePartNode: Else StatementNode  */
+#line 349 "syntax.y"
                        {
     (yyval.ast) = new ElsePartNode(dynamic_cast<StatementNode*>((yyvsp[0].ast)));
 }
-#line 1870 "syntax.tab.cpp"
+#line 1880 "syntax.tab.cpp"
     break;
 
-  case 64: /* ExpressionListNode: ExpressionNode  */
-#line 352 "syntax.y"
+  case 65: /* ExpressionListNode: ExpressionNode  */
+#line 353 "syntax.y"
                                    {
     (yyval.ast) = new ExpressionListNode(dynamic_cast<ExpressionNode*>((yyvsp[0].ast)));
 }
-#line 1878 "syntax.tab.cpp"
+#line 1888 "syntax.tab.cpp"
     break;
 
-  case 65: /* ExpressionListNode: ExpressionListNode Comma ExpressionNode  */
-#line 354 "syntax.y"
+  case 66: /* ExpressionListNode: ExpressionListNode Comma ExpressionNode  */
+#line 355 "syntax.y"
                                             {
     (yyval.ast) = new ExpressionListNode(dynamic_cast<ExpressionNode*>((yyvsp[0].ast)), dynamic_cast<ExpressionListNode*>((yyvsp[-2].ast)));
 }
-#line 1886 "syntax.tab.cpp"
+#line 1896 "syntax.tab.cpp"
     break;
 
-  case 66: /* ExpressionNode: SimpleExpressionNode  */
-#line 358 "syntax.y"
+  case 67: /* ExpressionNode: SimpleExpressionNode  */
+#line 359 "syntax.y"
                                      {
     (yyval.ast) = new ExpressionNode(dynamic_cast<SimpleExpressionNode*>((yyvsp[0].ast)));
 }
-#line 1894 "syntax.tab.cpp"
+#line 1904 "syntax.tab.cpp"
     break;
 
-  case 67: /* ExpressionNode: SimpleExpressionNode Relop SimpleExpressionNode  */
-#line 360 "syntax.y"
+  case 68: /* ExpressionNode: SimpleExpressionNode Relop SimpleExpressionNode  */
+#line 361 "syntax.y"
                                                     {
     FinalNode* id = new FinalNode(*(yyvsp[-1].token));
     (yyval.ast) = new ExpressionNode(dynamic_cast<SimpleExpressionNode*>((yyvsp[-2].ast)), id, dynamic_cast<SimpleExpressionNode*>((yyvsp[0].ast)));
 }
-#line 1903 "syntax.tab.cpp"
+#line 1913 "syntax.tab.cpp"
     break;
 
-  case 68: /* SimpleExpressionNode: TermNode  */
-#line 365 "syntax.y"
+  case 69: /* SimpleExpressionNode: TermNode  */
+#line 366 "syntax.y"
                                {
     (yyval.ast) = new SimpleExpressionNode(dynamic_cast<TermNode*>((yyvsp[0].ast)));
 }
-#line 1911 "syntax.tab.cpp"
+#line 1921 "syntax.tab.cpp"
     break;
 
-  case 69: /* SimpleExpressionNode: SimpleExpressionNode Addop TermNode  */
-#line 367 "syntax.y"
+  case 70: /* SimpleExpressionNode: SimpleExpressionNode Addop TermNode  */
+#line 368 "syntax.y"
                                         {
     FinalNode* op = new FinalNode(*(yyvsp[-1].token));
     (yyval.ast) = new SimpleExpressionNode(dynamic_cast<TermNode*>((yyvsp[0].ast)), dynamic_cast<SimpleExpressionNode*>((yyvsp[-2].ast)), op);
 }
-#line 1920 "syntax.tab.cpp"
+#line 1930 "syntax.tab.cpp"
     break;
 
-  case 70: /* TermNode: FactorNode  */
-#line 372 "syntax.y"
+  case 71: /* TermNode: FactorNode  */
+#line 373 "syntax.y"
                      {
     (yyval.ast) = new TermNode(dynamic_cast<FactorNode*>((yyvsp[0].ast)));
 }
-#line 1928 "syntax.tab.cpp"
+#line 1938 "syntax.tab.cpp"
     break;
 
-  case 71: /* TermNode: TermNode Mulop FactorNode  */
-#line 374 "syntax.y"
+  case 72: /* TermNode: TermNode Mulop FactorNode  */
+#line 375 "syntax.y"
                               {
     FinalNode* op = new FinalNode(*(yyvsp[-1].token));
     (yyval.ast) = new TermNode(dynamic_cast<FactorNode*>((yyvsp[0].ast)), dynamic_cast<TermNode*>((yyvsp[-2].ast)), op);
 }
-#line 1937 "syntax.tab.cpp"
+#line 1947 "syntax.tab.cpp"
     break;
 
-  case 72: /* FactorNode: Number  */
-#line 379 "syntax.y"
+  case 73: /* FactorNode: Number  */
+#line 380 "syntax.y"
                    {
     FinalNode* id = new FinalNode(*(yyvsp[0].token));
     (yyval.ast) = new FactorNode(id);
 }
-#line 1946 "syntax.tab.cpp"
+#line 1956 "syntax.tab.cpp"
     break;
 
-  case 73: /* FactorNode: VariableNode  */
-#line 382 "syntax.y"
+  case 74: /* FactorNode: VariableNode  */
+#line 383 "syntax.y"
                  {
     (yyval.ast) = new FactorNode(dynamic_cast<VariableNode*>((yyvsp[0].ast)));
 }
-#line 1954 "syntax.tab.cpp"
+#line 1964 "syntax.tab.cpp"
     break;
 
-  case 74: /* FactorNode: Lparen ExpressionNode Rparen  */
-#line 384 "syntax.y"
+  case 75: /* FactorNode: Lparen ExpressionNode Rparen  */
+#line 385 "syntax.y"
                                  {
     (yyval.ast) = new FactorNode(dynamic_cast<ExpressionNode*>((yyvsp[-1].ast)));
 }
-#line 1962 "syntax.tab.cpp"
+#line 1972 "syntax.tab.cpp"
     break;
 
-  case 75: /* FactorNode: Identifier Lparen ExpressionListNode Rparen  */
-#line 386 "syntax.y"
+  case 76: /* FactorNode: Identifier Lparen ExpressionListNode Rparen  */
+#line 387 "syntax.y"
                                                 {
     FinalNode* id = new FinalNode(*(yyvsp[-3].token));
     (yyval.ast) = new FactorNode(id, dynamic_cast<ExpressionListNode*>((yyvsp[-1].ast)));
 }
-#line 1971 "syntax.tab.cpp"
+#line 1981 "syntax.tab.cpp"
     break;
 
-  case 76: /* FactorNode: Notop FactorNode  */
-#line 389 "syntax.y"
+  case 77: /* FactorNode: Notop FactorNode  */
+#line 390 "syntax.y"
                      {
     if((yyvsp[-1].token)->property == "not"){
         FinalNode* id = new FinalNode(*(yyvsp[-1].token));
@@ -1982,11 +1992,11 @@ yyreduce:
         YYERROR;
     }
 }
-#line 1986 "syntax.tab.cpp"
+#line 1996 "syntax.tab.cpp"
     break;
 
-  case 77: /* FactorNode: Addop FactorNode  */
-#line 398 "syntax.y"
+  case 78: /* FactorNode: Addop FactorNode  */
+#line 399 "syntax.y"
                      {
     if((yyvsp[-1].token)->property == "-" || (yyvsp[-1].token)->property == "+"){
         FinalNode* op = new FinalNode(*(yyvsp[-1].token));
@@ -1997,31 +2007,31 @@ yyreduce:
         YYERROR;
     }
 }
-#line 2001 "syntax.tab.cpp"
+#line 2011 "syntax.tab.cpp"
     break;
 
-  case 78: /* FactorNode: Booltype  */
-#line 407 "syntax.y"
+  case 79: /* FactorNode: Booltype  */
+#line 408 "syntax.y"
              {
     FinalNode* id = new FinalNode(*(yyvsp[0].token));
     (yyval.ast) = new FactorNode(id);
 }
-#line 2010 "syntax.tab.cpp"
+#line 2020 "syntax.tab.cpp"
     break;
 
-  case 79: /* FactorNode: Identifier Lparen Rparen  */
-#line 410 "syntax.y"
+  case 80: /* FactorNode: Identifier Lparen Rparen  */
+#line 411 "syntax.y"
                             {
     FinalNode* id = new FinalNode(*(yyvsp[-2].token));
     IdVarpartNode* fake_idvar = new IdVarpartNode();
     VariableNode* fake_var = new VariableNode(id, fake_idvar);
     (yyval.ast) = new FactorNode(fake_var); // 测试用例21: 无参数函数 a := foo(); write(foo())
 }
-#line 2021 "syntax.tab.cpp"
+#line 2031 "syntax.tab.cpp"
     break;
 
 
-#line 2025 "syntax.tab.cpp"
+#line 2035 "syntax.tab.cpp"
 
       default: break;
     }
@@ -2214,7 +2224,7 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 420 "syntax.y"
+#line 421 "syntax.y"
 
 
 int yylex() {
