@@ -604,6 +604,17 @@ std::string IdVarpartNode::trans() const {
     }
 }
 
+bool is_expr(std::string s) {
+    // 因为经过了词法语法分析，所以不会出现)(这种错误，用数字模拟栈就好
+    int st = 0;
+    for (char c : s) {
+        if (c == '(') st++;
+        else if (c == ')') st--;
+    }
+    if (st == 0) return true; // 说明()完全匹配，是一个完整的表达式
+    return false; // 可能是函数的一部分
+}
+
 std::string ProcedureCallNode::trans() const {
     if (this->expression_list == nullptr)
         return this->id->trans() + "()";
@@ -652,22 +663,28 @@ std::string ProcedureCallNode::trans() const {
         std::string res = this->id->trans() + "(";
         std::vector<int> cites = std::get<1>(t.table[*this->id]);
         int arg_num = cites.size();
-        // expr_list = this->expression_list->trans();
-        int k = 0; // 正在判断第k个expression要不要加*
+        int k = 0; // 正在判断第k个expression要不要加&
+        std::string expr = "";
         size_t del_pos = expr_list.find(",");
-        while(del_pos != std::string::npos && k < arg_num - 1) {
-            std::string expr = expr_list.substr(0, del_pos);
+        while(del_pos != std::string::npos) {
+            expr = expr_list.substr(0, del_pos);
+            if (!is_expr(expr)) {
+                expr += ",";
+                expr_list.erase(0,del_pos + 1);
+                del_pos = expr_list.find(",");
+                continue;
+            }
             if (cites.at(k) >= CITE)
                 res += "&";
             res += expr + ",";
+            expr = "";
             k++;
             expr_list.erase(0,del_pos + 1);
             del_pos = expr_list.find(",");
         }
         if (cites.at(k) >= CITE)
             res += "&";
-        res += expr_list + ")";
-        // return res + expr_list + ") " + kind;
+        res += expr + expr_list + ")";
         //return res + " " + kind; // eg: f(a,&b) %d
         return res; // eg: f(a,&b)
     }
@@ -839,21 +856,28 @@ std::string FactorNode::trans() const {
         std::string res = this->id->trans() + "(";
         std::vector<int> cites = std::get<1>(t.table[*this->id]);
         int arg_num = cites.size();
-        // expr_list = this->expression_list->trans();
-        int k = 0; // 正在判断第k个expression要不要加*
+        int k = 0; // 正在判断第k个expression要不要加&
+        std::string expr = "";
         size_t del_pos = expr_list.find(",");
-        while(del_pos != std::string::npos && k < arg_num - 1) {
-            std::string expr = expr_list.substr(0, del_pos);
+        while(del_pos != std::string::npos) {
+            expr = expr_list.substr(0, del_pos);
+            if (!is_expr(expr)) {
+                expr += ",";
+                expr_list.erase(0,del_pos + 1);
+                del_pos = expr_list.find(",");
+                continue;
+            }
             if (cites.at(k) >= CITE)
                 res += "&";
             res += expr + ",";
+            expr = "";
             k++;
             expr_list.erase(0,del_pos + 1);
             del_pos = expr_list.find(",");
         }
         if (cites.at(k) >= CITE)
             res += "&";
-        res += expr_list + ")";
+        res += expr + expr_list + ")";
         // 判断函数返回值类型
         auto info = t.table[*id];
         std::string kind = "";
