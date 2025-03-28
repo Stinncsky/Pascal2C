@@ -6,11 +6,11 @@
 #include <iostream>
 
 #define ID_INT 0
-#define ID_DOUBLE 1
+#define ID_FLOAT 1
 #define ID_CHAR 2
 #define ID_STRING 3
 #define FUNC_INT 4
-#define FUNC_DOUBLE 5
+#define FUNC_FLOAT 5
 #define FUNC_CHAR 6
 #define FUNC_VOID -1
 #define CITE 3

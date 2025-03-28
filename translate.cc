@@ -25,7 +25,7 @@ std::string FinalNode::trans() const{
             if (this->token.property == "integer")
                 return "int";
             else if (this->token.property == "real")
-                return "double";
+                return "float";
             else if (this->token.property == "char")
                 return "char";
             else if (this->token.property == "boolean")
@@ -102,8 +102,8 @@ std::string IdListNode::trans(const std::string type, const std::string tmp, con
         t.table[*id] = info;
     } else if (type == "int "){
         t.table[*(this->id)] = std::make_tuple(ID_INT, std::vector<int>(1,0), *dim);
-    } else if (type == "double ") {
-        t.table[*(this->id)] = std::make_tuple(ID_DOUBLE, std::vector<int>(1,0), *dim);
+    } else if (type == "float ") {
+        t.table[*(this->id)] = std::make_tuple(ID_FLOAT, std::vector<int>(1,0), *dim);
     } else if (type == "char "){
         t.table[*(this->id)] = std::make_tuple(ID_CHAR, std::vector<int>(1,0), *dim);
     } else if (type == "string "){
@@ -133,8 +133,8 @@ std::string ConstDeclarationNode::trans() const{
     int type = 0;
     if (this->const_value->numletter->token.type == TokenType::Number){
         if (this->const_value->numletter->token.property.find(".") != std::string::npos){
-            res += "double ";
-            type = ID_DOUBLE;
+            res += "float ";
+            type = ID_FLOAT;
         } else {
             res += "int ";
             type = ID_INT;
@@ -238,8 +238,8 @@ std::string SubprogramNode::trans() const{
         func_type = FUNC_VOID;
     } else if (this->subprogram_head->basic_type->trans() == "int"){
         func_type = FUNC_INT;
-    } else if (this->subprogram_head->basic_type->trans() == "double"){
-        func_type = FUNC_DOUBLE;
+    } else if (this->subprogram_head->basic_type->trans() == "float"){
+        func_type = FUNC_FLOAT;
     } else if (this->subprogram_head->basic_type->trans() == "char"){
         func_type = FUNC_CHAR;
     }
@@ -551,8 +551,8 @@ std::string VariableNode::trans() const {
     if (std::get<0>(info) == ID_INT) {
         res += " %d";
     }
-    else if (std::get<0>(info) == ID_DOUBLE) {
-        res += " %lf";
+    else if (std::get<0>(info) == ID_FLOAT) {
+        res += " %f";
     }
     else if (std::get<0>(info) == ID_CHAR) {
         res += " %c";
@@ -563,8 +563,8 @@ std::string VariableNode::trans() const {
     else if (std::get<0>(info) == FUNC_INT) {
         res += "() %d";
     }
-    else if (std::get<0>(info) == FUNC_DOUBLE) {
-        res += "() %lf";
+    else if (std::get<0>(info) == FUNC_FLOAT) {
+        res += "() %f";
     }
     else if (std::get<0>(info) == FUNC_CHAR) {
         res += "() %c";
@@ -628,8 +628,8 @@ std::string ProcedureCallNode::trans() const {
         if (std::get<0>(info) == ID_INT) {
             kind = "%d";
         }
-        else if (std::get<0>(info) == ID_DOUBLE) {
-            kind = "%lf";
+        else if (std::get<0>(info) == ID_FLOAT) {
+            kind = "%f";
         }
         else if (std::get<0>(info) == ID_CHAR) {
             kind = "%c";
@@ -640,8 +640,8 @@ std::string ProcedureCallNode::trans() const {
         else if (std::get<0>(info) == FUNC_INT) {
             kind = "%d";
         }
-        else if (std::get<0>(info) == FUNC_DOUBLE) {
-            kind = "%lf";
+        else if (std::get<0>(info) == FUNC_FLOAT) {
+            kind = "%f";
         }
         else if (std::get<0>(info) == FUNC_CHAR) {
             kind = "%c";
@@ -714,8 +714,8 @@ std::string ExpressionNode::trans() const {
         std::string simple_expr_2_content = simple_expr_2.substr(0, simple_expr_2_space_pos);
         std::string simple_expr_2_kind = simple_expr_2.substr(simple_expr_2_space_pos + 1);
         std::string kind = "";
-        if (simple_expr_kind == "%lf" || simple_expr_2_kind == "%lf") // error: 这里应该按符号具体判断种类，可能会有错误处理
-            kind = "%lf";
+        if (simple_expr_kind == "%f" || simple_expr_2_kind == "%f") // error: 这里应该按符号具体判断种类，可能会有错误处理
+            kind = "%f";
         else
             kind = "%d";
         return simple_expr_content + op + simple_expr_2_content + " " + kind; // eg: "a=1*2+1*2 %d"
@@ -736,8 +736,8 @@ std::string SimpleExpressionNode::trans() const {
         std::string simple_expr_content = simple_expr.substr(0, simple_expr_space_pos);
         std::string simple_expr_kind = simple_expr.substr(simple_expr_space_pos + 1);
         std::string kind = "";
-        if (term_kind == "%lf" || simple_expr_kind == "%lf") // error: 这里应该按符号具体判断种类，可能会有错误处理
-            kind = "%lf";
+        if (term_kind == "%f" || simple_expr_kind == "%f") // error: 这里应该按符号具体判断种类，可能会有错误处理
+            kind = "%f";
         else
             kind = "%d";
         // int sim_exp = std::stoi(simple_expr_content);
@@ -768,8 +768,8 @@ std::string TermNode::trans() const {
         std::string factor_content = factor_expr.substr(0, factor_space_pos);
         std::string factor_kind = factor_expr.substr(factor_space_pos + 1);
         std::string kind = "";
-        if (term_kind == "%lf" || factor_kind == "%lf")
-            kind = "%lf";
+        if (term_kind == "%f" || factor_kind == "%f")
+            kind = "%f";
         else
             kind = "%d";
         std::string op = this->mulop->trans(); // * / div mod and
@@ -795,7 +795,7 @@ std::string FactorNode::trans() const {
         std::string num_str = this->num->trans();
         std::string kind = "";
         if (num_str.find('.') != std::string::npos)
-            kind = "%lf";
+            kind = "%f";
         else
             kind = "%d";
         return num_str + " " + kind; // eg: "1 %d"
@@ -806,7 +806,7 @@ std::string FactorNode::trans() const {
         // size_t space_pos = str.find(' ');
         // auto tmpstr = str.substr(0, space_pos);
         // auto info = t.table[*this->variable->id]; // 判断是变量还是无参数传递的函数
-        // if (std::get<0>(info) == FUNC_VOID || std::get<0>(info) == FUNC_INT || std::get<0>(info) == FUNC_DOUBLE || std::get<0>(info) == FUNC_CHAR) {
+        // if (std::get<0>(info) == FUNC_VOID || std::get<0>(info) == FUNC_INT || std::get<0>(info) == FUNC_FLOAT || std::get<0>(info) == FUNC_CHAR) {
         //     std::string res = tmpstr + "()";
         //     return res;
         // }
@@ -860,8 +860,8 @@ std::string FactorNode::trans() const {
         if (std::get<0>(info) == ID_INT) {
             kind = "%d";
         }
-        else if (std::get<0>(info) == ID_DOUBLE) {
-            kind = "%lf";
+        else if (std::get<0>(info) == ID_FLOAT) {
+            kind = "%f";
         }
         else if (std::get<0>(info) == ID_CHAR) {
             kind = "%c";
@@ -872,8 +872,8 @@ std::string FactorNode::trans() const {
         else if (std::get<0>(info) == FUNC_INT) {
             kind = "%d";
         }
-        else if (std::get<0>(info) == FUNC_DOUBLE) {
-            kind = "%lf";
+        else if (std::get<0>(info) == FUNC_FLOAT) {
+            kind = "%f";
         }
         else if (std::get<0>(info) == FUNC_CHAR) {
             kind = "%c";

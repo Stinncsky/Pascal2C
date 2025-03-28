@@ -26,6 +26,9 @@ void set_parameter(int argc, char *argv[]) {
         }
         if (strcmp(argv[i], "-i") == 0) {
             INPUT_FILE = argv[++i];
+            // 将输出文件名设置为输入文件名 + ".c"
+            std::string input_file_name = INPUT_FILE.substr(0, INPUT_FILE.find_last_of('.'));
+            OUTPUT_FILE = input_file_name + ".c";
         }
         if (strcmp(argv[i], "-o") == 0) {
             OUTPUT_FILE = argv[++i];
