@@ -24,7 +24,7 @@ void Lexical::run() {
     NumState num_state = NumState::START;  // 数字常量状态
 
     std::string temp_token;
-    int i = 0;
+    std::string::size_type i = 0;
     while(i < code.size()){
         char ch = std::tolower(code[i]);  // 统一转换为小写字母(Pascal-S不区分大小写)
         
@@ -433,12 +433,14 @@ int Token::to_yacc_token() const {
             else if(this->property == "and") return 25; // MULOP
             /*拓展语法：while*/
             else if(this->property == "while") return 39;
+            break;
         case TokenType::Operator: 
             if(this->property == "*" || this->property == "/") return 25;
             else if(this->property == "+" || this->property == "-") return 26;
             else if(this->property == "<" || this->property == "<=" || this->property == ">" || this->property == ">=" || this->property == "=" || this->property == "<>") return 27; //RELOP
             else if(this->property == ":=") return 28;
             else if(this->property == "..") return 29;
+            break;
         case TokenType::Delimiters: 
             if(this->property == ";") return 30;
             else if(this->property == ".") return 31;
@@ -448,6 +450,7 @@ int Token::to_yacc_token() const {
             else if(this->property == "]") return 35;
             else if(this->property == ":") return 36;
             else if(this->property == ",") return 37;
+            break;
         case TokenType::Null: return 38;
     }
     return 38;

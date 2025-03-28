@@ -1,4 +1,4 @@
-// 测试样例 00-27 (28 'not') 29-43 (65 函数参数) (49 最后的write()) (56 EXIT TOOLONG) (63 EXIT)
+// 测试样例 00-27 (28 'not') 29-43 (56 EXIT TOOLONG) (63 EXIT) (65)
 program main;
 const
   ca = 1;
@@ -196,5 +196,5 @@ begin
 
   func(a);
   a := (func(func(func(a))));
-  aaa(bbb(ccc(5), ccc(5))); // 错误
+  aaa(bbb(ccc(5), ccc(5))); //存在越界问题
 end.

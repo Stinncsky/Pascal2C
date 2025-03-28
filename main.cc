@@ -1,3 +1,4 @@
+/* DEBUG USAGE: g++ -D_GLIBCXX_DEBUG -Wall -Wextra -pedantic -g -o main.exe .\main.cc */
 #include <cstring>
 #include <iostream>
 #include <fstream>
@@ -52,7 +53,7 @@ void Program::run(){
     std::ifstream file(INPUT_FILE);
     if (!file.is_open()) {
         std::string err_out = "Error: Open file" + INPUT_FILE + " failed\n";
-        fprintf(stderr, err_out.c_str());
+        fprintf(stderr, "%s", err_out.c_str());
         exit(1);
         return;
     }

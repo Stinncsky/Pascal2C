@@ -421,7 +421,7 @@ FactorNode: Number {
 %%
 
 int yylex() {
-    if (tokenIndex >= tokens.size()) return 0;
+    if (tokenIndex >= static_cast<int>(tokens.size())) return 0;
     Token* current = &tokens[tokenIndex];
     yylval.token = current;
 
