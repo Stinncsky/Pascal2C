@@ -464,9 +464,9 @@ std::string StatementNode::trans() const {
         std::vector<std::string> expr, kind;
         size_t space_pos = expr_list.find(' ');
         while (space_pos != std::string::npos) {
-            size_t del_pos = expr_list.find(',');
             expr.push_back(expr_list.substr(0, space_pos));
             expr_list.erase(0, space_pos + 1);
+            size_t del_pos = expr_list.find(',');
             if (del_pos != std::string::npos) {
                 kind.push_back(expr_list.substr(0, del_pos));
                 expr_list = expr_list.erase(0, del_pos + 1);
@@ -612,8 +612,9 @@ std::string ProcedureCallNode::trans() const {
         std::string temp = "";
         size_t space_pos = expr_list.find(' ');
         while (space_pos != std::string::npos) {
-            size_t del_pos = expr_list.find(',');
             temp += expr_list.substr(0, space_pos) + ",";
+            expr_list.erase(0, space_pos);
+            size_t del_pos = expr_list.find(',');
             if (del_pos != std::string::npos)
                 expr_list = expr_list.erase(0, del_pos + 1);
             else
@@ -623,8 +624,8 @@ std::string ProcedureCallNode::trans() const {
         if (temp[int(temp.size()) - 1] == ',') temp.erase(int(temp.size()) - 1);
         expr_list = temp;
         auto info = t.table[*id];
-        std::string kind = "";
-        /*if (std::get<0>(info) == ID_INT) {
+        /*std::string kind = "";
+        if (std::get<0>(info) == ID_INT) {
             kind = "%d";
         }
         else if (std::get<0>(info) == ID_DOUBLE) {
@@ -667,7 +668,8 @@ std::string ProcedureCallNode::trans() const {
             res += "&";
         res += expr_list + ")";
         // return res + expr_list + ") " + kind;
-        return res + " " + kind; // eg: f(a,&b) %d
+        //return res + " " + kind; // eg: f(a,&b) %d
+        return res; // eg: f(a,&b)
     }
 }
 
