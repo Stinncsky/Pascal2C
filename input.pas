@@ -1,4 +1,4 @@
-// 测试样例 00-27 (28 'not') 29-43 (45 Syntax) (56 EXIT) (57 函数传入多参数) (58 While)
+// 测试样例 00-27 (28 'not') 29-43 (45 65 Syntax) (49 最后的write()) (56 EXIT TOOLONG) (63 EXIT)
 program main;
 const
   ca = 1;
@@ -181,4 +181,6 @@ begin
     a := a - 1;
   end;
   write(a);
+
+  func(a);
 end.

@@ -623,7 +623,7 @@ std::string ProcedureCallNode::trans() const {
         expr_list = temp;
         auto info = t.table[*id];
         std::string kind = "";
-        if (std::get<0>(info) == ID_INT) {
+        /*if (std::get<0>(info) == ID_INT) {
             kind = "%d";
         }
         else if (std::get<0>(info) == ID_DOUBLE) {
@@ -646,7 +646,7 @@ std::string ProcedureCallNode::trans() const {
         }
         else if (std::get<0>(info) == FUNC_VOID) {
             kind = ""; // error: 
-        }
+        }*/ // 这里不考虑赋值的问题，直接调用，不要添加类型
         std::string res = this->id->trans() + "(";
         std::vector<int> cites = std::get<1>(t.table[*this->id]);
         int arg_num = cites.size();
