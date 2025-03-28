@@ -17,6 +17,12 @@ bool is_keyword(std::string word){ // Pascal-S
     return false;
 }
 
+static void all_to_lower(std::string &str) {
+    for (auto &ch : str) {
+        ch = std::tolower(ch); // 转换为小写字母(Pascal-S不区分大小写)
+    }
+}
+
 void Lexical::run() {
     int line_number = 1;  // 当前行号
     int column_number = 1;  // 当前列号
@@ -26,7 +32,7 @@ void Lexical::run() {
     std::string temp_token;
     std::string::size_type i = 0;
     while(i < code.size()){
-        char ch = std::tolower(code[i]);  // 统一转换为小写字母(Pascal-S不区分大小写)
+        char ch = code[i];  // 先不转换为小写字母：字符常量和字符串常量中可能包含大写字母
         
         switch(state){
             case State::START:
@@ -34,6 +40,11 @@ void Lexical::run() {
                     line_number++;
                     column_number = 1;
                     i++;
+                }
+                else if(ch == '\r'){ // 处理 Windows 风格的换行符
+                    line_number++;
+                    column_number = 1;
+                    i += 2; // 跳过 '\r' 和 '\n'
                 }
                 else if(ch == ' ' || ch == '\t'){ 
                     column_number++;
@@ -56,7 +67,7 @@ void Lexical::run() {
                         }
                     }
                 }
-                else if((ch >= 'a' && ch <= 'z') || ch == '_'){  // 标识符或关键字
+                else if((ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z') || ch == '_'){  // 标识符或关键字
                     state = State::IN_WORD;
                     temp_token += ch;
                     column_number++;
@@ -225,11 +236,12 @@ void Lexical::run() {
                 break;
 
             case State::IN_WORD:
-                if((ch >= 'a' && ch <= 'z') || (ch >= '0' && ch <= '9') || ch == '_'){
+                if((ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z') || (ch >= '0' && ch <= '9') || ch == '_'){
                     temp_token += ch;
                     column_number++;
                     i++;
                 } else {
+                    all_to_lower(temp_token); // 转换为小写字母
                     if(is_keyword(temp_token)){
                         Token new_token(temp_token, TokenType::Keyword, line_number, column_number - temp_token.size());
                         tokens.push_back(new_token);

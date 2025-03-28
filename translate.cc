@@ -604,7 +604,7 @@ std::string IdVarpartNode::trans() const {
     }
 }
 
-bool is_expr(std::string s) {
+static bool is_expr(std::string s) {
     // 因为经过了词法语法分析，所以不会出现)(这种错误，用数字模拟栈就好
     int st = 0;
     for (char c : s) {
@@ -666,7 +666,7 @@ std::string ProcedureCallNode::trans() const {
         int k = 0; // 正在判断第k个expression要不要加&
         std::string expr = "";
         size_t del_pos = expr_list.find(",");
-        while(del_pos != std::string::npos) {
+        while(del_pos != std::string::npos && k < arg_num - 1) {
             expr = expr_list.substr(0, del_pos);
             if (!is_expr(expr)) {
                 expr += ",";
@@ -859,7 +859,7 @@ std::string FactorNode::trans() const {
         int k = 0; // 正在判断第k个expression要不要加&
         std::string expr = "";
         size_t del_pos = expr_list.find(",");
-        while(del_pos != std::string::npos) {
+        while(del_pos != std::string::npos && k < arg_num - 1) {
             expr = expr_list.substr(0, del_pos);
             if (!is_expr(expr)) {
                 expr += ",";
