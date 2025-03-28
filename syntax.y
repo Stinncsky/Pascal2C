@@ -233,7 +233,8 @@ FormalParameterNode: {
     $$ = new FormalParameterNode();
 } | Lparen ParameterListNode Rparen {
     $$ = new FormalParameterNode(dynamic_cast<ParameterListNode*>($2));
-
+} | Lparen Rparen {
+    $$ = new FormalParameterNode();
 }
 
 ParameterListNode: ParameterNode {
