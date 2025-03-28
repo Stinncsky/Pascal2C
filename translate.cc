@@ -655,7 +655,7 @@ std::string ProcedureCallNode::trans() const {
         // expr_list = this->expression_list->trans();
         int k = 0; // 正在判断第k个expression要不要加*
         size_t del_pos = expr_list.find(",");
-        while(del_pos != std::string::npos) {
+        while(del_pos != std::string::npos && k < arg_num - 1) {
             std::string expr = expr_list.substr(0, del_pos);
             if (cites.at(k) >= CITE)
                 res += "&";
@@ -842,7 +842,7 @@ std::string FactorNode::trans() const {
         // expr_list = this->expression_list->trans();
         int k = 0; // 正在判断第k个expression要不要加*
         size_t del_pos = expr_list.find(",");
-        while(del_pos != std::string::npos) {
+        while(del_pos != std::string::npos && k < arg_num - 1) {
             std::string expr = expr_list.substr(0, del_pos);
             if (cites.at(k) >= CITE)
                 res += "&";

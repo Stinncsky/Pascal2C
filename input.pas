@@ -1,4 +1,4 @@
-// 测试样例 00-27 (28 'not') 29-43 (56 EXIT TOOLONG) (63 EXIT) (65)
+// 测试样例 00-27 (28 'not') 29-43 (56 EXIT TOOLONG) (63 EXIT)
 program main;
 const
   ca = 1;
@@ -196,5 +196,8 @@ begin
 
   func(a);
   a := (func(func(func(a))));
-  aaa(bbb(ccc(5), ccc(5))); //存在越界问题
+  aaa(bbb(ccc(5), ccc(5)));
+  bbb(a, a);
+  bbb(ccc(5), ccc(5));
+  ccc(5);
 end.
