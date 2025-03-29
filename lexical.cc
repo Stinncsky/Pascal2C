@@ -3,7 +3,7 @@
 
 bool is_keyword(std::string word){ // Pascal-S
     std::vector<std::string> keywords = {
-        "and", "array", "begin", "case", "const", "div", "do", "downto", "else", "end", "file", 
+        "and", "array", "begin", "case", "const", "div", "do", "downto", "else", "end", "file", "break",
         "for", "function", "goto", "if", "in", "label", "mod", "nil", "not", "of", "or", "packed", "procedure", 
         "program", "record", "repeat", "set", "then", "to", "type", "until", "var", "while", "with",
         "integer", "real", "char", "boolean", "string", "true", "false",
@@ -443,8 +443,9 @@ int Token::to_yacc_token() const {
             else if(this->property == "div" || this->property == "mod") return 25;
             else if(this->property == "or") return 26; // ADDOP
             else if(this->property == "and") return 25; // MULOP
-            /*拓展语法：while*/
+            /*拓展语法：while, break*/
             else if(this->property == "while") return 39;
+            else if(this->property == "break") return 40;
             break;
         case TokenType::Operator: 
             if(this->property == "*" || this->property == "/") return 25;

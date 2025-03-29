@@ -31,7 +31,7 @@ std::string FinalNode::trans() const{
             else if (this->token.property == "boolean")
                 return "int";
             else if (this->token.property == "true")
-                return "1";
+                return "-1";
             else if (this->token.property == "false")
                 return "0";
             else if (this->token.property == "read")
@@ -43,7 +43,7 @@ std::string FinalNode::trans() const{
             else if (this->token.property == "or")
                 return "||";
             else if (this->token.property == "not")
-                return "!";
+                return "~";
             else if (this->token.property == "div")
                 return "/";
             else if (this->token.property == "mod")
@@ -508,6 +508,9 @@ std::string StatementNode::trans() const {
         else {
             return "while (" + exp + ") {\n" + statement_str + "}\n";
         }
+    }
+    else if(kind == 11){
+        return "break;\n";
     }
     return "";
 }

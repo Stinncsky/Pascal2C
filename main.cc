@@ -11,6 +11,29 @@
     #include "translate.cc"
 #endif
 
+#ifdef _WIN32
+    #include <windows.h>
+    #include <thread>
+    #include <chrono>
+#else
+    #include <csignal>
+    #include <unistd.h>
+    #include <cstdlib>
+#endif
+#ifdef _WIN32
+void windowsTimeoutThread(int seconds) { // Windows 实现：启动一个计时线程，等待超时时间后终止程序
+    std::this_thread::sleep_for(std::chrono::seconds(seconds));
+    std::cerr << "TLE ERROR" << std::endl;
+    ExitProcess(1);
+}
+#else
+void timeoutHandler(int signum) { // Linux 实现：使用 alarm 与信号处理函数
+    std::cerr << "TLE ERROR" << std::endl;
+    std::exit(signum);
+}
+#endif
+const int timeoutSeconds = 10; // 设置超时时间为 10 秒
+
 Syntax* syntax = nullptr;
 std::vector<Token> tokens;
 int tokenIndex = 0;
@@ -42,6 +65,16 @@ int main(int argc, char *argv[]) {
 
     syntax = new Syntax(); // 这里初始化 syntax
     syntax->tree = nullptr;
+
+    #ifdef _WIN32
+        // 启动计时线程，并分离（后台运行）
+        std::thread timerThread(windowsTimeoutThread, timeoutSeconds);
+        timerThread.detach();
+    #else
+        // 设置信号处理函数，并启动定时器
+        std::signal(SIGALRM, timeoutHandler);
+        alarm(timeoutSeconds);
+    #endif
 
     Program program;
     program.run();

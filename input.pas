@@ -191,6 +191,7 @@ begin
   while a > 0 do
   begin
     a := a - 1;
+    if a <= 0 then break;
   end;
   write(a);
 
