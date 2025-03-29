@@ -53,6 +53,9 @@ void set_parameter(int argc, char *argv[]) {
             std::string input_file_name = INPUT_FILE.substr(0, INPUT_FILE.find_last_of('.'));
             OUTPUT_FILE = input_file_name + ".c";
         }
+        if(strcmp(argv[i], "-ii") == 0) {
+            INPUT_FILE = argv[++i];
+        }
         if (strcmp(argv[i], "-o") == 0) {
             OUTPUT_FILE = argv[++i];
         }

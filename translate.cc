@@ -440,7 +440,7 @@ std::string StatementNode::trans() const {
             size_t del_pos = var_list.find(',');
             var.push_back(var_list.substr(0, space_pos));
             if (del_pos != std::string::npos) {
-                kind.push_back(var_list.substr(space_pos + 1, del_pos - space_pos));
+                kind.push_back(var_list.substr(space_pos + 1, del_pos - space_pos  - 1)); // 删去','
                 var_list = var_list.erase(0, del_pos + 1);
             }
             else {
@@ -451,7 +451,7 @@ std::string StatementNode::trans() const {
         }
         int n = var.size();
         std::string res = "";
-        for (int i = 0; i < n; i++) {
+        for (int i = n - 1; i >= 0; i--) {
             if (kind[i] != "%s")
                 res += "scanf(\"" + kind[i] + "\", &" + var[i] + ");\n";
             else

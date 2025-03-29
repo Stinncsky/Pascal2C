@@ -21,7 +21,7 @@ for pas_file in pas_files:
     print(f"正在处理...")
 
     try:
-        result = subprocess.run(["main.exe", "-i", input_file], 
+        result = subprocess.run(["main.exe", "-ii", input_file], 
                               capture_output=True, text=True, check=False)
 
         if result.returncode != 0 or result.stderr:

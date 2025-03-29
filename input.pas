@@ -151,6 +151,14 @@ end;
 
 procedure aaa(cond: integer); begin end;
 
+function afunc(a, b, c: integer): integer;
+var i, j, k: integer;
+begin
+  read(i);
+  read(j, b);
+  read(a, b, c);
+end;
+
 begin
   write(cb);
   a := defn;
