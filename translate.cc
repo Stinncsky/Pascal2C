@@ -623,12 +623,19 @@ std::string ProcedureCallNode::trans() const {
         return this->id->trans() + "()";
     else { // 找到每一个空格，从空格开始到逗号前的部分都去掉
         std::string expr_list = this->expression_list->trans();
+        std::string expr1 = "";
         std::string temp = "";
         size_t space_pos = expr_list.find(' ');
         while (space_pos != std::string::npos) {
-            temp += expr_list.substr(0, space_pos) + ",";
+            expr1 += expr_list.substr(0, space_pos);
             expr_list.erase(0, space_pos);
+            if (!is_expr(expr1)) {
+                space_pos = expr_list.find(" ");
+                continue;
+            }
             size_t del_pos = expr_list.find(',');
+            temp += expr1 + ",";
+            expr1 = "";
             if (del_pos != std::string::npos)
                 expr_list = expr_list.erase(0, del_pos + 1);
             else
@@ -843,11 +850,19 @@ std::string FactorNode::trans() const {
     }
     else if (this->kind == 4) { // 找到每一个空格，从空格开始到逗号前的部分都去掉
         std::string expr_list = this->expression_list->trans();
+        std::string expr = "";
         std::string temp = "";
         size_t space_pos = expr_list.find(' ');
         while (space_pos != std::string::npos) {
+            expr += expr_list.substr(0, space_pos);
+            expr_list.erase(0, space_pos);
+            if (!is_expr(expr)) {
+                space_pos = expr_list.find(" ");
+                continue;
+            }
             size_t del_pos = expr_list.find(',');
-            temp += expr_list.substr(0, space_pos) + ",";
+            temp += expr + ",";
+            expr = "";
             if (del_pos != std::string::npos)
                 expr_list = expr_list.erase(0, del_pos + 1);
             else
@@ -860,7 +875,7 @@ std::string FactorNode::trans() const {
         std::vector<int> cites = std::get<1>(t.table[*this->id]);
         int arg_num = cites.size();
         int k = 0; // 正在判断第k个expression要不要加&
-        std::string expr = "";
+        expr = "";
         size_t del_pos = expr_list.find(",");
         while(del_pos != std::string::npos && k < arg_num - 1) {
             expr = expr_list.substr(0, del_pos);
