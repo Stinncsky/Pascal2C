@@ -77,20 +77,23 @@ extern int yydebug;
     Write = 278,                   /* Write  */
     Else = 279,                    /* Else  */
     Booltype = 280,                /* Booltype  */
-    Relop = 281,                   /* Relop  */
+    Notop = 281,                   /* Notop  */
     Mulop = 282,                   /* Mulop  */
     Addop = 283,                   /* Addop  */
-    Assignop = 284,                /* Assignop  */
-    Dotdot = 285,                  /* Dotdot  */
-    Semi = 286,                    /* Semi  */
-    Dot = 287,                     /* Dot  */
-    Lparen = 288,                  /* Lparen  */
-    Rparen = 289,                  /* Rparen  */
-    Lbra = 290,                    /* Lbra  */
-    Rbra = 291,                    /* Rbra  */
-    Colon = 292,                   /* Colon  */
-    Comma = 293,                   /* Comma  */
-    Null = 294                     /* Null  */
+    Relop = 284,                   /* Relop  */
+    Assignop = 285,                /* Assignop  */
+    Dotdot = 286,                  /* Dotdot  */
+    Semi = 287,                    /* Semi  */
+    Dot = 288,                     /* Dot  */
+    Lparen = 289,                  /* Lparen  */
+    Rparen = 290,                  /* Rparen  */
+    Lbra = 291,                    /* Lbra  */
+    Rbra = 292,                    /* Rbra  */
+    Colon = 293,                   /* Colon  */
+    Comma = 294,                   /* Comma  */
+    Null = 295,                    /* Null  */
+    While = 296,                   /* While  */
+    Break = 297                    /* Break  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
@@ -104,7 +107,7 @@ union YYSTYPE
     Token* token;
     AST* ast;
 
-#line 108 "syntax.tab.hpp"
+#line 111 "syntax.tab.hpp"
 
 };
 typedef union YYSTYPE YYSTYPE;

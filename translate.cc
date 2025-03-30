@@ -25,13 +25,13 @@ std::string FinalNode::trans() const{
             if (this->token.property == "integer")
                 return "int";
             else if (this->token.property == "real")
-                return "double";
+                return "float";
             else if (this->token.property == "char")
                 return "char";
             else if (this->token.property == "boolean")
                 return "int";
             else if (this->token.property == "true")
-                return "1";
+                return "-1";
             else if (this->token.property == "false")
                 return "0";
             else if (this->token.property == "read")
@@ -43,7 +43,7 @@ std::string FinalNode::trans() const{
             else if (this->token.property == "or")
                 return "||";
             else if (this->token.property == "not")
-                return "!";
+                return "~";
             else if (this->token.property == "div")
                 return "/";
             else if (this->token.property == "mod")
@@ -76,7 +76,13 @@ std::string ProgramBodyNode::trans() const{
     res += this->var_declarations->trans();
     res += this->subprogram_declarations->trans();
     res += "int main()";
-    res += this->compound_statement->trans();
+    std::string main_func_body = this->compound_statement->trans();
+    if(main_func_body == "") {
+        res +="{\nreturn ;\n}\n";
+    } else {
+        main_func_body.erase(main_func_body.size()-2);// 去掉末尾的 }和 \n
+        res += main_func_body+ "return 0;\n}\n";
+    }
     return res;
 }
 
@@ -92,17 +98,24 @@ std::string IdListNode::trans(const std::string type, const std::string tmp, con
     res += type + this->id->trans() + tmp + end;
     if (is_cite){
         auto info = t.table[*id];
-        info = std::make_tuple(std::get<0>(info), std::vector<int>(1,1), std::get<2>(info));
+        info = std::make_tuple(std::get<0>(info), std::vector<int>(1,CITE), std::get<2>(info));
         t.table[*id] = info;
-    } else if (type == "int " || type == "double "){
-        t.table[*(this->id)] = std::make_tuple(type == "int " ? 0 : 1, std::vector<int>(1,0), *dim);
+    } else if (type == "int "){
+        t.table[*(this->id)] = std::make_tuple(ID_INT, std::vector<int>(1,0), *dim);
+    } else if (type == "float ") {
+        t.table[*(this->id)] = std::make_tuple(ID_FLOAT, std::vector<int>(1,0), *dim);
     } else if (type == "char "){
-        t.table[*(this->id)] = std::make_tuple(2, std::vector<int>(1,0), *dim);
+        t.table[*(this->id)] = std::make_tuple(ID_CHAR, std::vector<int>(1,0), *dim);
     } else if (type == "string "){
-        t.table[*(this->id)] = std::make_tuple(3, std::vector<int>(1,0), *dim);
+        t.table[*(this->id)] = std::make_tuple(ID_STRING, std::vector<int>(1,0), *dim);
     }
     if (func_p_is_cite != nullptr){
-        func_p_is_cite->push_back(is_cite);
+        if (is_cite) {
+            func_p_is_cite->push_back(CITE);
+        } else {
+            func_p_is_cite->push_back(0);
+        }
+        
     }
     return res;
 }
@@ -120,23 +133,23 @@ std::string ConstDeclarationNode::trans() const{
     int type = 0;
     if (this->const_value->numletter->token.type == TokenType::Number){
         if (this->const_value->numletter->token.property.find(".") != std::string::npos){
-            res += "double ";
-            type = 1;
+            res += "float ";
+            type = ID_FLOAT;
         } else {
             res += "int ";
-            type = 0;
+            type = ID_INT;
         }
         t.table[*(this->id)] = std::make_tuple(type, std::vector<int>(1,0), std::vector<int>());
         res += this->id->trans() + " = ";
         res += this->const_value->trans() + ";\n";
     } else if (this->const_value->numletter->token.type == TokenType::Char){
         res += "char ";
-        t.table[*(this->id)] = std::make_tuple(2, std::vector<int>(1,0), std::vector<int>());
+        t.table[*(this->id)] = std::make_tuple(ID_CHAR, std::vector<int>(1,0), std::vector<int>());
         res += this->id->trans() + " = ";
         res += "\'" + this->const_value->trans() + "\';\n";
     } else if (this->const_value->numletter->token.type == TokenType::String){
         res += "char *";
-        t.table[*(this->id)] = std::make_tuple(3, std::vector<int>(1,0), std::vector<int>());
+        t.table[*(this->id)] = std::make_tuple(ID_STRING, std::vector<int>(1,0), std::vector<int>());
         res += this->id->trans() + " = ";
         res += "\"" + this->const_value->trans() + "\";\n";
     }
@@ -195,7 +208,7 @@ std::string BasicTypeNode::trans() const{
 std::string PeriodNode::trans(std::vector<int> &dim) const{
     std::string res = "";
     if (this->period != nullptr){
-        res += this->period->trans();
+        res += this->period->trans(dim);
     }
     int start = std::stoi(this->num1->trans());
     dim.push_back(start);
@@ -220,9 +233,20 @@ std::string SubprogramNode::trans() const{
     Table tmp = t;
     res += this->subprogram_head->trans(&func_p_is_cite);
     FinalNode now_func = *t.now_funcid;
-    res += this->subprogram_body->trans();
+    int func_type;
+    if (this->subprogram_head->basic_type == nullptr){
+        func_type = FUNC_VOID;
+    } else if (this->subprogram_head->basic_type->trans() == "int"){
+        func_type = FUNC_INT;
+    } else if (this->subprogram_head->basic_type->trans() == "float"){
+        func_type = FUNC_FLOAT;
+    } else if (this->subprogram_head->basic_type->trans() == "char"){
+        func_type = FUNC_CHAR;
+    }
+    t.table[now_func] = std::make_tuple(func_type, func_p_is_cite, std::vector<int>());//自身递归需要
+    res += this->subprogram_body->trans(); //先存符号表，再处理函数体：递归调用自身
     t = tmp;
-    t.table[now_func] = std::make_tuple(-1, func_p_is_cite, std::vector<int>());
+    t.table[now_func] = std::make_tuple(func_type, func_p_is_cite, std::vector<int>());//外部调用需要
     return res;
 }
 
@@ -288,10 +312,12 @@ std::string ValueParameterNode::trans(const bool is_ptr, std::vector<int> *func_
 }
 
 std::string SubprogramBodyNode::trans() const {
+    std::string constDecl = this->const_declarations->trans();
+    std::string varDecl = this->var_declarations->trans();
     std::string com_state = this->compound_statement->trans();
     if (com_state != "") {
-        com_state.erase(0, 1);
-        return "{\n" + this->const_declarations->trans() + this->var_declarations->trans() + com_state;
+        com_state.erase(0, 1); // 去掉开头的'{'
+        return "{\n" + constDecl + varDecl + com_state;
     }
     else
         return "";
@@ -341,6 +367,9 @@ std::string StatementNode::trans() const {
             } else {
                 exp = exp.substr(0, space_pos);
             }
+            auto info = t.table[*id];
+            if (!std::get<1>(info).empty() && std::get<1>(info).back() >= CITE)
+                id_str = "(*" + id_str + ")";
             return id_str + " = " + exp + ";\n";
         }
     }
@@ -349,14 +378,59 @@ std::string StatementNode::trans() const {
     else if (this->kind == 5)
         return this->compound_statement->trans();
     else if (this->kind == 6) { // 后面用不用考虑变成else if的形式，更工整但可能不是很必要？
-        return "if (" + this->expression->trans() + ") {\n" +
-               this->statement->trans() + "}" + this->else_part->trans() + "\n";
+        std::string exp = this->expression->trans();
+        size_t space_pos = exp.find(' ');
+        if (exp[exp.size() - 1] == ')') {
+            exp = exp.substr(0, space_pos) + ")";
+        } else {
+            exp = exp.substr(0, space_pos);
+        }
+        std::string statement_str = this->statement->trans();
+        // return "if " + exp + " " + statement_str + this->else_part->trans() + "\n";
+        // return "if (" + exp + ") {\n" + this->statement->trans() + "}" + this->else_part->trans() + "\n";
+        int end_index = statement_str.size() - 1;
+        while(end_index > 0){ 
+            if(statement_str[end_index] != '\n' && statement_str[end_index] != ' ' && statement_str[end_index] != '\t'){
+                break;
+            }
+            end_index--;
+        } //去掉结尾的'\n', ' ', '\t'等方便判断是否以'}'结尾
+        if(end_index >= 0 && statement_str[0] == '{' && statement_str[end_index] == '}'){
+            return "if (" + exp + ") " + this->statement->trans() + this->else_part->trans() + "\n"; //若以{}包裹则不需要再加{}
+        }
+        else {
+            return "if (" + exp + ") {\n" + this->statement->trans() + "}" + this->else_part->trans() + "\n";
+        }
     }
     else if (this->kind == 7) {
+        std::string exp = this->expression->trans();
+        size_t space_pos = exp.find(' ');
+        if (exp[exp.size() - 1] == ')') {
+            exp = exp.substr(0, space_pos) + ")";
+        } else {
+            exp = exp.substr(0, space_pos);
+        }
+        std::string exp2 = this->expression_2->trans();
+        space_pos = exp2.find(' ');
+        if (exp2[exp2.size() - 1] == ')') {
+            exp2 = exp2.substr(0, space_pos) + ")";
+        } else {
+            exp2 = exp2.substr(0, space_pos);
+        }
         std::string i = this->id->trans();
-        return "for (" + i + " = " + this->expression->trans() + "; " + i +
-               " <= " + this->expression_2->trans() + "; " + i + "++) {\n" +
-               this->statement->trans() + "}\n";
+        std::string statement_str = this->statement->trans();
+        int end_index = statement_str.size() - 1;
+        while(end_index > 0){ 
+            if(statement_str[end_index] != '\n' && statement_str[end_index] != ' ' && statement_str[end_index] != '\t'){
+                break;
+            }
+            end_index--;
+        } //去掉结尾的'\n', ' ', '\t'等方便判断是否以'}'结尾
+        if(end_index >= 0 && statement_str[0] == '{' && statement_str[end_index] == '}'){
+            return "for (" + i + " = " + exp + "; " + i + " <= " + exp2 + "; " + i + "++) " + statement_str; //若以{}包裹则不需要再加{}
+        } else {
+            return "for (" + i + " = " + exp + "; " + i + " <= " + exp2 + "; " + i + "++) {\n" + statement_str + "}\n";
+        }
     }
     else if (this->kind == 8) {
         std::string var_list = this->variable_list->trans();
@@ -366,7 +440,7 @@ std::string StatementNode::trans() const {
             size_t del_pos = var_list.find(',');
             var.push_back(var_list.substr(0, space_pos));
             if (del_pos != std::string::npos) {
-                kind.push_back(var_list.substr(space_pos + 1, del_pos - space_pos));
+                kind.push_back(var_list.substr(space_pos + 1, del_pos - space_pos  - 1)); // 删去','
                 var_list = var_list.erase(0, del_pos + 1);
             }
             else {
@@ -377,7 +451,7 @@ std::string StatementNode::trans() const {
         }
         int n = var.size();
         std::string res = "";
-        for (int i = 0; i < n; i++) {
+        for (int i = n - 1; i >= 0; i--) {
             if (kind[i] != "%s")
                 res += "scanf(\"" + kind[i] + "\", &" + var[i] + ");\n";
             else
@@ -390,14 +464,15 @@ std::string StatementNode::trans() const {
         std::vector<std::string> expr, kind;
         size_t space_pos = expr_list.find(' ');
         while (space_pos != std::string::npos) {
-            size_t del_pos = expr_list.find(',');
             expr.push_back(expr_list.substr(0, space_pos));
+            expr_list.erase(0, space_pos + 1);
+            size_t del_pos = expr_list.find(',');
             if (del_pos != std::string::npos) {
-                kind.push_back(expr_list.substr(space_pos + 1, del_pos - space_pos));
+                kind.push_back(expr_list.substr(0, del_pos));
                 expr_list = expr_list.erase(0, del_pos + 1);
             }
             else {
-                kind.push_back(expr_list.substr(space_pos + 1));
+                kind.push_back(expr_list);
                 expr_list = "";
             }
             space_pos = expr_list.find(' ');
@@ -405,9 +480,37 @@ std::string StatementNode::trans() const {
         int n = expr.size();
         std::string res = "";
         for (int i = 0; i < n; i++) {
+            if (kind[i][int(kind[i].size()) - 1] == ',')
+                kind[i].erase(kind[i].end() - 1);
             res += "printf(\"" + kind[i] + "\", " + expr[i] + ");\n";
         }
         return res;
+    }
+    else if(kind == 10){ //  statement → while expression do statement
+        std::string exp = this->expression->trans();
+        size_t space_pos = exp.find(' ');
+        if (exp[exp.size() - 1] == ')') {
+            exp = exp.substr(0, space_pos) + ")";
+        } else {
+            exp = exp.substr(0, space_pos);
+        }
+        const std::string statement_str = this->statement->trans();
+        int end_index = statement_str.size() - 1;
+        while(end_index > 0){ 
+            if(statement_str[end_index] != '\n' && statement_str[end_index] != ' ' && statement_str[end_index] != '\t'){
+                break;
+            }
+            end_index--;
+        } //去掉结尾的'\n', ' ', '\t'等方便判断是否以'}'结尾
+        if(end_index >= 0 && statement_str[0] == '{' && statement_str[end_index] == '}'){
+            return "while (" + exp + ") " + statement_str + "\n"; //若以{}包裹则不需要再加{}
+        }
+        else {
+            return "while (" + exp + ") {\n" + statement_str + "}\n";
+        }
+    }
+    else if(kind == 11){
+        return "break;\n";
     }
     return "";
 }
@@ -429,34 +532,55 @@ std::string VariableListNode::trans() const {
 std::string VariableNode::trans() const {
     auto info = t.table[*id];
     std::string res = this->id->trans();
-    if (std::get<0>(info) == 0) {
-        // res = "scanf(\"%d\", &";
+    std::string raw_index = this->id_varpart->trans();
+    int i = 0;
+    size_t space_pos = raw_index.find(' ');
+    while (space_pos != std::string::npos) {
+        // int int_index = std::stoi(raw_index.substr(0, space_pos));
+        // int_index -= std::get<2>(info)[i]; // error: 维度要匹配
+        int start_i = std::get<2>(info)[i];
+        std::string index = "";
+        if (start_i > 0)
+            index = raw_index.substr(0, space_pos) + "-" + std::to_string(start_i);
+        else if (start_i < 0)
+            index = raw_index.substr(0, space_pos) + "+" + std::to_string(-start_i);
+        else
+            index = raw_index.substr(0, space_pos);
+        res += "[" + index + "]";
+        i++;
+        raw_index.erase(0, space_pos + 1);
+        space_pos = raw_index.find(' ');
+    }
+    if (std::get<0>(info) == ID_INT) {
         res += " %d";
     }
-    else if (std::get<0>(info) == 1) {
-        // res = "scanf(\"%lf\", &";
-        res += " %lf";
+    else if (std::get<0>(info) == ID_FLOAT) {
+        res += " %f";
     }
-    else if (std::get<0>(info) == 2) {
-        // res = "scanf(\"%c\", &";
+    else if (std::get<0>(info) == ID_CHAR) {
         res += " %c";
     }
-    else if (std::get<0>(info) == 3) {
-        // res = "scanf(\"%s\", ";
+    else if (std::get<0>(info) == ID_STRING) {
         res += " %s";
     }
-    std::string index = this->id_varpart->trans();
-    int i = 0;
-    size_t space_pos = index.find(' ');
-    while (space_pos != std::string::npos) {
-        int int_index = std::stoi(index.substr(0, space_pos));
-        int_index -= std::get<2>(info)[i]; // error: 维度要匹配
-        res += "[" + std::to_string(int_index) + "]";
-        i++;
-        space_pos = index.find(' ');
+    else if (std::get<0>(info) == FUNC_INT) {
+        res += "() %d";
     }
-    if (!std::get<1>(info).empty() && std::get<1>(info).back() == 1)
-        res = "&" + res;
+    else if (std::get<0>(info) == FUNC_FLOAT) {
+        res += "() %f";
+    }
+    else if (std::get<0>(info) == FUNC_CHAR) {
+        res += "() %c";
+    }
+    else if (std::get<0>(info) == FUNC_VOID) {
+        res += ""; // error: 
+    }
+    if (!std::get<1>(info).empty() && std::get<1>(info).back() >= CITE) {
+        size_t space_pos = res.find(" ");
+        std::string res_content = res.substr(0, space_pos);
+        std::string kind = res.substr(space_pos + 1);
+        res = "(*" + res_content + ") " + kind;
+    }
     // res += ");\n";
     return res;
     // eg: "a[1][2] %d"
@@ -483,77 +607,124 @@ std::string IdVarpartNode::trans() const {
     }
 }
 
+static bool is_expr(std::string s) {
+    // 因为经过了词法语法分析，所以不会出现)(这种错误，用数字模拟栈就好
+    int st = 0;
+    for (char c : s) {
+        if (c == '(') st++;
+        else if (c == ')') st--;
+    }
+    if (st == 0) return true; // 说明()完全匹配，是一个完整的表达式
+    return false; // 可能是函数的一部分
+}
+
 std::string ProcedureCallNode::trans() const {
     if (this->expression_list == nullptr)
         return this->id->trans() + "()";
     else { // 找到每一个空格，从空格开始到逗号前的部分都去掉
         std::string expr_list = this->expression_list->trans();
+        std::string expr1 = "";
+        std::string temp = "";
         size_t space_pos = expr_list.find(' ');
         while (space_pos != std::string::npos) {
+            expr1 += expr_list.substr(0, space_pos);
+            expr_list.erase(0, space_pos);
+            if (!is_expr(expr1)) {
+                space_pos = expr_list.find(" ");
+                continue;
+            }
             size_t del_pos = expr_list.find(',');
-            expr_list = expr_list.erase(space_pos, del_pos - space_pos);
+            temp += expr1 + ",";
+            expr1 = "";
+            if (del_pos != std::string::npos)
+                expr_list = expr_list.erase(0, del_pos + 1);
+            else
+                expr_list = "";
             space_pos = expr_list.find(' ');
         }
+        if (temp[int(temp.size()) - 1] == ',') temp.erase(int(temp.size()) - 1);
+        expr_list = temp;
         auto info = t.table[*id];
-        std::string kind = "";
-        if (std::get<0>(info) == 0) {
+        /*std::string kind = "";
+        if (std::get<0>(info) == ID_INT) {
             kind = "%d";
         }
-        else if (std::get<0>(info) == 1) {
-            kind = "%lf";
+        else if (std::get<0>(info) == ID_FLOAT) {
+            kind = "%f";
         }
-        else if (std::get<0>(info) == 2) {
+        else if (std::get<0>(info) == ID_CHAR) {
             kind = "%c";
         }
-        else if (std::get<0>(info) == 3) {
+        else if (std::get<0>(info) == ID_STRING) {
             kind = "%s";
         }
+        else if (std::get<0>(info) == FUNC_INT) {
+            kind = "%d";
+        }
+        else if (std::get<0>(info) == FUNC_FLOAT) {
+            kind = "%f";
+        }
+        else if (std::get<0>(info) == FUNC_CHAR) {
+            kind = "%c";
+        }
+        else if (std::get<0>(info) == FUNC_VOID) {
+            kind = ""; // error: 
+        }*/ // 这里不考虑赋值的问题，直接调用，不要添加类型
         std::string res = this->id->trans() + "(";
         std::vector<int> cites = std::get<1>(t.table[*this->id]);
         int arg_num = cites.size();
-        expr_list = this->expression_list->trans();
-        int k = 0; // 正在判断第k个expression要不要加*
+        int k = 0; // 正在判断第k个expression要不要加&
+        std::string expr = "";
         size_t del_pos = expr_list.find(",");
-        while(del_pos != std::string::npos) {
-            std::string expr = expr_list.substr(0, del_pos);
-            if (cites[k] == 1)
-                res += "*";
+        while(del_pos != std::string::npos && k < arg_num - 1) {
+            expr += expr_list.substr(0, del_pos);
+            if (!is_expr(expr)) {
+                expr += ",";
+                expr_list.erase(0,del_pos + 1);
+                del_pos = expr_list.find(",");
+                continue;
+            }
+            if (cites.at(k) >= CITE)
+                res += "&";
             res += expr + ",";
+            expr = "";
             k++;
             expr_list.erase(0,del_pos + 1);
             del_pos = expr_list.find(",");
         }
-        if (cites[k] == 1)
+        if (cites.at(k) >= CITE)
             res += "&";
-        res += expr_list + ")";
-        // 更新符号表
-        for (int i = 0; i < arg_num; i++) {
-            if (cites[i] == 1) {
-                ExpressionNode* need_cite_var = nullptr; // error: 这应该得是变量而不应该是表达式的吧，要判断下吧
-                ExpressionListNode* temp_list = nullptr;
-                for (int j = i; j < arg_num; j++) { // 需要访问几次expression_list指针才能访问expression指针
-                    temp_list = temp_list->expression_list;
-                }
-                need_cite_var = temp_list->expression;
-                std::get<1>(t.table[*need_cite_var->simple_expression->term->factor->id]).push_back(1); // ERROR: 如果出错排查下这，感觉怪怪的
-            }
-        }
-        return res + expr_list + ")" + kind; // eg: f(a,&b)%d
+        res += expr + expr_list + ")";
+        //return res + " " + kind; // eg: f(a,&b) %d
+        return res; // eg: f(a,&b)
     }
 }
 
 std::string ElsePartNode::trans() const {
     if (this->statement == nullptr)
         return "";
-    else
-        return " else {\n" + this->statement->trans() + "}";
+    else{
+        std::string statement_str = this->statement->trans();
+        int end_index = statement_str.size() - 1;
+        while(end_index > 0){ 
+            if(statement_str[end_index] != '\n' && statement_str[end_index] != ' ' && statement_str[end_index] != '\t'){
+                break;
+            }
+            end_index--;
+        } //去掉结尾的'\n', ' ', '\t'等方便判断是否以'}'结尾
+        if(end_index >= 0 && statement_str[0] == '{' && statement_str[end_index] == '}'){
+            return " else " + this->statement->trans(); //若以{}包裹则不需要再加{}
+        } else {
+            return " else {\n" + this->statement->trans() + "}";
+        }
+    }
 }
 
 std::string ExpressionListNode::trans() const {
     if (this->expression_list == nullptr)
         return this->expression->trans();
     else
-        return this->expression->trans() + "," + this->expression_list->trans();
+        return this->expression_list->trans() + "," + this->expression->trans();
 }
 
 std::string ExpressionNode::trans() const {
@@ -570,8 +741,8 @@ std::string ExpressionNode::trans() const {
         std::string simple_expr_2_content = simple_expr_2.substr(0, simple_expr_2_space_pos);
         std::string simple_expr_2_kind = simple_expr_2.substr(simple_expr_2_space_pos + 1);
         std::string kind = "";
-        if (simple_expr_kind == "%lf" || simple_expr_2_kind == "%lf") // error: 这里应该按符号具体判断种类，可能会有错误处理
-            kind = "%lf";
+        if (simple_expr_kind == "%f" || simple_expr_2_kind == "%f") // error: 这里应该按符号具体判断种类，可能会有错误处理
+            kind = "%f";
         else
             kind = "%d";
         return simple_expr_content + op + simple_expr_2_content + " " + kind; // eg: "a=1*2+1*2 %d"
@@ -592,8 +763,8 @@ std::string SimpleExpressionNode::trans() const {
         std::string simple_expr_content = simple_expr.substr(0, simple_expr_space_pos);
         std::string simple_expr_kind = simple_expr.substr(simple_expr_space_pos + 1);
         std::string kind = "";
-        if (term_kind == "%lf" || simple_expr_kind == "%lf") // error: 这里应该按符号具体判断种类，可能会有错误处理
-            kind = "%lf";
+        if (term_kind == "%f" || simple_expr_kind == "%f") // error: 这里应该按符号具体判断种类，可能会有错误处理
+            kind = "%f";
         else
             kind = "%d";
         // int sim_exp = std::stoi(simple_expr_content);
@@ -604,6 +775,8 @@ std::string SimpleExpressionNode::trans() const {
         //     return std::to_string(term - sim_exp) + kind;
         // else if (op == "or")
         //     return std::to_string(term | sim_exp) + kind;
+        if (term_content != "" && term_content.substr(0, 1) == op)
+            return simple_expr_content + op + "(" + term_content + ") " + kind;
         return simple_expr_content + op + term_content + " " + kind;
         // eg: "1 * 2 + 1 * 2 %d" -> "1*2+1*2 %d"
     }
@@ -622,8 +795,8 @@ std::string TermNode::trans() const {
         std::string factor_content = factor_expr.substr(0, factor_space_pos);
         std::string factor_kind = factor_expr.substr(factor_space_pos + 1);
         std::string kind = "";
-        if (term_kind == "%lf" || factor_kind == "%lf")
-            kind = "%lf";
+        if (term_kind == "%f" || factor_kind == "%f")
+            kind = "%f";
         else
             kind = "%d";
         std::string op = this->mulop->trans(); // * / div mod and
@@ -649,90 +822,120 @@ std::string FactorNode::trans() const {
         std::string num_str = this->num->trans();
         std::string kind = "";
         if (num_str.find('.') != std::string::npos)
-            kind = "%lf";
+            kind = "%f";
         else
             kind = "%d";
         return num_str + " " + kind; // eg: "1 %d"
     }
     else if (this->kind == 2) {
-        std::string str = this->variable->trans(); // eg: "a %d"
-        size_t space_pos = str.find(' ');
-        auto tmpstr = str.substr(0, space_pos);
-        auto info = t.table[*this->variable->id]; // 判断是变量还是无参数传递的函数
-        if (std::get<0>(info) == -1) {
-            std::string res = tmpstr + "( )";
-            return res;
-        }
-        else {
-            return str;
-        }
+        std::string str = this->variable->trans();
+        return str; // eg: "a %d"
+        // size_t space_pos = str.find(' ');
+        // auto tmpstr = str.substr(0, space_pos);
+        // auto info = t.table[*this->variable->id]; // 判断是变量还是无参数传递的函数
+        // if (std::get<0>(info) == FUNC_VOID || std::get<0>(info) == FUNC_INT || std::get<0>(info) == FUNC_FLOAT || std::get<0>(info) == FUNC_CHAR) {
+        //     std::string res = tmpstr + "()";
+        //     return res;
+        // }
+        // else {
+        //     return str;
+        // }
     }
     else if (this->kind == 3) {
         std::string expr = this->expression->trans();
         size_t space_pos = expr.find(' ');
         std::string before_space = "(" + expr.substr(0, space_pos) + ")";
         std::string after_space = expr.substr(space_pos);
-        return before_space + after_space;
+        return before_space + after_space; // (1+1) %d
     }
     else if (this->kind == 4) { // 找到每一个空格，从空格开始到逗号前的部分都去掉
         std::string expr_list = this->expression_list->trans();
-        // 去掉expr_list中的类型，使"a %d,b %s"变成"a,b"
+        std::string expr = "";
+        std::string temp = "";
         size_t space_pos = expr_list.find(' ');
         while (space_pos != std::string::npos) {
+            expr += expr_list.substr(0, space_pos);
+            expr_list.erase(0, space_pos);
+            if (!is_expr(expr)) {
+                space_pos = expr_list.find(" ");
+                continue;
+            }
             size_t del_pos = expr_list.find(',');
-            expr_list = expr_list.erase(space_pos, del_pos - space_pos);
+            temp += expr + ",";
+            expr = "";
+            if (del_pos != std::string::npos)
+                expr_list = expr_list.erase(0, del_pos + 1);
+            else
+                expr_list = "";
             space_pos = expr_list.find(' ');
         }
+        if (temp[int(temp.size()) - 1] == ',') temp.erase(int(temp.size()) - 1);
+        expr_list = temp;
         std::string res = this->id->trans() + "(";
         std::vector<int> cites = std::get<1>(t.table[*this->id]);
         int arg_num = cites.size();
-        expr_list = this->expression_list->trans();
-        int k = 0; // 正在判断第k个expression要不要加*
+        int k = 0; // 正在判断第k个expression要不要加&
+        expr = "";
         size_t del_pos = expr_list.find(",");
-        while(del_pos != std::string::npos) {
-            std::string expr = expr_list.substr(0, del_pos);
-            if (cites[k] == 1)
-                res += "*";
+        while(del_pos != std::string::npos && k < arg_num - 1) {
+            expr += expr_list.substr(0, del_pos);
+            if (!is_expr(expr)) {
+                expr += ",";
+                expr_list.erase(0,del_pos + 1);
+                del_pos = expr_list.find(",");
+                continue;
+            }
+            if (cites.at(k) >= CITE)
+                res += "&";
             res += expr + ",";
+            expr = "";
             k++;
             expr_list.erase(0,del_pos + 1);
             del_pos = expr_list.find(",");
         }
-        if (cites[k] == 1)
+        if (cites.at(k) >= CITE)
             res += "&";
-        res += expr_list + ")";
-        // 更新符号表
-        for (int i = 0; i < arg_num; i++) {
-            if (cites[i] == 1) {
-                ExpressionNode* need_cite_var = nullptr; // error: 这应该得是变量而不应该是表达式的吧，要判断下吧
-                ExpressionListNode* temp_list = nullptr;
-                for (int j = i; j < arg_num; j++) { // 需要访问几次expression_list指针才能访问expression指针
-                    temp_list = temp_list->expression_list;
-                }
-                need_cite_var = temp_list->expression;
-                std::get<1>(t.table[*need_cite_var->simple_expression->term->factor->id]).push_back(1); // ERROR: 如果出错排查下这，感觉怪怪的
-            }
-        }
+        res += expr + expr_list + ")";
         // 判断函数返回值类型
         auto info = t.table[*id];
         std::string kind = "";
-        if (std::get<0>(info) == 0) {
+        if (std::get<0>(info) == ID_INT) {
             kind = "%d";
         }
-        else if (std::get<0>(info) == 1) {
-            kind = "%lf";
+        else if (std::get<0>(info) == ID_FLOAT) {
+            kind = "%f";
         }
-        else if (std::get<0>(info) == 2) {
+        else if (std::get<0>(info) == ID_CHAR) {
             kind = "%c";
         }
-        else if (std::get<0>(info) == 3) {
+        else if (std::get<0>(info) == ID_STRING) {
             kind = "%s";
         }
-        return res + expr_list + ")" + kind; // eg: f(a,&b)%d
+        else if (std::get<0>(info) == FUNC_INT) {
+            kind = "%d";
+        }
+        else if (std::get<0>(info) == FUNC_FLOAT) {
+            kind = "%f";
+        }
+        else if (std::get<0>(info) == FUNC_CHAR) {
+            kind = "%c";
+        }
+        else if (std::get<0>(info) == FUNC_VOID) {
+            kind = ""; // error: 
+        }
+        // return res + expr_list + ") " + kind;
+        return res + " " + kind; // eg: f(a,&b) %d
     }
     else if (this->kind == 5) {
         std::string op = this->not_uminus->trans();
-        return op + this->factor->trans();
+        std::string factor_str = this->factor->trans();
+        if (factor_str != "" && factor_str.substr(0, 1) == op) {
+            size_t space_pos = factor_str.find(' ');
+            std::string factor_content = factor_str.substr(0, space_pos);
+            std::string factor_kind = factor_str.substr(space_pos);
+            return op + "(" + factor_content + ") " + factor_kind;
+        }
+        return op + factor_str; // -(-1) %d
     }
     return "";
 }

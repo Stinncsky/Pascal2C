@@ -366,6 +366,7 @@ class StatementNode : public AST {
         VariableListNode *variable_list = nullptr;
         ExpressionListNode *expression_list = nullptr;
         FinalNode *w_r = nullptr; // 'write' or 'read'
+        FinalNode *break_key = nullptr;
         int kind = 0;
 
         StatementNode() : AST(NodeType::statement) {
@@ -420,6 +421,17 @@ class StatementNode : public AST {
             this->expression_list = expression_list;
             this->kind = 9;
         } //  statement → write ( expression_list )
+
+        StatementNode(ExpressionNode *expression, StatementNode *statement) : AST(NodeType::statement) {
+            this->expression = expression;
+            this->statement = statement;
+            this->kind = 10;
+        } //  statement → while expression do statement
+
+        StatementNode(FinalNode *break_key) {
+            this->break_key = break_key;
+            this->kind = 11;
+        }
         ~StatementNode();
 
         std::string trans() const override;

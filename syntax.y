@@ -25,7 +25,7 @@
     AST* ast;
 }
 // **声明终结符**
-%token <token> Identifier Number String_var Char_var ProgramKey Const Var Array Of Basictype Procedure Function Begin End If Then For To Do Read Write Else Booltype Relop Mulop Addop Assignop Dotdot Semi Dot Lparen Rparen Lbra Rbra Colon Comma Null 
+%token <token> Identifier Number String_var Char_var ProgramKey Const Var Array Of Basictype Procedure Function Begin End If Then For To Do Read Write Else Booltype Notop Mulop Addop Relop Assignop Dotdot Semi Dot Lparen Rparen Lbra Rbra Colon Comma Null While Break
 
 
 // **声明非终结符**
@@ -233,7 +233,8 @@ FormalParameterNode: {
     $$ = new FormalParameterNode();
 } | Lparen ParameterListNode Rparen {
     $$ = new FormalParameterNode(dynamic_cast<ParameterListNode*>($2));
-
+} | Lparen Rparen {
+    $$ = new FormalParameterNode();
 }
 
 ParameterListNode: ParameterNode {
@@ -248,8 +249,8 @@ ParameterNode: VarParameterNode {
     $$ = new ParameterNode(dynamic_cast<ValueParameterNode*>($1));
 }
 
-VarParameterNode: Var VarParameterNode {
-    $$ = new VarParameterNode(dynamic_cast<VarParameterNode*>($2));
+VarParameterNode: Var ValueParameterNode {
+    $$ = new VarParameterNode(dynamic_cast<ValueParameterNode*>($2));
 }
 
 ValueParameterNode: IdListNode Colon BasicTypeNode {
@@ -311,7 +312,12 @@ StatementNode: {
 } | Write Lparen ExpressionListNode Rparen {
     FinalNode* Wr = new FinalNode(*$1);
     $$ = new StatementNode(Wr, dynamic_cast<ExpressionListNode*>($3));
-} 
+} | While ExpressionNode Do StatementNode{ // while语句拓展
+    $$ = new StatementNode(dynamic_cast<ExpressionNode*>($2), dynamic_cast<StatementNode*>($4));
+} | Break{ // break拓展
+    FinalNode* bk = new FinalNode(*$1);
+    $$ = new StatementNode(bk);
+}
 
 VariableListNode: VariableNode {
     $$ = new VariableListNode(dynamic_cast<VariableNode*>($1));
@@ -336,6 +342,9 @@ ProcedureCallNode: Identifier {
 } | Identifier Lparen ExpressionListNode Rparen {
     FinalNode* id = new FinalNode(*$1);
     $$ = new ProcedureCallNode(id, dynamic_cast<ExpressionListNode*>($3));
+} | Identifier Lparen Rparen{
+    FinalNode* id = new FinalNode(*$1);
+    $$ = new ProcedureCallNode(id); // 语法拓展：无参数过程调用支持 foo()
 }
 
 ElsePartNode:  {
@@ -381,7 +390,7 @@ FactorNode: Number {
 } | Identifier Lparen ExpressionListNode Rparen {
     FinalNode* id = new FinalNode(*$1);
     $$ = new FactorNode(id, dynamic_cast<ExpressionListNode*>($3));
-} | Relop FactorNode {
+} | Notop FactorNode {
     if($1->property == "not"){
         FinalNode* id = new FinalNode(*$1);
         $$ = new FactorNode(id, dynamic_cast<FactorNode*>($2));
@@ -391,17 +400,22 @@ FactorNode: Number {
         YYERROR;
     }
 } | Addop FactorNode {
-    if($1->property == "-"){
+    if($1->property == "-" || $1->property == "+"){
         FinalNode* op = new FinalNode(*$1);
         $$ = new FactorNode(op,dynamic_cast<FactorNode*>($2));
     }
     else {
-        yyerror("Expected '-'");
+        yyerror("Expected '-' or '+'");
         YYERROR;
     }
 } | Booltype {
     FinalNode* id = new FinalNode(*$1);
     $$ = new FactorNode(id);
+} | Identifier Lparen Rparen{
+    FinalNode* id = new FinalNode(*$1);
+    IdVarpartNode* fake_idvar = new IdVarpartNode();
+    VariableNode* fake_var = new VariableNode(id, fake_idvar);
+    $$ = new FactorNode(fake_var); // 测试用例21: 无参数函数 a := foo(); write(foo())
 }
 
 
@@ -410,7 +424,7 @@ FactorNode: Number {
 %%
 
 int yylex() {
-    if (tokenIndex >= tokens.size()) return 0;
+    if (tokenIndex >= static_cast<int>(tokens.size())) return 0;
     Token* current = &tokens[tokenIndex];
     yylval.token = current;
 
