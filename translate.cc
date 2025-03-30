@@ -97,9 +97,16 @@ std::string IdListNode::trans(const std::string type, const std::string tmp, con
     }
     res += type + this->id->trans() + tmp + end;
     if (is_cite){
-        auto info = t.table[*id];
-        info = std::make_tuple(std::get<0>(info), std::vector<int>(1,CITE), std::get<2>(info));
-        t.table[*id] = info;
+        /*auto info = t.table[*id];
+         *info = std::make_tuple(std::get<0>(info), std::vector<int>(1,CITE), std::get<2>(info));
+         *t.table[*id] = info;*/ //存在info读取不到的问题
+        if (type == "int *"){
+            t.table[*(this->id)] = std::make_tuple(ID_INT, std::vector<int>(1,CITE), *dim);
+        } else if (type == "float *") {
+            t.table[*(this->id)] = std::make_tuple(ID_FLOAT, std::vector<int>(1,CITE), *dim);
+        } else if (type == "char *"){
+            t.table[*(this->id)] = std::make_tuple(ID_CHAR, std::vector<int>(1,CITE), *dim);
+        }
     } else if (type == "int "){
         t.table[*(this->id)] = std::make_tuple(ID_INT, std::vector<int>(1,0), *dim);
     } else if (type == "float ") {

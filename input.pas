@@ -1,4 +1,4 @@
-// 测试样例 00-27 (28 'not') 29-43 (56 EXIT TOOLONG) (63 EXIT)
+// 测试样例 00-27 (28 'not') 29-43 (56 EXIT TOOLONG) ALL DONE!
 program main;
 const
   ca = 1;
@@ -159,6 +159,12 @@ begin
   read(a, b, c);
 end;
 
+procedure typetest(var xx, yy: real);
+begin
+  read(xx, yy);
+  write(xx, yy);
+end;
+
 begin
   write(cb);
   a := defn;
@@ -209,4 +215,10 @@ begin
   bbb(a, a);
   bbb(ccc(5), ccc(5));
   ccc(5);
+
+  a := func(funcall(a, a, a, a, a));
+  a := func(funcall(a, bbb(a, a), a, a, a));
+  func(funcall(a, bbb(a, a), a, a, a));
+
+  typetest(f, f);
 end.
