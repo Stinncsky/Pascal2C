@@ -251,6 +251,10 @@ std::string SubprogramNode::trans() const{
         func_type = FUNC_CHAR;
     }
     t.table[now_func] = std::make_tuple(func_type, func_p_is_cite, std::vector<int>());//自身递归需要
+    if (func_type != FUNC_VOID){
+        FinalNode tmp_func_id(Token(now_func.trans() + TMP_RETURN, TokenType::Identifier, -1, -1));
+        t.table[tmp_func_id] = std::make_tuple(func_type - FUNC, std::vector<int>(1,0), std::vector<int>());  
+    }
     res += this->subprogram_body->trans(); //先存符号表，再处理函数体：递归调用自身
     t = tmp;
     t.table[now_func] = std::make_tuple(func_type, func_p_is_cite, std::vector<int>());//外部调用需要
@@ -322,8 +326,22 @@ std::string SubprogramBodyNode::trans() const {
     std::string constDecl = this->const_declarations->trans();
     std::string varDecl = this->var_declarations->trans();
     std::string com_state = this->compound_statement->trans();
+    
     if (com_state != "") {
         com_state.erase(0, 1); // 去掉开头的'{'
+        if (t.now_funcid != nullptr && std::get<0>(t.table[*t.now_funcid]) != FUNC_VOID) {
+            std::string ret_type;
+            if (std::get<0>(t.table[*t.now_funcid]) == FUNC_INT) {
+                ret_type = "int ";
+            } else if (std::get<0>(t.table[*t.now_funcid]) == FUNC_FLOAT) {
+                ret_type = "float ";
+            } else if (std::get<0>(t.table[*t.now_funcid]) == FUNC_CHAR) {
+                ret_type = "char ";
+            }
+            varDecl += ret_type + t.now_funcid->trans() + TMP_RETURN + " = 0;\n";
+            com_state.erase(com_state.size() - 2); // 去掉结尾的'}'和'\n'
+            com_state += "return " + t.now_funcid->trans() + TMP_RETURN + ";\n}\n";
+        }
         return "{\n" + constDecl + varDecl + com_state;
     }
     else
@@ -363,7 +381,7 @@ std::string StatementNode::trans() const {
             std::string exp = this->expression->trans();
             size_t space_pos = exp.find(' ');
             exp = exp.substr(0, space_pos);
-            return "return " + exp + ";\n";
+            return t.now_funcid->trans() + TMP_RETURN + " = " + exp + ";\n";
         }
         else {
             std::string id_str = this->id->trans();
@@ -459,6 +477,12 @@ std::string StatementNode::trans() const {
         int n = var.size();
         std::string res = "";
         for (int i = n - 1; i >= 0; i--) {
+            if (var[i].back() == ')'){
+                var[i].pop_back(), var[i].pop_back();
+                if(t.now_funcid != nullptr && var[i] == t.now_funcid->token.property){
+                    var[i] += TMP_RETURN;
+                }
+            }
             if (kind[i] != "%s")
                 res += "scanf(\"" + kind[i] + "\", &" + var[i] + ");\n";
             else
