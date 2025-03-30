@@ -677,7 +677,7 @@ std::string ProcedureCallNode::trans() const {
         std::string expr = "";
         size_t del_pos = expr_list.find(",");
         while(del_pos != std::string::npos && k < arg_num - 1) {
-            expr = expr_list.substr(0, del_pos);
+            expr += expr_list.substr(0, del_pos);
             if (!is_expr(expr)) {
                 expr += ",";
                 expr_list.erase(0,del_pos + 1);
@@ -878,7 +878,7 @@ std::string FactorNode::trans() const {
         expr = "";
         size_t del_pos = expr_list.find(",");
         while(del_pos != std::string::npos && k < arg_num - 1) {
-            expr = expr_list.substr(0, del_pos);
+            expr += expr_list.substr(0, del_pos);
             if (!is_expr(expr)) {
                 expr += ",";
                 expr_list.erase(0,del_pos + 1);
