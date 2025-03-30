@@ -477,7 +477,7 @@ std::string StatementNode::trans() const {
         int n = var.size();
         std::string res = "";
         for (int i = n - 1; i >= 0; i--) {
-            if (var[i].back() == ')'){
+            if (var[i].at(var[i].size() - 1) == ')' && var[i].at(var[i].size() - 2) == '(') {
                 var[i].pop_back(), var[i].pop_back();
                 if(t.now_funcid != nullptr && var[i] == t.now_funcid->token.property){
                     var[i] += TMP_RETURN;

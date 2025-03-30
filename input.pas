@@ -165,6 +165,11 @@ begin
   write(xx, yy);
 end;
 
+function readfunc: integer;
+begin
+  read(readfunc);
+end;
+
 begin
   write(cb);
   a := defn;
@@ -221,4 +226,5 @@ begin
   func(funcall(a, bbb(a, a), a, a, a));
 
   typetest(f, f);
+  write(readfunc);
 end.
