@@ -9,11 +9,15 @@
 #define ID_FLOAT 1
 #define ID_CHAR 2
 #define ID_STRING 3
-#define FUNC_INT 4
-#define FUNC_FLOAT 5
-#define FUNC_CHAR 6
+
+#define FUNC 10
+#define FUNC_INT FUNC+ID_INT
+#define FUNC_FLOAT FUNC+ID_FLOAT
+#define FUNC_CHAR FUNC+ID_CHAR
 #define FUNC_VOID -1
-#define CITE 3
+const std::string TMP_RETURN = "__tmp_return";
+
+#define CITE 100
 class Table {
 public:
     std::map<FinalNode, std::tuple<int, std::vector<int>, std::vector<int>>> table;
