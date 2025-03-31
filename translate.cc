@@ -421,10 +421,10 @@ std::string StatementNode::trans() const {
             end_index--;
         } //去掉结尾的'\n', ' ', '\t'等方便判断是否以'}'结尾
         if(end_index >= 0 && statement_str[0] == '{' && statement_str[end_index] == '}'){
-            return "if (" + exp + ") " + this->statement->trans() + this->else_part->trans() + "\n"; //若以{}包裹则不需要再加{}
+            return "if (" + exp + ") " + statement_str + this->else_part->trans() + "\n"; //若以{}包裹则不需要再加{}
         }
         else {
-            return "if (" + exp + ") {\n" + this->statement->trans() + "}" + this->else_part->trans() + "\n";
+            return "if (" + exp + ") {\n" + statement_str + "}" + this->else_part->trans() + "\n";
         }
     }
     else if (this->kind == 7) {
@@ -744,9 +744,9 @@ std::string ElsePartNode::trans() const {
             end_index--;
         } //去掉结尾的'\n', ' ', '\t'等方便判断是否以'}'结尾
         if(end_index >= 0 && statement_str[0] == '{' && statement_str[end_index] == '}'){
-            return " else " + this->statement->trans(); //若以{}包裹则不需要再加{}
+            return " else " + statement_str; //若以{}包裹则不需要再加{}
         } else {
-            return " else {\n" + this->statement->trans() + "}";
+            return " else {\n" + statement_str + "}";
         }
     }
 }
