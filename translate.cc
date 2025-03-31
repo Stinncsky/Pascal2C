@@ -2,6 +2,7 @@
 
 #include "AST.cc"
 Table t;
+std::string LINE_FORMAT = "";
 std::string FinalNode::trans() const{
     switch(this->token.type){
         case TokenType::Number:
@@ -76,13 +77,9 @@ std::string ProgramBodyNode::trans() const{
     res += this->var_declarations->trans();
     res += this->subprogram_declarations->trans();
     res += "int main()";
+    LINE_FORMAT += "\t";
     std::string main_func_body = this->compound_statement->trans();
-    if(main_func_body == "") {
-        res +="{\nreturn ;\n}\n";
-    } else {
-        main_func_body.erase(main_func_body.size()-2);// 去掉末尾的 }和 \n
-        res += main_func_body+ "return 0;\n}\n";
-    }
+    res += "{\n" + main_func_body + LINE_FORMAT + "return 0;\n}";
     return res;
 }
 
@@ -95,11 +92,8 @@ std::string IdListNode::trans(const std::string type, const std::string tmp, con
     if(this->id_list != nullptr){
         res += this->id_list->trans(type, tmp, end, dim, is_cite, func_p_is_cite);
     }
-    res += type + this->id->trans() + tmp + end;
+    res += LINE_FORMAT + type + this->id->trans() + tmp + end;
     if (is_cite){
-        /*auto info = t.table[*id];
-         *info = std::make_tuple(std::get<0>(info), std::vector<int>(1,CITE), std::get<2>(info));
-         *t.table[*id] = info;*/ //存在info读取不到的问题
         if (type == "int *"){
             t.table[*(this->id)] = std::make_tuple(ID_INT, std::vector<int>(1,CITE), *dim);
         } else if (type == "float *") {
@@ -136,7 +130,11 @@ std::string ConstDeclarationsNode::trans() const{
 }
 
 std::string ConstDeclarationNode::trans() const{
-    std::string res = "const ";
+    std::string res = "";
+    if (this->const_declaration != nullptr){
+        res += this->const_declaration->trans();
+    }
+    res += "const ";
     int type = 0;
     if (this->const_value->numletter->token.type == TokenType::Number){
         if (this->const_value->numletter->token.property.find(".") != std::string::npos){
@@ -159,10 +157,6 @@ std::string ConstDeclarationNode::trans() const{
         t.table[*(this->id)] = std::make_tuple(ID_STRING, std::vector<int>(1,0), std::vector<int>());
         res += this->id->trans() + " = ";
         res += "\"" + this->const_value->trans() + "\";\n";
-    }
-
-    if (this->const_declaration != nullptr){
-        res += this->const_declaration->trans();
     }
 
     return res;
@@ -255,7 +249,9 @@ std::string SubprogramNode::trans() const{
         FinalNode tmp_func_id(Token(now_func.trans() + TMP_RETURN, TokenType::Identifier, -1, -1));
         t.table[tmp_func_id] = std::make_tuple(func_type - FUNC, std::vector<int>(1,0), std::vector<int>());  
     }
+    LINE_FORMAT += "\t";
     res += this->subprogram_body->trans(); //先存符号表，再处理函数体：递归调用自身
+    LINE_FORMAT = LINE_FORMAT.substr(0, LINE_FORMAT.size() - 1);
     t = tmp;
     t.table[now_func] = std::make_tuple(func_type, func_p_is_cite, std::vector<int>());//外部调用需要
     return res;
@@ -326,33 +322,23 @@ std::string SubprogramBodyNode::trans() const {
     std::string constDecl = this->const_declarations->trans();
     std::string varDecl = this->var_declarations->trans();
     std::string com_state = this->compound_statement->trans();
-    
-    if (com_state != "") {
-        com_state.erase(0, 1); // 去掉开头的'{'
-        if (t.now_funcid != nullptr && std::get<0>(t.table[*t.now_funcid]) != FUNC_VOID) {
-            std::string ret_type;
-            if (std::get<0>(t.table[*t.now_funcid]) == FUNC_INT) {
-                ret_type = "int ";
-            } else if (std::get<0>(t.table[*t.now_funcid]) == FUNC_FLOAT) {
-                ret_type = "float ";
-            } else if (std::get<0>(t.table[*t.now_funcid]) == FUNC_CHAR) {
-                ret_type = "char ";
-            }
-            varDecl += ret_type + t.now_funcid->trans() + TMP_RETURN + " = 0;\n";
-            com_state.erase(com_state.size() - 2); // 去掉结尾的'}'和'\n'
-            com_state += "return " + t.now_funcid->trans() + TMP_RETURN + ";\n}\n";
+    if (t.now_funcid != nullptr && std::get<0>(t.table[*t.now_funcid]) != FUNC_VOID) {
+        std::string ret_type;
+        if (std::get<0>(t.table[*t.now_funcid]) == FUNC_INT) {
+            ret_type = "int ";
+        } else if (std::get<0>(t.table[*t.now_funcid]) == FUNC_FLOAT) {
+            ret_type = "float ";
+        } else if (std::get<0>(t.table[*t.now_funcid]) == FUNC_CHAR) {
+            ret_type = "char ";
         }
-        return "{\n" + constDecl + varDecl + com_state;
+        varDecl += LINE_FORMAT + ret_type + t.now_funcid->trans() + TMP_RETURN + " = 0;\n";
+        com_state += LINE_FORMAT + "return " + t.now_funcid->trans() + TMP_RETURN + ";\n";
     }
-    else
-        return "";
+    return "{\n" + constDecl + varDecl + com_state + "}\n";
 }
 std::string CompoundStatementNode::trans() const {
     std::string state_ls_str = this->statement_list->trans();
-    if (state_ls_str != "")
-        return "{\n" + state_ls_str + "}\n";
-    else
-        return "";
+    return state_ls_str;
 }
 
 std::string StatementListNode::trans() const {
@@ -366,7 +352,7 @@ std::string StatementListNode::trans() const {
 
 std::string StatementNode::trans() const {
     if (this->kind == 1)
-        return "\n";
+        return "";
     else if (this->kind == 2) {
         std::string var = this->variable->trans();
         size_t space_pos = var.find(' ');
@@ -374,14 +360,14 @@ std::string StatementNode::trans() const {
         std::string exp = this->expression->trans();
         space_pos = exp.find(' ');
         exp = exp.substr(0, space_pos);
-        return var + " = " + exp + ";\n";
+        return LINE_FORMAT + var + " = " + exp + ";\n";
     }
     else if (this->kind == 3){
         if(t.now_funcid != nullptr && *(this->id) == *(t.now_funcid)) {
             std::string exp = this->expression->trans();
             size_t space_pos = exp.find(' ');
             exp = exp.substr(0, space_pos);
-            return t.now_funcid->trans() + TMP_RETURN + " = " + exp + ";\n";
+            return LINE_FORMAT + t.now_funcid->trans() + TMP_RETURN + " = " + exp + ";\n";
         }
         else {
             std::string id_str = this->id->trans();
@@ -395,11 +381,11 @@ std::string StatementNode::trans() const {
             auto info = t.table[*id];
             if (!std::get<1>(info).empty() && std::get<1>(info).back() >= CITE)
                 id_str = "(*" + id_str + ")";
-            return id_str + " = " + exp + ";\n";
+            return LINE_FORMAT + id_str + " = " + exp + ";\n";
         }
     }
     else if (this->kind == 4)
-        return this->procedure_call->trans() + ";\n";
+        return LINE_FORMAT + this->procedure_call->trans() + ";\n";
     else if (this->kind == 5)
         return this->compound_statement->trans();
     else if (this->kind == 6) { // 后面用不用考虑变成else if的形式，更工整但可能不是很必要？
@@ -410,22 +396,12 @@ std::string StatementNode::trans() const {
         } else {
             exp = exp.substr(0, space_pos);
         }
+        std::string res = LINE_FORMAT + "if (" + exp + ")";
+        LINE_FORMAT += "\t";
         std::string statement_str = this->statement->trans();
-        // return "if " + exp + " " + statement_str + this->else_part->trans() + "\n";
-        // return "if (" + exp + ") {\n" + this->statement->trans() + "}" + this->else_part->trans() + "\n";
-        int end_index = statement_str.size() - 1;
-        while(end_index > 0){ 
-            if(statement_str[end_index] != '\n' && statement_str[end_index] != ' ' && statement_str[end_index] != '\t'){
-                break;
-            }
-            end_index--;
-        } //去掉结尾的'\n', ' ', '\t'等方便判断是否以'}'结尾
-        if(end_index >= 0 && statement_str[0] == '{' && statement_str[end_index] == '}'){
-            return "if (" + exp + ") " + statement_str + this->else_part->trans() + "\n"; //若以{}包裹则不需要再加{}
-        }
-        else {
-            return "if (" + exp + ") {\n" + statement_str + "}" + this->else_part->trans() + "\n";
-        }
+        LINE_FORMAT = LINE_FORMAT.substr(0, LINE_FORMAT.size() - 1);
+        res += "{\n" + statement_str + LINE_FORMAT + "}"+ this->else_part->trans() + "\n";
+        return  res;
     }
     else if (this->kind == 7) {
         std::string exp = this->expression->trans();
@@ -443,19 +419,12 @@ std::string StatementNode::trans() const {
             exp2 = exp2.substr(0, space_pos);
         }
         std::string i = this->id->trans();
+        std::string res = LINE_FORMAT + "for (" + i + " = " + exp + "; " + i + " <= " + exp2 + "; " + i + "++)";
+        LINE_FORMAT += "\t";
         std::string statement_str = this->statement->trans();
-        int end_index = statement_str.size() - 1;
-        while(end_index > 0){ 
-            if(statement_str[end_index] != '\n' && statement_str[end_index] != ' ' && statement_str[end_index] != '\t'){
-                break;
-            }
-            end_index--;
-        } //去掉结尾的'\n', ' ', '\t'等方便判断是否以'}'结尾
-        if(end_index >= 0 && statement_str[0] == '{' && statement_str[end_index] == '}'){
-            return "for (" + i + " = " + exp + "; " + i + " <= " + exp2 + "; " + i + "++) " + statement_str; //若以{}包裹则不需要再加{}
-        } else {
-            return "for (" + i + " = " + exp + "; " + i + " <= " + exp2 + "; " + i + "++) {\n" + statement_str + "}\n";
-        }
+        LINE_FORMAT = LINE_FORMAT.substr(0, LINE_FORMAT.size() - 1);
+        res += "{\n" + statement_str + LINE_FORMAT + "}\n";
+        return  res;
     }
     else if (this->kind == 8) {
         std::string var_list = this->variable_list->trans();
@@ -484,9 +453,9 @@ std::string StatementNode::trans() const {
                 }
             }
             if (kind[i] != "%s")
-                res += "scanf(\"" + kind[i] + "\", &" + var[i] + ");\n";
+                res += LINE_FORMAT + "scanf(\"" + kind[i] + "\", &" + var[i] + ");\n";
             else
-                res += "scanf(\"%s\", " + var[i] + ");\n";
+                res += LINE_FORMAT + "scanf(\"%s\", " + var[i] + ");\n";
         }
         return res;
     }
@@ -513,7 +482,7 @@ std::string StatementNode::trans() const {
         for (int i = 0; i < n; i++) {
             if (kind[i][int(kind[i].size()) - 1] == ',')
                 kind[i].erase(kind[i].end() - 1);
-            res += "printf(\"" + kind[i] + "\", " + expr[i] + ");\n";
+            res += LINE_FORMAT + "printf(\"" + kind[i] + "\", " + expr[i] + ");\n";
         }
         return res;
     }
@@ -525,7 +494,9 @@ std::string StatementNode::trans() const {
         } else {
             exp = exp.substr(0, space_pos);
         }
+        LINE_FORMAT += "\t";
         const std::string statement_str = this->statement->trans();
+        LINE_FORMAT = LINE_FORMAT.substr(0, LINE_FORMAT.size() - 1);
         int end_index = statement_str.size() - 1;
         while(end_index > 0){ 
             if(statement_str[end_index] != '\n' && statement_str[end_index] != ' ' && statement_str[end_index] != '\t'){
@@ -534,26 +505,19 @@ std::string StatementNode::trans() const {
             end_index--;
         } //去掉结尾的'\n', ' ', '\t'等方便判断是否以'}'结尾
         if(end_index >= 0 && statement_str[0] == '{' && statement_str[end_index] == '}'){
-            return "while (" + exp + ") " + statement_str + "\n"; //若以{}包裹则不需要再加{}
+            return LINE_FORMAT + "while (" + exp + ") " + statement_str + "\n"; //若以{}包裹则不需要再加{}
         }
         else {
-            return "while (" + exp + ") {\n" + statement_str + "}\n";
+            return LINE_FORMAT + "while (" + exp + ") {\n" + statement_str + LINE_FORMAT + "}\n";
         }
     }
     else if(kind == 11){
-        return "break;\n";
+        return LINE_FORMAT + "break;\n";
     }
     return "";
 }
 
 std::string VariableListNode::trans() const {
-    // std::string result = "";
-    // if (this->variable_list != nullptr)
-    // {
-    //     result += this->variable_list->trans();
-    // }
-    // result += this->variable->trans();
-    // return result;
     if (this->variable_list == nullptr)
         return this->variable->trans();
     else
@@ -567,8 +531,6 @@ std::string VariableNode::trans() const {
     int i = 0;
     size_t space_pos = raw_index.find(' ');
     while (space_pos != std::string::npos) {
-        // int int_index = std::stoi(raw_index.substr(0, space_pos));
-        // int_index -= std::get<2>(info)[i]; // error: 维度要匹配
         int start_i = std::get<2>(info)[i];
         std::string index = "";
         if (start_i > 0)
@@ -676,31 +638,6 @@ std::string ProcedureCallNode::trans() const {
         if (temp[int(temp.size()) - 1] == ',') temp.erase(int(temp.size()) - 1);
         expr_list = temp;
         auto info = t.table[*id];
-        /*std::string kind = "";
-        if (std::get<0>(info) == ID_INT) {
-            kind = "%d";
-        }
-        else if (std::get<0>(info) == ID_FLOAT) {
-            kind = "%f";
-        }
-        else if (std::get<0>(info) == ID_CHAR) {
-            kind = "%c";
-        }
-        else if (std::get<0>(info) == ID_STRING) {
-            kind = "%s";
-        }
-        else if (std::get<0>(info) == FUNC_INT) {
-            kind = "%d";
-        }
-        else if (std::get<0>(info) == FUNC_FLOAT) {
-            kind = "%f";
-        }
-        else if (std::get<0>(info) == FUNC_CHAR) {
-            kind = "%c";
-        }
-        else if (std::get<0>(info) == FUNC_VOID) {
-            kind = ""; // error: 
-        }*/ // 这里不考虑赋值的问题，直接调用，不要添加类型
         std::string res = this->id->trans() + "(";
         std::vector<int> cites = std::get<1>(t.table[*this->id]);
         int arg_num = cites.size();
@@ -726,7 +663,6 @@ std::string ProcedureCallNode::trans() const {
         if (cites.at(k) >= CITE)
             res += "&";
         res += expr + expr_list + ")";
-        //return res + " " + kind; // eg: f(a,&b) %d
         return res; // eg: f(a,&b)
     }
 }
@@ -735,19 +671,10 @@ std::string ElsePartNode::trans() const {
     if (this->statement == nullptr)
         return "";
     else{
+        LINE_FORMAT += "\t";
         std::string statement_str = this->statement->trans();
-        int end_index = statement_str.size() - 1;
-        while(end_index > 0){ 
-            if(statement_str[end_index] != '\n' && statement_str[end_index] != ' ' && statement_str[end_index] != '\t'){
-                break;
-            }
-            end_index--;
-        } //去掉结尾的'\n', ' ', '\t'等方便判断是否以'}'结尾
-        if(end_index >= 0 && statement_str[0] == '{' && statement_str[end_index] == '}'){
-            return " else " + statement_str; //若以{}包裹则不需要再加{}
-        } else {
-            return " else {\n" + statement_str + "}";
-        }
+        LINE_FORMAT = LINE_FORMAT.substr(0, LINE_FORMAT.size() - 1);
+        return " else {\n" + statement_str + LINE_FORMAT + "}";
     }
 }
 
@@ -798,18 +725,9 @@ std::string SimpleExpressionNode::trans() const {
             kind = "%f";
         else
             kind = "%d";
-        // int sim_exp = std::stoi(simple_expr_content);
-        // int term = std::stoi(term_content);
-        // if (op == "+")
-        //     return std::to_string(term + sim_exp) + kind;
-        // else if (op == "-")
-        //     return std::to_string(term - sim_exp) + kind;
-        // else if (op == "or")
-        //     return std::to_string(term | sim_exp) + kind;
         if (term_content != "" && term_content.substr(0, 1) == op)
             return simple_expr_content + op + "(" + term_content + ") " + kind;
         return simple_expr_content + op + term_content + " " + kind;
-        // eg: "1 * 2 + 1 * 2 %d" -> "1*2+1*2 %d"
     }
 }
 
@@ -831,18 +749,6 @@ std::string TermNode::trans() const {
         else
             kind = "%d";
         std::string op = this->mulop->trans(); // * / div mod and
-        // int term = std::stoi(term_content);
-        // int factor = std::stoi(factor_content);
-        // if (op == "*")
-        //     return std::to_string(term * factor) + kind;
-        // else if (op == "/")
-        //     return std::to_string(term / factor) + kind;
-        // else if (op == "div")
-        //     return std::to_string(term / factor) + kind;  // error: 这里应该判断两边是不是都是整数，不是就报错
-        // else if (op == "mod")
-        //     return std::to_string(term % factor) + kind;
-        // else if (op == "and")
-        //     return std::to_string(term & factor) + kind;
         return term_content + this->mulop->trans() + factor_content + " " + kind;
         // eg: "1 * 2 %d" -> "1*2 %d"
     }
@@ -861,16 +767,6 @@ std::string FactorNode::trans() const {
     else if (this->kind == 2) {
         std::string str = this->variable->trans();
         return str; // eg: "a %d"
-        // size_t space_pos = str.find(' ');
-        // auto tmpstr = str.substr(0, space_pos);
-        // auto info = t.table[*this->variable->id]; // 判断是变量还是无参数传递的函数
-        // if (std::get<0>(info) == FUNC_VOID || std::get<0>(info) == FUNC_INT || std::get<0>(info) == FUNC_FLOAT || std::get<0>(info) == FUNC_CHAR) {
-        //     std::string res = tmpstr + "()";
-        //     return res;
-        // }
-        // else {
-        //     return str;
-        // }
     }
     else if (this->kind == 3) {
         std::string expr = this->expression->trans();
@@ -954,7 +850,6 @@ std::string FactorNode::trans() const {
         else if (std::get<0>(info) == FUNC_VOID) {
             kind = ""; // error: 
         }
-        // return res + expr_list + ") " + kind;
         return res + " " + kind; // eg: f(a,&b) %d
     }
     else if (this->kind == 5) {
