@@ -40,7 +40,7 @@ int tokenIndex = 0;
 
 static std::string INPUT_FILE = "input.pas";
 static std::string OUTPUT_FILE = "output.c";
-const static std::string VERSION = "0.1.0";
+const static std::string VERSION = "1.1.0";
 
 void set_parameter(int argc, char *argv[]) {
     for (int i = 0; i < argc; i++) {

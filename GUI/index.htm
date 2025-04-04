@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>编译原理与技术课程设计</title>
+    <style>
+        :root {
+            --primary-color: #4285f4;
+            --hover-color: #357abd;
+            --active-color: #2a65a0;
+            --border-color: #dfe1e5;
+            --background-color: #f8f9fa;
+        }
+
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            margin: 0;
+            padding: 2rem;
+            background: var(--background-color);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            padding: 2rem;
+        }
+
+        .translation-container {
+            display: flex;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .translation-box {
+            flex: 1;
+            position: relative;
+        }
+
+        .language-selector {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        select {
+            width: 140px;
+            padding: 10px 35px 10px 15px;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            appearance: none;
+            background: url('./resource/bars-solid.svg') no-repeat right 10px center/15px;
+            font-size: 16px;
+            color: #333;
+            cursor: pointer;
+            transition: border-color 0.3s;
+        }
+
+        select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        textarea {
+            width: 100%;
+            height: 300px;
+            padding: 1rem;
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            font-size: 16px;
+            line-height: 1.5;
+            resize: none;
+            transition: border-color 0.3s;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(66,133,244,0.2);
+        }
+
+        #outputText {
+            background-color: #f8f9fa;
+            cursor: not-allowed;
+        }
+
+        .button-container {
+            text-align: center;
+            margin-top: 1.5rem;
+        }
+
+        button {
+            padding: 12px 32px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        button:hover {
+            background-color: var(--hover-color);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+            transform: translateY(-1px);
+        }
+
+        button:active {
+            background-color: var(--active-color);
+            transform: translateY(0);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        button::after {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.3s, height 0.3s;
+        }
+
+        button:active::after {
+            width: 200px;
+            height: 200px;
+        }
+
+        .swap-languages {
+            display: flex;
+            justify-content: center;
+            margin: 120px 0;
+        }
+
+        .swap-button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 10%;
+            transition: background 0.3s;
+        }
+
+        .swap-button:hover {
+            background: rgba(0,0,0,0.05);
+        }
+
+        .swap-button img {
+            width: 24px;
+            height: 24px;
+            vertical-align: middle;
+        }
+
+        .file-input-label {
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 50%;
+            transition: background 0.3s;
+            margin-left: 10px;
+        }
+
+        .file-input-label:hover {
+            background: rgba(0,0,0,0.05);
+        }
+
+        .file-icon {
+            width: 24px;
+            height: 24px;
+            vertical-align: middle;
+        }
+
+        .language-selector {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+            justify-content: space-between;
+        }
+    </style>
+</head>
+<body>
+    <img src="resource/Pascal2C_ba-style@nulla.top.png", alt="Pascal2C Logo" style="width: 100%; max-width: 200px; margin: 0 auto; display: block;"/>
+    <div class="container">
+        <div class="translation-container">
+            <div class="translation-box">
+                <div class="language-selector">
+                    <select id="sourceLang">
+                        <option value="pas">Pascal</option>
+                        <option value="c" disabled>C</option>
+                        <option value="cpp" disabled>C++</option>
+                        <option value="java" disabled>Java</option>
+                        <option value="ase" disabled>汇编</option>
+                    </select>
+                    <label class="file-input-label" title="从文件导入">
+                        <input type="file" id="fileInput" 
+                             accept=".txt,.pas,.c,.cpp,.cc,.java,.asm" hidden>
+                        <img src="resource/folder-open-solid.svg" 
+                           alt="打开文件" class="file-icon">
+                    </label>
+                </div>
+                <textarea id="inputText" placeholder="请输入要翻译的原始代码..." style="width: 92%; font-family: 'Consolas';"></textarea>
+            </div>
+
+            <div class="swap-languages">
+                <button class="swap-button" onclick="swapLanguages()">
+                    <img src="resource/right-left-solid.svg" alt="swap">
+                </button>
+            </div>
+
+            <div class="translation-box">
+                <div class="language-selector">
+                    <select id="targetLang">
+                        <option value="c">C</option>
+                        <option value="ase">汇编</option>
+                        <option value="pas">Pascal</option>
+                        <option value="cpp" disabled>C++</option>
+                        <option value="java" disabled>Java</option>
+                    </select>
+                </div>
+                <textarea id="outputText" style="width: 92%; font-family: 'Consolas';" readonly></textarea>
+            </div>
+        </div>
+
+        <div class="button-container">
+            <button id="translateBtn">立即翻译</button>
+        </div>
+    </div>
+
+    <script>
+        function swapLanguages() {
+            const source = document.getElementById('sourceLang');
+            const target = document.getElementById('targetLang');
+            [source.value, target.value] = [target.value, source.value];
+        }
+
+        document.getElementById('fileInput').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                document.getElementById('inputText').value = event.target.result;
+                showAlert(`已成功加载文件: ${file.name}`, 'info');
+            };
+            reader.onerror = function() {
+                showAlert('文件读取失败', 'error');
+            };
+            reader.readAsText(file);
+        });
+
+        document.getElementById('translateBtn').addEventListener('click', async () => {
+            const inputText = document.getElementById('inputText').value.trim();
+            const sourceLang = document.getElementById('sourceLang').value;
+            const targetLang = document.getElementById('targetLang').value;
+            const outputText = document.getElementById('outputText');
+
+            if (!inputText) {
+                showAlert('请输入要翻译的文本', 'warning');
+                return;
+            }
+
+            if (sourceLang === targetLang) {
+                showAlert('源语言和目标语言相同', 'warning');
+                outputText.value = inputText;
+                return;
+            }
+
+            try {
+                showAlert(`正在将 ${document.querySelector('#sourceLang option:checked').textContent} 
+                    翻译为 ${document.querySelector('#targetLang option:checked').textContent}`, 'info');
+
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 5000);
+
+                const response = await fetch('http://localhost:10043', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        text: inputText,
+                        source_lang: sourceLang,
+                        target_lang: targetLang
+                    }),
+                    signal: controller.signal
+                });
+
+                clearTimeout(timeoutId);
+
+                if (!response.ok) throw new Error(`请求失败: ${response.status}`);
+                
+                const data = await response.json();
+                outputText.value = data.result || '翻译结果解析失败';
+                
+            } catch (error) {
+                outputText.value = '';
+                if (error.name === 'AbortError') {
+                    showAlert('请求超时，请稍后再试', 'error');
+                } else {
+                    showAlert(`翻译失败: ${error.message}`, 'error');
+                }
+            }
+        });
+
+        function showAlert(message, type = 'info') {
+            const alertBox = document.createElement('div');
+            alertBox.style.position = 'fixed';
+            alertBox.style.top = '20px';
+            alertBox.style.left = '50%';
+            alertBox.style.transform = 'translateX(-50%)';
+            alertBox.style.padding = '12px 24px';
+            alertBox.style.borderRadius = '8px';
+            alertBox.style.fontSize = '14px';
+            alertBox.style.color = 'white';
+            alertBox.style.zIndex = '1000';
+            alertBox.style.boxShadow = '0 2px 8px rgba(0,0,0,0.1)';
+
+            const colors = {
+                info: '#4285f4',
+                warning: '#f4b400',
+                error: '#db4437'
+            };
+            
+            alertBox.style.backgroundColor = colors[type] || colors.info;
+            alertBox.textContent = message;
+
+            document.body.appendChild(alertBox);
+            setTimeout(() => alertBox.remove(), 3000);
+        }
+    </script>
+</body>
+</html>
