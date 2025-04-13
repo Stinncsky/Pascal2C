@@ -47,9 +47,14 @@ def handle_translation():
             os.remove("../http.pas")
         else:
             print(result.returncode, result.stderr.strip())
+            if os.path.exists("../http.c"):
+                os.remove("../http.c")
+            if os.path.exists("../http.pas"):
+                os.remove("../http.pas")
             return jsonify({
-                "error": "翻译失败"
-            }), 500
+                "error": "翻译失败",
+                "details": result.stderr.strip()
+            }), 200
         
         return jsonify({
             "result": translated_text

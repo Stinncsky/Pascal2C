@@ -74,6 +74,8 @@
             line-height: 1.5;
             resize: none;
             transition: border-color 0.3s;
+            tab-size: 4;      /* 将 tab 显示为 4 个空格宽度 */
+            -moz-tab-size: 4;
         }
 
         textarea:focus {
@@ -299,6 +301,11 @@
                 
                 const data = await response.json();
                 outputText.value = data.result || '翻译结果解析失败';
+
+                if(data.error){
+                    outputText.value = data.error + "\n" + data.details;
+                    showAlert('翻译失败:  ' + data.error + "  " + data.details.slice(0, 20), 'error');
+                }
                 
             } catch (error) {
                 outputText.value = '';
