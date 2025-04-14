@@ -304,7 +304,13 @@
 
                 if(data.error){
                     outputText.value = data.error + "\n" + data.details;
-                    showAlert('翻译失败:  ' + data.error + "  " + data.details.slice(0, 20), 'error');
+                    if(data.result && data.result !== ""){
+                        outputText.value += "\n" + "-".repeat(52) + "\n" + data.result;
+                    }
+                    else{
+                        outputText.value += "\n翻译失败"
+                    }
+                    showAlert(data.error + "  " + data.details.slice(0, 30), 'error');
                 }
                 
             } catch (error) {

@@ -37,6 +37,7 @@ def handle_translation():
 
         exe_path = "../main.exe"
         args = [exe_path, "-i", "../http.pas"]
+        translated_text = ""
         # 执行编译后的程序并传入参数
         result = subprocess.run(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
         if result.returncode == 0 and result.stderr.strip() == "":
@@ -45,15 +46,29 @@ def handle_translation():
             file.close()
             os.remove("../http.c")
             os.remove("../http.pas")
-        else:
+        elif result.returncode == 0:
             print(result.returncode, result.stderr.strip())
             if os.path.exists("../http.c"):
+                with open("../http.c", "r", encoding="utf-8") as file:
+                    translated_text = file.read()
+                file.close()
                 os.remove("../http.c")
             if os.path.exists("../http.pas"):
                 os.remove("../http.pas")
             return jsonify({
-                "error": "翻译失败",
+                "result": translated_text,
+                "error": "翻译错误",
                 "details": result.stderr.strip()
+            }), 200
+        else:
+            if os.path.exists("../http.pas"):
+                os.remove("../http.pas")
+            errdetail = "Runtime Error: Unexpected Exit With Code " + str(result.returncode)
+            if result.stderr:
+                errdetail += "\n" + result.stderr.strip()
+            return jsonify({
+                "error": "翻译失败",
+                "details": errdetail
             }), 200
         
         return jsonify({

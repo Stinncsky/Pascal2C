@@ -229,7 +229,7 @@ void Lexical::run() {
                     i++;
                 }
                 else{
-                    fprintf(stderr, "Error: In %d line %d column, unknown character '%c'\n", line_number, column_number, ch);
+                    fprintf(stderr, "Error: In line %d column %d, unknown character '%c'\n", line_number, column_number, ch);
                     column_number++;
                     i++;
                 }
@@ -305,7 +305,7 @@ void Lexical::run() {
                         temp_token.clear();
                         state = State::START;
                     } else {
-                        fprintf(stderr, "Error: In %d line %d column, number constant error\n", line_number, column_number);
+                        fprintf(stderr, "Error: In line %d column %d, number constant error\n", line_number, column_number);
                         temp_token.pop_back(); // 删除小数点
                         Token new_token(temp_token, TokenType::Number, line_number, column_number - temp_token.size());
                         tokens.push_back(new_token);
@@ -348,7 +348,7 @@ void Lexical::run() {
                     }
                 }
                 else if(ch == '\n'){
-                    fprintf(stderr, "Error: In %d line %d column, string constant error\n", line_number, column_number);
+                    fprintf(stderr, "Error: In line %d column %d, string constant error\n", line_number, column_number);
                     if(temp_token.size() == 1){
                         Token new_token(temp_token, TokenType::Char, line_number, column_number - 1);
                         tokens.push_back(new_token);
@@ -371,7 +371,7 @@ void Lexical::run() {
     }
 
     if(state == State::IN_STRING){
-        fprintf(stderr, "Error: In %d line %d column, string constant error\n", line_number, column_number);
+        fprintf(stderr, "Error: In line %d column %d, string constant error\n", line_number, column_number);
         if(temp_token.size() == 1){
             Token new_token(temp_token, TokenType::Char, line_number, column_number - 1);
             tokens.push_back(new_token);
@@ -383,7 +383,7 @@ void Lexical::run() {
     }
 
     if(state == State::IN_COMMENT){
-        fprintf(stderr, "Error: In %d line %d column, comment error\n", line_number, column_number);
+        fprintf(stderr, "Error: In line %d column %d, comment error\n", line_number, column_number);
     }
 
     if(state == State::IN_WORD && temp_token.size() != 0){
@@ -404,7 +404,7 @@ void Lexical::run() {
             temp_token.clear();
         }
         else if(num_state == NumState::FRACTION){
-            fprintf(stderr, "Error: In %d line %d column, number constant error\n", line_number, column_number);
+            fprintf(stderr, "Error: In line %d column %d, number constant error\n", line_number, column_number);
             temp_token.pop_back(); // 删除小数点
             Token new_token(temp_token, TokenType::Number, line_number, column_number - temp_token.size());
             tokens.push_back(new_token);
