@@ -437,13 +437,56 @@ StatementNode: {
         yyerror("Expected ':=' operator");
         YYERROR;
     }
+} | FOR error ASSIGNOP ExpressionNode TO ExpressionNode DO StatementNode {
+    yyerror("Expected 'ID' after 'for' keyword");
+    yyerrok;
+    $$ = new StatementNode(id, dynamic_cast<ExpressionNode*>($4), dynamic_cast<ExpressionNode*>($6), dynamic_cast<StatementNode*>($8));
+} | FOR ID error ExpressionNode TO ExpressionNode DO StatementNode {
+    yyerror("Expected ':=' operator after 'ID'");
+    yyerrok;
+    FinalNode* id = new FinalNode(*$2);
+    $$ = new StatementNode(id, dynamic_cast<ExpressionNode*>($4), dynamic_cast<ExpressionNode*>($6), dynamic_cast<StatementNode*>($8));
+} | FOR ID ASSIGNOP ExpressionNode error ExpressionNode DO StatementNode {
+    yyerror("Expected 'to' after 'ExpressionNode'");
+    yyerrok;
+    FinalNode* id = new FinalNode(*$2);
+    $$ = new StatementNode(id, dynamic_cast<ExpressionNode*>($4), dynamic_cast<ExpressionNode*>($6), dynamic_cast<StatementNode*>($8));
+} | FOR ID ASSIGNOP ExpressionNode TO ExpressionNode error StatementNode {
+    yyerror("Expected 'do' after 'ExpressionNode'");
+    yyerrok;
+    FinalNode* id = new FinalNode(*$2);
+    $$ = new StatementNode(id, dynamic_cast<ExpressionNode*>($4), dynamic_cast<ExpressionNode*>($6), dynamic_cast<StatementNode*>($8));
 } | READ LPAREN VariableListNode RPAREN {
+    FinalNode* Re = new FinalNode(*$1);
+    $$ = new StatementNode(Re, dynamic_cast<VariableListNode*>($3));
+} | READ error VariableListNode RPAREN {
+    yyerror("Expected '(' after 'read' keyword");
+    yyerrok;
+    FinalNode* Re = new FinalNode(*$1);
+    $$ = new StatementNode(Re, dynamic_cast<VariableListNode*>($3));
+} | READ LPAREN VariableListNode error {
+    yyerror("Expected ')' after 'read' keyword");
+    yyerrok;
     FinalNode* Re = new FinalNode(*$1);
     $$ = new StatementNode(Re, dynamic_cast<VariableListNode*>($3));
 } | WRITE LPAREN ExpressionListNode RPAREN {
     FinalNode* Wr = new FinalNode(*$1);
     $$ = new StatementNode(Wr, dynamic_cast<ExpressionListNode*>($3));
+} | WRITE error ExpressionListNode RPAREN {
+    yyerror("Expected '(' after 'write' keyword");
+    yyerrok;
+    FinalNode* Wr = new FinalNode(*$1);
+    $$ = new StatementNode(Wr, dynamic_cast<ExpressionListNode*>($3));
+} | WRITE LPAREN ExpressionListNode error {
+    yyerror("Expected ')' after 'write' keyword");
+    yyerrok;
+    FinalNode* Wr = new FinalNode(*$1);
+    $$ = new StatementNode(Wr, dynamic_cast<ExpressionListNode*>($3));
 } | WHILE ExpressionNode DO StatementNode{ // while语句拓展
+    $$ = new StatementNode(dynamic_cast<ExpressionNode*>($2), dynamic_cast<StatementNode*>($4));
+} | WHILE ExpressionNode error StatementNode {
+    yyerror("Expected 'do' after 'ExpressionNode'");
+    yyerrok;
     $$ = new StatementNode(dynamic_cast<ExpressionNode*>($2), dynamic_cast<StatementNode*>($4));
 } | BREAK{ // break拓展
     FinalNode* bk = new FinalNode(*$1);
@@ -465,7 +508,11 @@ IdVarpartNode: {
     $$ = new IdVarpartNode();
 } | LBRA ExpressionListNode RBRA {
     $$ = new IdVarpartNode(dynamic_cast<ExpressionListNode*>($2));
-}
+} | LBRA ExpressionListNode error {
+    yyerror("Expected ']' after '[' operator");
+    yyerrok;
+    $$ = new IdVarpartNode(dynamic_cast<ExpressionListNode*>($2));
+} 
 
 ProcedureCallNode: ID {
     FinalNode* id = new FinalNode(*$1);
@@ -473,7 +520,17 @@ ProcedureCallNode: ID {
 } | ID LPAREN ExpressionListNode RPAREN {
     FinalNode* id = new FinalNode(*$1);
     $$ = new ProcedureCallNode(id, dynamic_cast<ExpressionListNode*>($3));
+} | ID LPAREN ExpressionListNode error {
+    yyerror("Expected ')' after 'ExpressionListNode'");
+    yyerrok;
+    FinalNode* id = new FinalNode(*$1);
+    $$ = new ProcedureCallNode(id, dynamic_cast<ExpressionListNode*>($3));
 } | ID LPAREN RPAREN{
+    FinalNode* id = new FinalNode(*$1);
+    $$ = new ProcedureCallNode(id); // 语法拓展：无参数过程调用支持 foo()
+} | ID LPAREN error {
+    yyerror("Expected ')' after '(' operator");
+    yyerrok;
     FinalNode* id = new FinalNode(*$1);
     $$ = new ProcedureCallNode(id); // 语法拓展：无参数过程调用支持 foo()
 }
@@ -488,21 +545,21 @@ ExpressionListNode: ExpressionNode {
     $$ = new ExpressionListNode(dynamic_cast<ExpressionNode*>($1));
 } | ExpressionListNode COMMA ExpressionNode {
     $$ = new ExpressionListNode(dynamic_cast<ExpressionNode*>($3), dynamic_cast<ExpressionListNode*>($1));
-}
+}  
 
 ExpressionNode: SimpleExpressionNode {
     $$ = new ExpressionNode(dynamic_cast<SimpleExpressionNode*>($1));
 } | SimpleExpressionNode RELOP SimpleExpressionNode {
     FinalNode* id = new FinalNode(*$2);
     $$ = new ExpressionNode(dynamic_cast<SimpleExpressionNode*>($1), id, dynamic_cast<SimpleExpressionNode*>($3));
-}
+} 
 
 SimpleExpressionNode: TermNode {
     $$ = new SimpleExpressionNode(dynamic_cast<TermNode*>($1));
 } | SimpleExpressionNode ADDOP TermNode {
     FinalNode* op = new FinalNode(*$2);
     $$ = new SimpleExpressionNode(dynamic_cast<TermNode*>($3), dynamic_cast<SimpleExpressionNode*>($1), op);
-}
+} 
 
 TermNode: FactorNode {
     $$ = new TermNode(dynamic_cast<FactorNode*>($1));
@@ -518,7 +575,16 @@ FactorNode: NUM {
     $$ = new FactorNode(dynamic_cast<VariableNode*>($1));
 } | LPAREN ExpressionNode RPAREN {
     $$ = new FactorNode(dynamic_cast<ExpressionNode*>($2));
+} | LPAREN ExpressionNode error {
+    yyerror("Expected ')' after '(' operator");
+    yyerrok;
+    $$ = new FactorNode(dynamic_cast<ExpressionNode*>($2));
 } | ID LPAREN ExpressionListNode RPAREN {
+    FinalNode* id = new FinalNode(*$1);
+    $$ = new FactorNode(id, dynamic_cast<ExpressionListNode*>($3));
+} | ID LPAREN ExpressionListNode error {
+    yyerror("Expected ')' after '(' operator");
+    yyerrok;
     FinalNode* id = new FinalNode(*$1);
     $$ = new FactorNode(id, dynamic_cast<ExpressionListNode*>($3));
 } | NOTOP FactorNode {
@@ -547,7 +613,14 @@ FactorNode: NUM {
     IdVarpartNode* fake_idvar = new IdVarpartNode();
     VariableNode* fake_var = new VariableNode(id, fake_idvar);
     $$ = new FactorNode(fake_var); // 测试用例21: 无参数函数 a := foo(); write(foo())
-}
+} | ID LPAREN error {
+    yyerror("Expected ')' after '(' operator");
+    yyerrok;
+    FinalNode* id = new FinalNode(*$1);
+    IdVarpartNode* fake_idvar = new IdVarpartNode();
+    VariableNode* fake_var = new VariableNode(id, fake_idvar);
+    $$ = new FactorNode(fake_var); // 测试用例21: 无参数函数 a := foo(); write(foo())
+}  
 
 
 
