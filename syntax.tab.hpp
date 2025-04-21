@@ -54,46 +54,46 @@ extern int yydebug;
     YYEOF = 0,                     /* "end of file"  */
     YYerror = 256,                 /* error  */
     YYUNDEF = 257,                 /* "invalid token"  */
-    Identifier = 258,              /* Identifier  */
-    Number = 259,                  /* Number  */
-    String_var = 260,              /* String_var  */
-    Char_var = 261,                /* Char_var  */
-    ProgramKey = 262,              /* ProgramKey  */
-    Const = 263,                   /* Const  */
-    Var = 264,                     /* Var  */
-    Array = 265,                   /* Array  */
-    Of = 266,                      /* Of  */
-    Basictype = 267,               /* Basictype  */
-    Procedure = 268,               /* Procedure  */
-    Function = 269,                /* Function  */
-    Begin = 270,                   /* Begin  */
-    End = 271,                     /* End  */
-    If = 272,                      /* If  */
-    Then = 273,                    /* Then  */
-    For = 274,                     /* For  */
-    To = 275,                      /* To  */
-    Do = 276,                      /* Do  */
-    Read = 277,                    /* Read  */
-    Write = 278,                   /* Write  */
-    Else = 279,                    /* Else  */
-    Booltype = 280,                /* Booltype  */
-    Notop = 281,                   /* Notop  */
-    Mulop = 282,                   /* Mulop  */
-    Addop = 283,                   /* Addop  */
-    Relop = 284,                   /* Relop  */
-    Assignop = 285,                /* Assignop  */
-    Dotdot = 286,                  /* Dotdot  */
-    Semi = 287,                    /* Semi  */
-    Dot = 288,                     /* Dot  */
-    Lparen = 289,                  /* Lparen  */
-    Rparen = 290,                  /* Rparen  */
-    Lbra = 291,                    /* Lbra  */
-    Rbra = 292,                    /* Rbra  */
-    Colon = 293,                   /* Colon  */
-    Comma = 294,                   /* Comma  */
+    ID = 258,                      /* ID  */
+    NUM = 259,                     /* NUM  */
+    STR_V = 260,                   /* STR_V  */
+    CHAR_V = 261,                  /* CHAR_V  */
+    PROGRAM = 262,                 /* PROGRAM  */
+    CONST = 263,                   /* CONST  */
+    VAR = 264,                     /* VAR  */
+    ARRAY = 265,                   /* ARRAY  */
+    OF = 266,                      /* OF  */
+    TYPE = 267,                    /* TYPE  */
+    PROCEDURE = 268,               /* PROCEDURE  */
+    FUNCTION = 269,                /* FUNCTION  */
+    BEGIN = 270,                   /* BEGIN  */
+    END = 271,                     /* END  */
+    IF = 272,                      /* IF  */
+    THEN = 273,                    /* THEN  */
+    FOR = 274,                     /* FOR  */
+    TO = 275,                      /* TO  */
+    DO = 276,                      /* DO  */
+    READ = 277,                    /* READ  */
+    WRITE = 278,                   /* WRITE  */
+    ELSE = 279,                    /* ELSE  */
+    BOOL = 280,                    /* BOOL  */
+    NOTOP = 281,                   /* NOTOP  */
+    MULOP = 282,                   /* MULOP  */
+    ADDOP = 283,                   /* ADDOP  */
+    RELOP = 284,                   /* RELOP  */
+    ASSIGNOP = 285,                /* ASSIGNOP  */
+    DOTDOT = 286,                  /* DOTDOT  */
+    SEMI = 287,                    /* SEMI  */
+    DOT = 288,                     /* DOT  */
+    LPAREN = 289,                  /* LPAREN  */
+    RPAREN = 290,                  /* RPAREN  */
+    LBRA = 291,                    /* LBRA  */
+    RBRA = 292,                    /* RBRA  */
+    COLON = 293,                   /* COLON  */
+    COMMA = 294,                   /* COMMA  */
     Null = 295,                    /* Null  */
-    While = 296,                   /* While  */
-    Break = 297                    /* Break  */
+    WHILE = 296,                   /* WHILE  */
+    BREAK = 297                    /* BREAK  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
@@ -102,7 +102,7 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 23 "syntax.y"
+#line 29 "syntax1.y"
 
     Token* token;
     AST* ast;
