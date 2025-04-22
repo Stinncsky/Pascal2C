@@ -1,4 +1,5 @@
 #include "./header/translate.hh"
+#include <algorithm>
 
 #include "AST.cc"
 Table t;
@@ -364,7 +365,7 @@ std::string StatementNode::trans() const {
         exp = exp.substr(0, space_pos);
         if ((var_kind == "%s") ^ (exp_kind == "%s")) { // 如果赋值符号两边有且仅有一个字符串
             Token error_token = this->variable->id->token;
-            printf("赋值时左值右值类型冲突, 位置: %d 行, %d 列\n", error_token.line, error_token.column);
+            fprintf(stderr, "Error: In line %d column %d, string assignment error\n", error_token.line, error_token.column);
         }
         return LINE_FORMAT + var + " = " + exp + ";\n";
     }
@@ -531,18 +532,9 @@ std::string VariableListNode::trans() const {
 }
 
 bool isInteger(const std::string& str) {
-    if (str.empty()) return false;  // 空字符串不是整数
-    size_t i = 0;
-    // 处理可选的正负号
-    if (str[0] == '-' || str[0] == '+') {
-        if (str.size() == 1) return false;  // 只有一个 '+' 或 '-'，不是整数
-        i = 1;
-    }
-    for (; i < str.size(); ++i) {
-        if (!std::isdigit(str[i])) {
-            return false;  // 只要有一个不是数字字符，就不是整数
-        }
-    }
+    // TODO: 目前不充分的考量，只要不是小数常量就认为是整数
+    if(str.empty()) return false;
+    if(std::find(str.begin(), str.end(), '.') != str.end()) return false;
     return true;
 }
 
@@ -556,7 +548,7 @@ std::string VariableNode::trans() const {
         int start_i = std::get<2>(info)[i];
         if (!(isInteger(raw_index.substr(0, space_pos)))) { // 如果索引不为整数
             Token error_token = this->id->token;
-            printf("变量索引不都为整数, 位置: %d 行, %d 列\n", error_token.line, error_token.column);
+            fprintf(stderr, "Error: In line %d column %d, index of array is not integer\n", error_token.line, error_token.column);
         }
         std::string index = "";
         if (start_i > 0)
@@ -670,13 +662,19 @@ std::string ProcedureCallNode::trans() const {
         int k = 0; // 正在判断第k个expression要不要加&
         std::string expr = "";
         size_t del_pos = expr_list.find(",");
-        while(del_pos != std::string::npos && k < arg_num - 1) {
+        while(del_pos != std::string::npos) {
             expr += expr_list.substr(0, del_pos);
             if (!is_expr(expr)) {
                 expr += ",";
                 expr_list.erase(0,del_pos + 1);
                 del_pos = expr_list.find(",");
                 continue;
+            }
+            if(k >= arg_num - 1){
+                Token error_token = this->id->token;
+                fprintf(stderr, "Error: In line %d column %d, Too many arguments in function call\n", error_token.line, error_token.column);
+                expr += ")";
+                return res + expr;
             }
             if (cites.at(k) >= CITE)
                 res += "&";
@@ -688,7 +686,7 @@ std::string ProcedureCallNode::trans() const {
         }
         if (k + 1 != arg_num) {
             Token error_token = this->id->token;
-            printf("传入参数与函数声明参数数量不符, 传入%d个, 声明%d个, 位置: %d 行, %d 列\n", k+1, arg_num, error_token.line, error_token.column);
+            fprintf(stderr, "Error: In line %d column %d, function call argument number error. %d expected, %d given\n", error_token.line, error_token.column, arg_num, k + 1);
         }
         if (cites.at(k) >= CITE)
             res += "&";
@@ -847,13 +845,19 @@ std::string FactorNode::trans() const {
         int k = 0; // 正在判断第k个expression要不要加&
         expr = "";
         size_t del_pos = expr_list.find(",");
-        while(del_pos != std::string::npos && k < arg_num - 1) {
+        while(del_pos != std::string::npos) {
             expr += expr_list.substr(0, del_pos);
             if (!is_expr(expr)) {
                 expr += ",";
                 expr_list.erase(0,del_pos + 1);
                 del_pos = expr_list.find(",");
                 continue;
+            }
+            if(k >= arg_num - 1){
+                Token error_token = this->id->token;
+                fprintf(stderr, "Error: In line %d column %d, Too many arguments in function call\n", error_token.line, error_token.column);
+                res += expr + ")";
+                goto ret_kind_check;
             }
             if (cites.at(k) >= CITE)
                 res += "&";
@@ -865,12 +869,13 @@ std::string FactorNode::trans() const {
         }
         if (k + 1 != arg_num) {
             Token error_token = this->id->token;
-            printf("传入参数与函数声明参数数量不符, 传入%d个, 声明%d个, 位置: %d 行, %d 列\n", k+1, arg_num, error_token.line, error_token.column);
+            fprintf(stderr, "Error: In line %d column %d, function call argument number error. %d expected, %d given\n", error_token.line, error_token.column, arg_num, k + 1);
         }
         if (cites.at(k) >= CITE)
             res += "&";
         res += expr + expr_list + ")";
         // 判断函数返回值类型
+        ret_kind_check:
         auto info = t.table[*id];
         std::string kind = "";
         if (std::get<0>(info) == ID_INT) {
