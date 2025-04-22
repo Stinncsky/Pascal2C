@@ -5,10 +5,8 @@
     #include "./AST.cc"
     #include <cstdio>
     #include <cstdlib>
+    #include <cstring>
     #define YYLEX yylex
-
-
-    
 
     void yyerror(const char *s);
     void yyerror_at(const char *s, int line, int column, const Token * token = nullptr);
@@ -23,6 +21,7 @@
     extern Syntax* syntax;
 %}
 %define parse.error verbose
+%define api.token.prefix {Tk_}
 %debug
 
 
@@ -51,7 +50,7 @@ ProgramStructNode: ProgramHeadNode SEMI ProgramBodyNode DOT {
     syntax->tree = new ProgramStructNode(dynamic_cast<ProgramHeadNode*>($1), dynamic_cast<ProgramBodyNode*>($3));
 } | error {
     yyerror("Unrecoverable errors occurred");
-    while(yychar != YYEOF) {
+    while(yychar != Tk_YYEOF) {
         yychar = yylex();
     }
     $$ = nullptr; 
@@ -440,6 +439,7 @@ StatementNode: {
 } | FOR error ASSIGNOP ExpressionNode TO ExpressionNode DO StatementNode {
     yyerror("Expected 'ID' after 'for' keyword");
     yyerrok;
+    FinalNode* id = new FinalNode(Token("errId", TokenType::Identifier));
     $$ = new StatementNode(id, dynamic_cast<ExpressionNode*>($4), dynamic_cast<ExpressionNode*>($6), dynamic_cast<StatementNode*>($8));
 } | FOR ID error ExpressionNode TO ExpressionNode DO StatementNode {
     yyerror("Expected ':=' operator after 'ID'");

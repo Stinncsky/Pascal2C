@@ -50,50 +50,50 @@ extern int yydebug;
 # define YYTOKENTYPE
   enum yytokentype
   {
-    YYEMPTY = -2,
-    YYEOF = 0,                     /* "end of file"  */
-    YYerror = 256,                 /* error  */
-    YYUNDEF = 257,                 /* "invalid token"  */
-    ID = 258,                      /* ID  */
-    NUM = 259,                     /* NUM  */
-    STR_V = 260,                   /* STR_V  */
-    CHAR_V = 261,                  /* CHAR_V  */
-    PROGRAM = 262,                 /* PROGRAM  */
-    CONST = 263,                   /* CONST  */
-    VAR = 264,                     /* VAR  */
-    ARRAY = 265,                   /* ARRAY  */
-    OF = 266,                      /* OF  */
-    TYPE = 267,                    /* TYPE  */
-    PROCEDURE = 268,               /* PROCEDURE  */
-    FUNCTION = 269,                /* FUNCTION  */
-    BEGIN = 270,                   /* BEGIN  */
-    END = 271,                     /* END  */
-    IF = 272,                      /* IF  */
-    THEN = 273,                    /* THEN  */
-    FOR = 274,                     /* FOR  */
-    TO = 275,                      /* TO  */
-    DO = 276,                      /* DO  */
-    READ = 277,                    /* READ  */
-    WRITE = 278,                   /* WRITE  */
-    ELSE = 279,                    /* ELSE  */
-    BOOL = 280,                    /* BOOL  */
-    NOTOP = 281,                   /* NOTOP  */
-    MULOP = 282,                   /* MULOP  */
-    ADDOP = 283,                   /* ADDOP  */
-    RELOP = 284,                   /* RELOP  */
-    ASSIGNOP = 285,                /* ASSIGNOP  */
-    DOTDOT = 286,                  /* DOTDOT  */
-    SEMI = 287,                    /* SEMI  */
-    DOT = 288,                     /* DOT  */
-    LPAREN = 289,                  /* LPAREN  */
-    RPAREN = 290,                  /* RPAREN  */
-    LBRA = 291,                    /* LBRA  */
-    RBRA = 292,                    /* RBRA  */
-    COLON = 293,                   /* COLON  */
-    COMMA = 294,                   /* COMMA  */
-    Null = 295,                    /* Null  */
-    WHILE = 296,                   /* WHILE  */
-    BREAK = 297                    /* BREAK  */
+    Tk_YYEMPTY = -2,
+    Tk_YYEOF = 0,                  /* "end of file"  */
+    Tk_YYerror = 256,              /* error  */
+    Tk_YYUNDEF = 257,              /* "invalid token"  */
+    Tk_ID = 258,                   /* ID  */
+    Tk_NUM = 259,                  /* NUM  */
+    Tk_STR_V = 260,                /* STR_V  */
+    Tk_CHAR_V = 261,               /* CHAR_V  */
+    Tk_PROGRAM = 262,              /* PROGRAM  */
+    Tk_CONST = 263,                /* CONST  */
+    Tk_VAR = 264,                  /* VAR  */
+    Tk_ARRAY = 265,                /* ARRAY  */
+    Tk_OF = 266,                   /* OF  */
+    Tk_TYPE = 267,                 /* TYPE  */
+    Tk_PROCEDURE = 268,            /* PROCEDURE  */
+    Tk_FUNCTION = 269,             /* FUNCTION  */
+    Tk_BEGIN = 270,                /* BEGIN  */
+    Tk_END = 271,                  /* END  */
+    Tk_IF = 272,                   /* IF  */
+    Tk_THEN = 273,                 /* THEN  */
+    Tk_FOR = 274,                  /* FOR  */
+    Tk_TO = 275,                   /* TO  */
+    Tk_DO = 276,                   /* DO  */
+    Tk_READ = 277,                 /* READ  */
+    Tk_WRITE = 278,                /* WRITE  */
+    Tk_ELSE = 279,                 /* ELSE  */
+    Tk_BOOL = 280,                 /* BOOL  */
+    Tk_NOTOP = 281,                /* NOTOP  */
+    Tk_MULOP = 282,                /* MULOP  */
+    Tk_ADDOP = 283,                /* ADDOP  */
+    Tk_RELOP = 284,                /* RELOP  */
+    Tk_ASSIGNOP = 285,             /* ASSIGNOP  */
+    Tk_DOTDOT = 286,               /* DOTDOT  */
+    Tk_SEMI = 287,                 /* SEMI  */
+    Tk_DOT = 288,                  /* DOT  */
+    Tk_LPAREN = 289,               /* LPAREN  */
+    Tk_RPAREN = 290,               /* RPAREN  */
+    Tk_LBRA = 291,                 /* LBRA  */
+    Tk_RBRA = 292,                 /* RBRA  */
+    Tk_COLON = 293,                /* COLON  */
+    Tk_COMMA = 294,                /* COMMA  */
+    Tk_Null = 295,                 /* Null  */
+    Tk_WHILE = 296,                /* WHILE  */
+    Tk_BREAK = 297                 /* BREAK  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
@@ -102,7 +102,7 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 29 "syntax1.y"
+#line 28 "syntax_err.y"
 
     Token* token;
     AST* ast;
