@@ -1739,7 +1739,7 @@ yyreduce:
                                         {
         yyerror("Except ';' after ConstDeclarationsNode");
         yyerrok;
-        (yyval.ast) = new ConstDeclarationsNode(); 
+        (yyval.ast) = new ConstDeclarationsNode(dynamic_cast<ConstDeclarationNode*>((yyvsp[-1].ast))); 
     }
 #line 1745 "syntax.tab.cpp"
     break;
@@ -1851,7 +1851,7 @@ yyreduce:
                                  {
     yyerror("Expected ';' after VarDeclarationsNode");
     yyerrok;
-    (yyval.ast) = new VarDeclarationsNode();
+    (yyval.ast) = new VarDeclarationsNode(dynamic_cast<VarDeclarationNode*>((yyvsp[-1].ast)));
 }
 #line 1857 "syntax.tab.cpp"
     break;

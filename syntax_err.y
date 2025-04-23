@@ -109,7 +109,7 @@ ConstDeclarationsNode:
     } | CONST ConstDeclarationNode error{
         yyerror("Except ';' after ConstDeclarationsNode");
         yyerrok;
-        $$ = new ConstDeclarationsNode(); 
+        $$ = new ConstDeclarationsNode(dynamic_cast<ConstDeclarationNode*>($2)); 
     }
 
 
@@ -169,7 +169,7 @@ VarDeclarationsNode: {
 } | VAR VarDeclarationNode error {
     yyerror("Expected ';' after VarDeclarationsNode");
     yyerrok;
-    $$ = new VarDeclarationsNode();
+    $$ = new VarDeclarationsNode(dynamic_cast<VarDeclarationNode*>($2));
 }
 
 VarDeclarationNode: IdListNode COLON TypeNode {

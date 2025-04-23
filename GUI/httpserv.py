@@ -15,9 +15,13 @@ def handle_translation():
         source_lang = data.get('source_lang', '')
         target_lang = data.get('target_lang', '')
 
-        if not (source_lang == 'pas' and target_lang == 'c'):
+        if not (source_lang == 'pas'):
             return jsonify({
-                "error": "当前版本仅支持 pascal 转 c 的翻译"
+                "error": "当前版本仅支持 pascal 语言作为输入语言"
+            }), 418
+        if not (target_lang == 'c' or target_lang == 'asm'):
+            return jsonify({
+                "error": "当前版本仅支持 c 语言或汇编语言作为输出语言"
             }), 418
 
         with open("../http.pas", "w", encoding="utf-8") as file:
@@ -44,7 +48,8 @@ def handle_translation():
             with open("../http.c", "r", encoding="utf-8") as file:
                 translated_text = file.read()
             file.close()
-            os.remove("../http.c")
+            if target_lang == 'c':
+                os.remove("../http.c")
             os.remove("../http.pas")
         elif result.returncode == 0:
             print(result.returncode, result.stderr.strip())
@@ -55,11 +60,17 @@ def handle_translation():
                 os.remove("../http.c")
             if os.path.exists("../http.pas"):
                 os.remove("../http.pas")
-            return jsonify({
-                "result": translated_text,
-                "error": "翻译错误",
-                "details": result.stderr.strip()
-            }), 200
+            if target_lang == 'c':
+                return jsonify({
+                    "result": translated_text,
+                    "error": "翻译错误",
+                    "details": result.stderr.strip()
+                }), 200
+            else:
+                return jsonify({
+                    "error": "翻译错误",
+                    "details": result.stderr.strip() + "\n无法安全生成汇编代码"
+                }), 200
         else:
             if os.path.exists("../http.pas"):
                 os.remove("../http.pas")
@@ -71,9 +82,34 @@ def handle_translation():
                 "details": errdetail
             }), 200
         
-        return jsonify({
-            "result": translated_text
-        }), 200
+        if target_lang == 'c':
+            return jsonify({
+                "result": translated_text
+            }), 200
+        elif target_lang == 'asm':
+            # 调用gcc编译器生成汇编代码
+            try:
+                compile_args = ["gcc", "-S", "-o", "../http.s", "../http.c"]
+                result = subprocess.run(compile_args, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+                if result.returncode != 0:
+                    print(result.returncode, result.stderr.strip())
+                    return jsonify({
+                        "error": "编译失败",
+                        "details": result.stderr.strip()
+                    }), 500
+                with open("../http.s", "r", encoding="utf-8") as file:
+                    translated_text = file.read()
+                file.close()
+                os.remove("../http.c")
+                os.remove("../http.s")
+                return jsonify({
+                    "result": translated_text
+                }), 200
+            except Exception as e:
+                return jsonify({
+                    "error": "生成汇编代码失败",
+                    "details": str(e)
+                }), 500
 
     except Exception as e:
         return jsonify({
