@@ -1,4 +1,5 @@
 #include "./header/translate.hh"
+#include <algorithm>
 
 #include "AST.cc"
 Table t;
@@ -356,10 +357,16 @@ std::string StatementNode::trans() const {
     else if (this->kind == 2) {
         std::string var = this->variable->trans();
         size_t space_pos = var.find(' ');
+        std::string var_kind = var.substr(space_pos);
         var = var.substr(0, space_pos);
         std::string exp = this->expression->trans();
         space_pos = exp.find(' ');
+        std::string exp_kind = exp.substr(space_pos);
         exp = exp.substr(0, space_pos);
+        if ((var_kind == "%s") ^ (exp_kind == "%s")) { // 如果赋值符号两边有且仅有一个字符串
+            Token error_token = this->variable->id->token;
+            fprintf(stderr, "Error: In line %d column %d, string assignment error\n", error_token.line, error_token.column);
+        }
         return LINE_FORMAT + var + " = " + exp + ";\n";
     }
     else if (this->kind == 3){
@@ -524,6 +531,13 @@ std::string VariableListNode::trans() const {
         return this->variable->trans() + "," + this->variable_list->trans();
 }
 
+bool isInteger(const std::string& str) {
+    // TODO: 目前不充分的考量，只要不是小数常量就认为是整数
+    if(str.empty()) return false;
+    if(std::find(str.begin(), str.end(), '.') != str.end()) return false;
+    return true;
+}
+
 std::string VariableNode::trans() const {
     auto info = t.table[*id];
     std::string res = this->id->trans();
@@ -532,6 +546,10 @@ std::string VariableNode::trans() const {
     size_t space_pos = raw_index.find(' ');
     while (space_pos != std::string::npos) {
         int start_i = std::get<2>(info)[i];
+        if (!(isInteger(raw_index.substr(0, space_pos)))) { // 如果索引不为整数
+            Token error_token = this->id->token;
+            fprintf(stderr, "Error: In line %d column %d, index of array is not integer\n", error_token.line, error_token.column);
+        }
         std::string index = "";
         if (start_i > 0)
             index = raw_index.substr(0, space_pos) + "-" + std::to_string(start_i);
@@ -588,7 +606,7 @@ std::string IdVarpartNode::trans() const {
         size_t space_pos = expr_list.find(' ');
         while (space_pos != std::string::npos) {
             size_t del_pos = expr_list.find(',');
-            res += expr_list.substr(0, space_pos) + " "; // error: 应要求必须为整数
+            res += expr_list.substr(0, space_pos) + " "; // error: 应要求必须为整数，在variable中判断
             if (del_pos != std::string::npos)
                 expr_list = expr_list.erase(0, del_pos + 1);
             else
@@ -644,13 +662,19 @@ std::string ProcedureCallNode::trans() const {
         int k = 0; // 正在判断第k个expression要不要加&
         std::string expr = "";
         size_t del_pos = expr_list.find(",");
-        while(del_pos != std::string::npos && k < arg_num - 1) {
+        while(del_pos != std::string::npos) {
             expr += expr_list.substr(0, del_pos);
             if (!is_expr(expr)) {
                 expr += ",";
                 expr_list.erase(0,del_pos + 1);
                 del_pos = expr_list.find(",");
                 continue;
+            }
+            if(k >= arg_num - 1){
+                Token error_token = this->id->token;
+                fprintf(stderr, "Error: In line %d column %d, Too many arguments in function call\n", error_token.line, error_token.column);
+                expr += ")";
+                return res + expr;
             }
             if (cites.at(k) >= CITE)
                 res += "&";
@@ -659,6 +683,10 @@ std::string ProcedureCallNode::trans() const {
             k++;
             expr_list.erase(0,del_pos + 1);
             del_pos = expr_list.find(",");
+        }
+        if (k + 1 != arg_num) {
+            Token error_token = this->id->token;
+            fprintf(stderr, "Error: In line %d column %d, function call argument number error. %d expected, %d given\n", error_token.line, error_token.column, arg_num, k + 1);
         }
         if (cites.at(k) >= CITE)
             res += "&";
@@ -699,11 +727,11 @@ std::string ExpressionNode::trans() const {
         std::string simple_expr_2_content = simple_expr_2.substr(0, simple_expr_2_space_pos);
         std::string simple_expr_2_kind = simple_expr_2.substr(simple_expr_2_space_pos + 1);
         std::string kind = "";
-        if (simple_expr_kind == "%f" || simple_expr_2_kind == "%f") // error: 这里应该按符号具体判断种类，可能会有错误处理
+        if (simple_expr_kind == "%f" || simple_expr_2_kind == "%f") // error: 这里应该都是%d，因为返回值是一个等式或不等式的布尔判断结果
             kind = "%f";
         else
             kind = "%d";
-        return simple_expr_content + op + simple_expr_2_content + " " + kind; // eg: "a=1*2+1*2 %d"
+        return simple_expr_content + op + simple_expr_2_content + " " + kind; // eg: "a==1*2+1*2 %d"
     }
 }
 
@@ -711,7 +739,7 @@ std::string SimpleExpressionNode::trans() const {
     if (this->addop == nullptr)
         return this->term->trans(); // eg: "2 %d"
     else {
-        std::string op = this->addop->trans(); // + - or
+        std::string op = this->addop->trans(); // + - ||
         std::string term_expr = this->term->trans();
         size_t term_space_pos = term_expr.find(' ');
         std::string term_content = term_expr.substr(0, term_space_pos);
@@ -721,8 +749,14 @@ std::string SimpleExpressionNode::trans() const {
         std::string simple_expr_content = simple_expr.substr(0, simple_expr_space_pos);
         std::string simple_expr_kind = simple_expr.substr(simple_expr_space_pos + 1);
         std::string kind = "";
-        if (term_kind == "%f" || simple_expr_kind == "%f") // error: 这里应该按符号具体判断种类，可能会有错误处理
-            kind = "%f";
+        if (op == "+" || op == "-") {
+            if (term_kind == "%f" || simple_expr_kind == "%f") // error: 这里应该按符号具体判断种类，可能会有错误处理
+                kind = "%f";
+            else if (term_kind == "%d" || simple_expr_kind == "%d")
+                kind = "%d";
+            else
+                kind = "%c";
+        }
         else
             kind = "%d";
         if (term_content != "" && term_content.substr(0, 1) == op)
@@ -744,12 +778,19 @@ std::string TermNode::trans() const {
         std::string factor_content = factor_expr.substr(0, factor_space_pos);
         std::string factor_kind = factor_expr.substr(factor_space_pos + 1);
         std::string kind = "";
-        if (term_kind == "%f" || factor_kind == "%f")
-            kind = "%f";
+        std::string op = this->mulop->trans(); // * / % &&
+        if (op == "*" || op == "/") {
+            if (term_kind == "%f" || factor_kind == "%f") // error: 这里应该按符号具体判断种类，可能会有错误处理
+                kind = "%f";
+            else if (term_kind == "%d" || factor_kind == "%d")
+                kind = "%d";
+            else
+                kind = "%c";
+        }
         else
             kind = "%d";
-        std::string op = this->mulop->trans(); // * / div mod and
-        return term_content + this->mulop->trans() + factor_content + " " + kind;
+        // return term_content + this->mulop->trans() + factor_content + " " + kind;
+        return term_content + op + factor_content + " " + kind;
         // eg: "1 * 2 %d" -> "1*2 %d"
     }
 }
@@ -804,13 +845,19 @@ std::string FactorNode::trans() const {
         int k = 0; // 正在判断第k个expression要不要加&
         expr = "";
         size_t del_pos = expr_list.find(",");
-        while(del_pos != std::string::npos && k < arg_num - 1) {
+        while(del_pos != std::string::npos) {
             expr += expr_list.substr(0, del_pos);
             if (!is_expr(expr)) {
                 expr += ",";
                 expr_list.erase(0,del_pos + 1);
                 del_pos = expr_list.find(",");
                 continue;
+            }
+            if(k >= arg_num - 1){
+                Token error_token = this->id->token;
+                fprintf(stderr, "Error: In line %d column %d, Too many arguments in function call\n", error_token.line, error_token.column);
+                res += expr + ")";
+                goto ret_kind_check;
             }
             if (cites.at(k) >= CITE)
                 res += "&";
@@ -820,10 +867,15 @@ std::string FactorNode::trans() const {
             expr_list.erase(0,del_pos + 1);
             del_pos = expr_list.find(",");
         }
+        if (k + 1 != arg_num) {
+            Token error_token = this->id->token;
+            fprintf(stderr, "Error: In line %d column %d, function call argument number error. %d expected, %d given\n", error_token.line, error_token.column, arg_num, k + 1);
+        }
         if (cites.at(k) >= CITE)
             res += "&";
         res += expr + expr_list + ")";
         // 判断函数返回值类型
+        ret_kind_check:
         auto info = t.table[*id];
         std::string kind = "";
         if (std::get<0>(info) == ID_INT) {
