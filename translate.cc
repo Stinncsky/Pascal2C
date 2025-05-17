@@ -672,8 +672,13 @@ static bool is_expr(std::string s) {
 }
 
 std::string ProcedureCallNode::trans() const {
-    if (this->expression_list == nullptr)
+    if (this->expression_list == nullptr) {
+        if (!t.table.count(*this->id)) { // 如果当前函数未声明过
+            Token error_token = this->id->token;
+            fprintf(stderr, "Error: In line %d column %d, the identifier is not defined yet\n", error_token.line, error_token.column);
+        }
         return this->id->trans() + "()";
+    }
     else { // 找到每一个空格，从空格开始到逗号前的部分都去掉
         std::string expr_list = this->expression_list->trans();
         std::string expr1 = "";
@@ -697,6 +702,10 @@ std::string ProcedureCallNode::trans() const {
         }
         if (temp[int(temp.size()) - 1] == ',') temp.erase(int(temp.size()) - 1);
         expr_list = temp;
+        if (!t.table.count(*this->id)) { // 如果当前函数未声明过
+            Token error_token = this->id->token;
+            fprintf(stderr, "Error: In line %d column %d, the identifier is not defined yet\n", error_token.line, error_token.column);
+        }
         auto info = t.table[*id];
         std::string res = this->id->trans() + "(";
         std::vector<int> cites = std::get<1>(t.table[*this->id]);
@@ -938,6 +947,10 @@ std::string FactorNode::trans() const {
         res += expr + expr_list + ")";
         // 判断函数返回值类型
         ret_kind_check:
+        if (!t.table.count(*this->id)) { // 如果当前变量未声明过
+            Token error_token = this->id->token;
+            fprintf(stderr, "Error: In line %d column %d, the identifier is not defined yet\n", error_token.line, error_token.column);
+        }
         auto info = t.table[*id];
         std::string kind = "";
         if (std::get<0>(info) == ID_INT) {
