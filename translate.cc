@@ -81,6 +81,7 @@ std::string ProgramBodyNode::trans() const{
     LINE_FORMAT += "\t";
     std::string main_func_body = this->compound_statement->trans();
     res += "{\n" + main_func_body + LINE_FORMAT + "return 0;\n}";
+    LINE_FORMAT = LINE_FORMAT.substr(0, LINE_FORMAT.size()-1);
     return res;
 }
 
