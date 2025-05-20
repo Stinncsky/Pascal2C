@@ -558,7 +558,7 @@ bool isInteger(const std::string& str) {
 bool is_int(const std::string& str) {
     // TODO: 判断是否为纯粹的整数，而不是变量
     if (str[0] != '+' && str[0] != '-' && !isdigit(str[0])) return false;
-    for (int i = 1; i < str.length(); i++)
+    for (std::string::size_type i = 1; i < str.length(); i++)
         if (!isdigit(str[i])) return false;
     return true;
 }
@@ -725,8 +725,10 @@ std::string ProcedureCallNode::trans() const {
             if(k >= arg_num - 1){
                 Token error_token = this->id->token;
                 fprintf(stderr, "Error: In line %d column %d, Too many arguments in function call\n", error_token.line, error_token.column);
-                expr += ")";
-                return res + expr;
+                if(arg_num == 0 && k == 0)
+                    return res + ")";
+                else
+                    return res + expr + ")";
             }
             if (cites.at(k) >= CITE)
                 res += "&";
@@ -737,8 +739,15 @@ std::string ProcedureCallNode::trans() const {
             del_pos = expr_list.find(",");
         }
         if (k + 1 != arg_num) {
-            Token error_token = this->id->token;
-            fprintf(stderr, "Error: In line %d column %d, function call argument number error. %d expected, %d given\n", error_token.line, error_token.column, arg_num, k + 1);
+            if(arg_num == 0 && k == 0){
+                Token error_token = this->id->token;
+                fprintf(stderr, "Error: In line %d column %d, Too many arguments in function call\n", error_token.line, error_token.column);
+                return res + ")";
+            }
+            else{
+                Token error_token = this->id->token;
+                fprintf(stderr, "Error: In line %d column %d, function call argument number error. %d expected, %d given\n", error_token.line, error_token.column, arg_num, k + 1);
+            }
         }
         if (cites.at(k) >= CITE)
             res += "&";
@@ -928,7 +937,10 @@ std::string FactorNode::trans() const {
             if(k >= arg_num - 1){
                 Token error_token = this->id->token;
                 fprintf(stderr, "Error: In line %d column %d, Too many arguments in function call\n", error_token.line, error_token.column);
-                res += expr + ")";
+                if(arg_num == 0 && k == 0)
+                    res += ")";
+                else
+                    res += expr + ")";
                 goto ret_kind_check;
             }
             if (cites.at(k) >= CITE)
@@ -940,8 +952,16 @@ std::string FactorNode::trans() const {
             del_pos = expr_list.find(",");
         }
         if (k + 1 != arg_num) {
-            Token error_token = this->id->token;
-            fprintf(stderr, "Error: In line %d column %d, function call argument number error. %d expected, %d given\n", error_token.line, error_token.column, arg_num, k + 1);
+            if (arg_num == 0 && k == 0){
+                res += ")";
+                Token error_token = this->id->token;
+                fprintf(stderr, "Error: In line %d column %d, Too many arguments in function call\n", error_token.line, error_token.column);
+                goto ret_kind_check;
+            }
+            else{
+                Token error_token = this->id->token;
+                fprintf(stderr, "Error: In line %d column %d, function call argument number error. %d expected, %d given\n", error_token.line, error_token.column, arg_num, k + 1);
+            }
         }
         if (cites.at(k) >= CITE)
             res += "&";
