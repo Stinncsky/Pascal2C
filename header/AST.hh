@@ -53,6 +53,7 @@ class AST {
         }
         virtual ~AST() = default;
         virtual std::string trans() const = 0;
+        virtual void output() const = 0;
 };
 
 class FinalNode;

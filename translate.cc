@@ -2,8 +2,9 @@
 #include <algorithm>
 
 #include "AST.cc"
+#include "test/output_AST.cc"
 Table t;
-std::string LINE_FORMAT = "";
+static std::string LINE_FORMAT = "";
 std::string FinalNode::trans() const{
     switch(this->token.type){
         case TokenType::Number:
