@@ -2,14 +2,15 @@ import subprocess
 import sys
 import os
 # 可执行文件名（假设已编译为 test_semantic_error.exe）
-exe = 'test_semantic_error.exe'
 # 获取当前脚本所在目录
 test_dir = os.path.dirname(os.path.abspath(__file__))
 src = 'test_semantic_error.cc'
+exe = 'test_semantic_error.exe'
 src = os.path.join(test_dir, src)
-if not os.path.exists(exe):
+exe_path = os.path.join(test_dir, exe)
+if not os.path.exists(exe_path):
     # 编译C源文件
-    compile_cmd = ['g++', src, '-o', exe]
+    compile_cmd = ['g++', src, '-o', exe_path]
     try:
         compile_result = subprocess.run(compile_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
         if compile_result.returncode != 0:
@@ -18,13 +19,8 @@ if not os.path.exists(exe):
     except Exception as e:
         print(f"[FAIL] 编译过程中发生异常: {e}")
         sys.exit(1)
-exe = 'test_semantic_error.exe'
-# 获取当前脚本所在目录
-test_dir = os.path.dirname(os.path.abspath(__file__))
-# 构建可执行文件的完整路径
-exe = os.path.join(test_dir, exe)
 try:
-    result = subprocess.run(exe, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+    result = subprocess.run(exe_path, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
 except Exception as e:
     print(f"[FAIL] 无法运行可执行文件: {e}")
     sys.exit(1)

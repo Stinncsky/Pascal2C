@@ -20,6 +20,7 @@ class FinalNode : public AST { // 终结符节点
         }
 
         std::string trans() const override;
+        void output() const override;
 };
 
 class ProgramStructNode : public AST { 
@@ -34,6 +35,7 @@ class ProgramStructNode : public AST {
         ~ProgramStructNode();
 
         std::string trans() const override;
+        void output() const override;
 };
 
 class ProgramHeadNode : public AST { 
@@ -48,6 +50,7 @@ class ProgramHeadNode : public AST {
         ~ProgramHeadNode();
 
         std::string trans() const override;
+        void output() const override;
 };
 
 class ProgramBodyNode : public AST { 
@@ -66,6 +69,7 @@ class ProgramBodyNode : public AST {
         ~ProgramBodyNode();
 
         std::string trans() const override;
+        void output() const override;
 };
 
 class IdListNode : public AST { 
@@ -81,6 +85,7 @@ class IdListNode : public AST {
 
         std::string trans(const std::string type, const std::string tmp = "", const std::string end = "", const std::vector<int> *dim = nullptr, const bool is_cite = false, std::vector<int> *func_p_is_cite = nullptr) const;
         std::string trans() const override { return trans("");} // 重载纯虚函数
+        void output() const override;
 };
 
 class ConstDeclarationsNode : public AST { 
@@ -93,6 +98,7 @@ class ConstDeclarationsNode : public AST {
         ~ConstDeclarationsNode();
 
         std::string trans() const override;
+        void output() const override;
 };
 
 class ConstDeclarationNode : public AST { 
@@ -109,6 +115,7 @@ class ConstDeclarationNode : public AST {
         ~ConstDeclarationNode();
 
         std::string trans() const override;
+        void output() const override;
 };
 
 class ConstValueNode : public AST { 
@@ -123,6 +130,7 @@ class ConstValueNode : public AST {
         ~ConstValueNode();
 
         std::string trans() const override;
+        void output() const override;
 };
 
 class VarDeclarationsNode : public AST { 
@@ -135,6 +143,7 @@ class VarDeclarationsNode : public AST {
         ~VarDeclarationsNode();
 
         std::string trans() const override;
+        void output() const override;
 };
 
 class VarDeclarationNode : public AST { 
@@ -151,6 +160,7 @@ class VarDeclarationNode : public AST {
         ~VarDeclarationNode();
 
         std::string trans() const override;
+        void output() const override;
 };
 
 class TypeNode : public AST { 
@@ -165,6 +175,7 @@ class TypeNode : public AST {
         ~TypeNode();
 
         std::string trans() const override;
+        void output() const override;
 };
 
 class BasicTypeNode : public AST { 
@@ -177,6 +188,7 @@ class BasicTypeNode : public AST {
         ~BasicTypeNode();
 
         std::string trans() const override;
+        void output() const override;
 };
 
 class PeriodNode : public AST { 
@@ -192,6 +204,7 @@ class PeriodNode : public AST {
         ~PeriodNode();
         std::string trans(std::vector<int> &dim) const;
         std::string trans() const override{std::vector<int> tmp; return trans(tmp);}
+        void output() const override;
 };
 
 class SubprogramDeclarationsNode : public AST { 
@@ -206,6 +219,7 @@ class SubprogramDeclarationsNode : public AST {
         ~SubprogramDeclarationsNode();
 
         std::string trans() const override;
+        void output() const override;
 };
 
 class SubprogramNode : public AST { 
@@ -220,6 +234,7 @@ class SubprogramNode : public AST {
         ~SubprogramNode();
 
         std::string trans() const override;
+        void output() const override;
 };
 
 class SubprogramHeadNode : public AST { 
@@ -236,6 +251,7 @@ class SubprogramHeadNode : public AST {
         ~SubprogramHeadNode();
         std::string trans(std::vector<int> *func_p_is_cite) const;
         std::string trans() const override{return trans(nullptr);};
+        void output() const override;
 };
 
 class FormalParameterNode : public AST { 
@@ -249,6 +265,7 @@ class FormalParameterNode : public AST {
 
         std::string trans(std::vector<int> *func_p_is_cite) const;
         std::string trans() const override{return trans(nullptr);};
+        void output() const override;
 };
 
 class ParameterListNode : public AST { 
@@ -264,6 +281,7 @@ class ParameterListNode : public AST {
 
         std::string trans(std::vector<int> *func_p_is_cite) const;
         std::string trans() const override{return trans(nullptr);};
+        void output() const override;
 };
 
 class ParameterNode : public AST { 
@@ -281,6 +299,7 @@ class ParameterNode : public AST {
 
         std::string trans(std::vector<int> *func_p_is_cite) const;
         std::string trans() const override{return trans(nullptr);};
+        void output() const override;
 };
 
 class VarParameterNode : public AST { 
@@ -294,6 +313,7 @@ class VarParameterNode : public AST {
 
         std::string trans(std::vector<int> *func_p_is_cite) const;
         std::string trans() const override{return trans(nullptr);}
+        void output() const override;
 };
 
 class ValueParameterNode : public AST { 
@@ -309,6 +329,7 @@ class ValueParameterNode : public AST {
 
         std::string trans(const bool is_ptr, std::vector<int> *func_p_is_ptr = nullptr) const;
         std::string trans() const override {return trans(false);} // 重载纯虚函数
+        void output() const override;
 };
 
 class SubprogramBodyNode : public AST { 
@@ -325,6 +346,7 @@ class SubprogramBodyNode : public AST {
         ~SubprogramBodyNode();
 
         std::string trans() const override;
+        void output() const override;
 };
 
 class CompoundStatementNode : public AST { 
@@ -337,6 +359,7 @@ class CompoundStatementNode : public AST {
         ~CompoundStatementNode();
 
         std::string trans() const override;
+        void output() const override;
 };
 
 class StatementListNode : public AST { 
@@ -351,6 +374,7 @@ class StatementListNode : public AST {
         ~StatementListNode();
 
         std::string trans() const override;
+        void output() const override;
 };
 
 class StatementNode : public AST {
@@ -435,6 +459,7 @@ class StatementNode : public AST {
         ~StatementNode();
 
         std::string trans() const override;
+        void output() const override;
 };
 
 class VariableListNode : public AST { 
@@ -449,6 +474,7 @@ class VariableListNode : public AST {
         ~VariableListNode();
 
         std::string trans() const override;
+        void output() const override;
 };
 
 class VariableNode : public AST { 
@@ -463,6 +489,7 @@ class VariableNode : public AST {
         ~VariableNode();
 
         std::string trans() const override;
+        void output() const override;
 };
 
 class IdVarpartNode : public AST { 
@@ -475,6 +502,7 @@ class IdVarpartNode : public AST {
         ~IdVarpartNode();
 
         std::string trans() const override;
+        void output() const override;
 };
 
 class ProcedureCallNode : public AST { 
@@ -489,6 +517,7 @@ class ProcedureCallNode : public AST {
         ~ProcedureCallNode();
 
         std::string trans() const override;
+        void output() const override;
 };
 
 class ElsePartNode : public AST { 
@@ -501,6 +530,7 @@ class ElsePartNode : public AST {
         ~ElsePartNode();
 
         std::string trans() const override;
+        void output() const override;
 };
 
 class ExpressionListNode : public AST { 
@@ -515,6 +545,7 @@ class ExpressionListNode : public AST {
         ~ExpressionListNode();
 
         std::string trans() const override;
+        void output() const override;
 };
 
 class ExpressionNode : public AST { 
@@ -535,6 +566,7 @@ class ExpressionNode : public AST {
         ~ExpressionNode();
 
         std::string trans() const override;
+        void output() const override;
 };
 
 class SimpleExpressionNode : public AST { 
@@ -551,6 +583,7 @@ class SimpleExpressionNode : public AST {
         ~SimpleExpressionNode();
 
         std::string trans() const override;
+        void output() const override;
 };
 
 class TermNode : public AST { 
@@ -567,6 +600,7 @@ class TermNode : public AST {
         ~TermNode();
 
         std::string trans() const override;
+        void output() const override;
 };
 
 class FactorNode : public AST {
@@ -609,6 +643,7 @@ class FactorNode : public AST {
         ~FactorNode();
 
         std::string trans() const override;
+        void output() const override;
 };
 
 ProgramStructNode::~ProgramStructNode() {
