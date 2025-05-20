@@ -54,9 +54,10 @@ ProgramStructNode: ProgramHeadNode SEMI ProgramBodyNode DOT {
         yychar = yylex();
     }
     $$ = nullptr; 
-} | ProgramHeadNode ProgramBodyNode error {
-    syntax->tree = new ProgramStructNode(dynamic_cast<ProgramHeadNode*>($1), dynamic_cast<ProgramBodyNode*>($2));
+} | ProgramHeadNode SEMI ProgramBodyNode error {
+    syntax->tree = new ProgramStructNode(dynamic_cast<ProgramHeadNode*>($1), dynamic_cast<ProgramBodyNode*>($3));
     yyerror("Expected '.' at the end of the program");
+    yyerrok;
 }
 
 ProgramHeadNode: PROGRAM ID {
