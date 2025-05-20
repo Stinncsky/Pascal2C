@@ -380,6 +380,10 @@ std::string StatementNode::trans() const {
             Token error_token = this->variable->id->token;
             fprintf(stderr, "Error: In line %d column %d, string assignment error\n", error_token.line, error_token.column);
         }
+        if (var_kind != exp_kind) { // 如果赋值符号两边类型不一致
+            Token error_token = this->variable->id->token;
+            fprintf(stderr, "Warning: In line %d column %d, type mismatch\n", error_token.line, error_token.column);
+        }
         return LINE_FORMAT + var + " = " + exp + ";\n";
     }
     else if (this->kind == 3){
@@ -393,6 +397,8 @@ std::string StatementNode::trans() const {
             std::string id_str = this->id->trans();
             std::string exp = this->expression->trans();
             size_t space_pos = exp.find(' ');
+            auto exp_kind = exp.substr(space_pos);
+            std::string id_kind;
             if(exp[exp.size() - 1] == ')'){
                 exp = exp.substr(0, space_pos) + ")";
             } else {
@@ -403,6 +409,22 @@ std::string StatementNode::trans() const {
                 fprintf(stderr, "Error: In line %d column %d, the identifier is not defined yet\n", error_token.line, error_token.column);
             }
             auto info = t.table[*id];
+            if (std::get<0>(info) == ID_INT) {
+                id_kind = " %d";
+            }
+            else if (std::get<0>(info) == ID_FLOAT) {
+                id_kind = " %f";
+            }
+            else if (std::get<0>(info) == ID_CHAR) {
+                id_kind = " %c";
+            }
+            else if (std::get<0>(info) == ID_STRING) {
+                id_kind = " %s";
+            }
+            if (id_kind != exp_kind) { // 如果赋值符号两边类型不一致
+                Token error_token = this->id->token;
+                fprintf(stderr, "Warning: In line %d column %d, type mismatch\n", error_token.line, error_token.column);
+            }
             if (!std::get<1>(info).empty() && std::get<1>(info).back() >= CITE)
                 id_str = "(*" + id_str + ")";
             return LINE_FORMAT + id_str + " = " + exp + ";\n";
