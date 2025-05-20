@@ -2,6 +2,7 @@
 #include <algorithm>
 
 #include "AST.cc"
+#include "test/output_AST.cc"
 Table t;
 static std::string LINE_FORMAT = "";
 std::string FinalNode::trans() const{

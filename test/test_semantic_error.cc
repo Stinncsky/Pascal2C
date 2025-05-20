@@ -50,7 +50,7 @@ void test_type_mismatch() {
 }
 void test_array_index_negative() {
     clear_table();
-    std::vector<int> dim = {1,8};
+    std::vector<int> dim = {1};
     t.table[*a] = std::make_tuple(ID_INT, std::vector<int>{}, dim);
     // 直接使用声明头文件中的节点
     try {
@@ -60,7 +60,7 @@ void test_array_index_negative() {
 }
 void test_array_dimension_mismatch() {
     clear_table();
-    std::vector<int> dim = {1,8,1,8};
+    std::vector<int> dim = {1,1};
     t.table[*a] = std::make_tuple(ID_INT, std::vector<int>{}, dim);
     // 直接使用声明头文件中的节点
     try {
