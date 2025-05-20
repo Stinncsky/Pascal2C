@@ -142,7 +142,7 @@ ProgramStructNode* program_struct = new ProgramStructNode(program_head, program_
 // 
 ProcedureCallNode* proc_call = new ProcedureCallNode(p, expression_list_multi); // Pascal: p(3, 3)
 // test_type_mismatch 用到 b_char
-StatementNode* stmt = new StatementNode(variable_a, new ExpressionNode(new SimpleExpressionNode(new TermNode(new FactorNode(b_char))))); // Pascal: a := 'b';
+StatementNode* stmt = new StatementNode(variable_a, new ExpressionNode(new SimpleExpressionNode(new TermNode(new FactorNode(variable_b))))); // Pascal: a := 'b';
 // Pascal: a[-1] := 3; // 数组下标为负数
 FinalNode* minus_one = new FinalNode(Token("-1", TokenType::Number)); // Pascal: -1
 ExpressionNode* expr_minus_one = new ExpressionNode(new SimpleExpressionNode(new TermNode(new FactorNode(minus_one)))); // Pascal: -1

@@ -399,6 +399,7 @@ std::string StatementNode::trans() const {
             std::string exp = this->expression->trans();
             size_t space_pos = exp.find(' ');
             auto exp_kind = exp.substr(space_pos);
+            exp_kind = " " + exp_kind.substr(exp_kind.find('%'));
             std::string id_kind;
             if(exp[exp.size() - 1] == ')'){
                 exp = exp.substr(0, space_pos) + ")";

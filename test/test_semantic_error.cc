@@ -42,6 +42,7 @@ void test_function_arg_type_mismatch() {
 void test_type_mismatch() {
     clear_table();
     t.table[*a] = std::make_tuple(ID_INT, std::vector<int>{}, std::vector<int>{});
+    t.table[*b] = std::make_tuple(ID_CHAR, std::vector<int>{}, std::vector<int>{});
     // 直接使用声明头文件中的节点
     try {
         stmt->trans();
