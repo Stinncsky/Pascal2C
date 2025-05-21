@@ -895,11 +895,11 @@ std::string ExpressionNode::trans() const {
         std::string simple_expr = this->simple_expression->trans();
         size_t simple_expr_space_pos = simple_expr.find(' ');
         std::string simple_expr_content = simple_expr.substr(0, simple_expr_space_pos);
-        std::string simple_expr_kind = simple_expr.substr(simple_expr_space_pos + 1);
+        std::string simple_expr_kind = simple_expr.substr(simple_expr.size() - 2);
         std::string simple_expr_2 = this->simple_expression_2->trans();
         size_t simple_expr_2_space_pos = simple_expr_2.find(' ');
         std::string simple_expr_2_content = simple_expr_2.substr(0, simple_expr_2_space_pos);
-        std::string simple_expr_2_kind = simple_expr_2.substr(simple_expr_2_space_pos + 1);
+        std::string simple_expr_2_kind = simple_expr_2.substr(simple_expr_2.size() - 2);
         std::string kind = "%d";
         // 两边的类型检查
         op_type_check(this->relop->token.line, this->relop->token.column, simple_expr_kind, simple_expr_2_kind);
@@ -915,11 +915,11 @@ std::string SimpleExpressionNode::trans() const {
         std::string term_expr = this->term->trans();
         size_t term_space_pos = term_expr.find(' ');
         std::string term_content = term_expr.substr(0, term_space_pos);
-        std::string term_kind = term_expr.substr(term_space_pos + 1);
+        std::string term_kind = term_expr.substr(term_expr.size() - 2);
         std::string simple_expr = this->simple_expression->trans();
         size_t simple_expr_space_pos = simple_expr.find(' ');
         std::string simple_expr_content = simple_expr.substr(0, simple_expr_space_pos);
-        std::string simple_expr_kind = simple_expr.substr(simple_expr_space_pos + 1);
+        std::string simple_expr_kind = simple_expr.substr(simple_expr.size() - 2);
         std::string kind = "";
         std::string res_num = "";
         if (op == "+" || op == "-") {
@@ -956,11 +956,11 @@ std::string TermNode::trans() const {
         std::string term_expr = this->term->trans();
         size_t term_space_pos = term_expr.find(' ');
         std::string term_content = term_expr.substr(0, term_space_pos);
-        std::string term_kind = term_expr.substr(term_space_pos + 1);
+        std::string term_kind = term_expr.substr(term_expr.size() - 2);
         std::string factor_expr = this->factor->trans();
         size_t factor_space_pos = factor_expr.find(' ');
         std::string factor_content = factor_expr.substr(0, factor_space_pos);
-        std::string factor_kind = factor_expr.substr(factor_space_pos + 1);
+        std::string factor_kind = factor_expr.substr(factor_expr.size() - 2);
         std::string kind = "";
         std::string res_num = "";
         std::string op = this->mulop->trans(); // * / % &&
