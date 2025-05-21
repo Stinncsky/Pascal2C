@@ -13,6 +13,11 @@ begin
   typeerr := p;
 end;
 
+function f(var x: integer): integer;
+begin
+  f := x;
+end;
+
 begin
   func(a);
   func(1, 2);
@@ -20,4 +25,6 @@ begin
 
   typeerr(1, 2);
   typeerr(a, 1.0);
+
+  f(1);
 end.
