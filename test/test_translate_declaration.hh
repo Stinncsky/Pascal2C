@@ -158,7 +158,28 @@ ExpressionListNode* expr_list_three = new ExpressionListNode(expr_three); // Pas
 IdVarpartNode* id_varpart_three = new IdVarpartNode(expr_list_three); // Pascal: a[3]
 VariableNode* arr_var_three = new VariableNode(a, id_varpart_three); // Pascal: a[3]
 StatementNode* stmt_arr_three = new StatementNode(arr_var_three, expression_num); // Pascal: a[3] := 3;
+// Pascal: a < b; // 关系运算符两边类型不匹配
+ExpressionNode* expr_a = new ExpressionNode(new SimpleExpressionNode(new TermNode(new FactorNode(variable_a))));
+ExpressionNode* expr_b = new ExpressionNode(new SimpleExpressionNode(new TermNode(new FactorNode(variable_b))));
+ExpressionNode* expr_a_lt_b = new ExpressionNode(
+    new SimpleExpressionNode(new TermNode(new FactorNode(variable_a))),
+    relop_lt,
+    new SimpleExpressionNode(new TermNode(new FactorNode(variable_b)))
+); // Pascal: a < b
 
+// Pascal: a + b; // 加减运算符两边类型不匹配
+SimpleExpressionNode* simple_expr_a_plus_b = new SimpleExpressionNode(
+    new TermNode(new FactorNode(variable_a)),
+    new SimpleExpressionNode(new TermNode(new FactorNode(variable_b))),
+    addop_plus
+); // Pascal: a + b
+
+// Pascal: a * b; // 乘除运算符两边类型不匹配
+TermNode* term_a_mul_b = new TermNode(
+    new FactorNode(variable_a),
+    new TermNode(new FactorNode(variable_b)),
+    mulop
+); // Pascal: a * b
 // ================== 工具函数和全局变量 ==================
 extern Table t;
 void clear_table() { t.table.clear(); t.now_funcid = nullptr; }

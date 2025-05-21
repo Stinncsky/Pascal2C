@@ -626,6 +626,12 @@ static void type_is_match(const int& line, const int& col,const std::string& kin
         }
     }
 }
+
+static void op_type_check(const int& line, const int& col, const std::string& kind_1, const std::string& kind_2){
+    if (kind_1 != kind_2) {
+        fprintf(stderr, "Warning: In line %d column %d, op type mismatch\n", line, col);
+    }
+}
 bool isInteger(const std::string& str) {
     // TODO: 目前不充分的考量，只要不是小数常量就认为是整数，变量也被允许
     if(str.empty()) return false;
@@ -804,6 +810,7 @@ std::string ProcedureCallNode::trans() const {
         int arg_num = cites.size();
         int k = 0; // 正在判断第k个expression要不要加&
         std::string expr = "";
+        std::string last_expr = "";
         size_t del_pos = expr_list.find(",");
         while(del_pos != std::string::npos) {
             expr += expr_list.substr(0, del_pos);
@@ -831,6 +838,7 @@ std::string ProcedureCallNode::trans() const {
             // 参数类型检测
             type_is_match(this->id->token.line, this->id->token.column, arg_kind[k], cites.at(k));
             res += expr + ",";
+            last_expr = expr;
             expr = "";
             k++;
             expr_list.erase(0,del_pos + 1);
@@ -849,7 +857,7 @@ std::string ProcedureCallNode::trans() const {
         }
         if (cites.at(k) >= CITE) {
             res += "&";
-            if(!is_var(expr)){ // 如果传引用调用不为变量
+            if(!is_var(last_expr)){ // 如果传引用调用不为变量
                 Token error_token = this->id->token;
                 fprintf(stderr, "Error: In line %d column %d, The parameters of a reference call must be variables\n", error_token.line, error_token.column);
             }
@@ -892,11 +900,9 @@ std::string ExpressionNode::trans() const {
         size_t simple_expr_2_space_pos = simple_expr_2.find(' ');
         std::string simple_expr_2_content = simple_expr_2.substr(0, simple_expr_2_space_pos);
         std::string simple_expr_2_kind = simple_expr_2.substr(simple_expr_2_space_pos + 1);
-        std::string kind = "";
-        if (simple_expr_kind == "%f" || simple_expr_2_kind == "%f") // error: 这里应该都是%d，因为返回值是一个等式或不等式的布尔判断结果
-            kind = "%f";
-        else
-            kind = "%d";
+        std::string kind = "%d";
+        // 两边的类型检查
+        op_type_check(this->relop->token.line, this->relop->token.column, simple_expr_kind, simple_expr_2_kind);
         return simple_expr_content + op + simple_expr_2_content + " " + kind; // eg: "a==1*2+1*2 %d"
     }
 }
@@ -932,6 +938,8 @@ std::string SimpleExpressionNode::trans() const {
         }
         else
             kind = "%d";
+        // 检查term和simple_expr的类型是否匹配
+        op_type_check(this->addop->token.line, this->addop->token.column, term_kind, simple_expr_kind);
         if (term_content != "" && term_content.substr(0, 1) == op)
             return simple_expr_content + op + "(" + term_content + ") " + kind;
         if (res_num == "")
@@ -972,6 +980,8 @@ std::string TermNode::trans() const {
         }
         else
             kind = "%d";
+        // 检查term和factor的类型是否匹配
+        op_type_check(this->mulop->token.line, this->mulop->token.column, term_kind, factor_kind);
         // return term_content + this->mulop->trans() + factor_content + " " + kind;
         if (res_num == "")
             return term_content + op + factor_content + " " + kind;
@@ -1005,6 +1015,7 @@ std::string FactorNode::trans() const {
     else if (this->kind == 4) { // 找到每一个空格，从空格开始到逗号前的部分都去掉
         std::string expr_list = this->expression_list->trans();
         std::string expr = "";
+        std::string last_expr = "";
         std::string temp = "";
         std::vector<std::string> arg_kind;
         size_t space_pos = expr_list.find(' ');
@@ -1060,6 +1071,7 @@ std::string FactorNode::trans() const {
             // 参数类型检查
             type_is_match(this->id->token.line, this->id->token.column, arg_kind[k], cites.at(k));
             res += expr + ",";
+            last_expr = expr;
             expr = "";
             k++;
             expr_list.erase(0,del_pos + 1);
@@ -1079,7 +1091,7 @@ std::string FactorNode::trans() const {
         }
         if (cites.at(k) >= CITE) {
             res += "&";
-            if(!is_var(expr)){ // 如果传引用调用不为变量
+            if(!is_var(last_expr)){ // 如果传引用调用不为变量
                 Token error_token = this->id->token;
                 fprintf(stderr, "Error: In line %d column %d, The parameters of a reference call must be variables\n", error_token.line, error_token.column);
             }

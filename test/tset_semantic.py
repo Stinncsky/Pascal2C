@@ -31,7 +31,7 @@ stderr_output = result.stderr.strip()
 # 统计错误输出条数（以换行分割）
 err_lines = [line for line in stderr_output.split('\n') if line.strip()]
 
-EXPECTED_ERROR_COUNT = 7  # 预期语义错误数
+EXPECTED_ERROR_COUNT = 11  # 预期语义错误数
 
 if len(err_lines) >= EXPECTED_ERROR_COUNT:
     print(f"[PASS] 语义错误分析检测通过，捕获到 {len(err_lines)} 条错误输出。")
