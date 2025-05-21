@@ -758,10 +758,13 @@ static bool is_expr(std::string s) {
 
 bool is_var(std::string s) {
     if (s.empty()) return false;
-    if (!(std::isalpha(s[0]) || s[0] == '_')) return false;
+    if (!(std::isalpha(s[0]) || s[0] == '_' || s[0] == '*' || s[0] == '(')) return false;
     for (size_t i = 1; i < s.size(); ++i) {
-        if (!(std::isalnum(s[i]) || s[i] == '_')) {
+        if (!(std::isalnum(s[i]) || s[i] == '_' || s[i] == '*' || s[i] == '[' || s[i] == ']' || s[i] == '(' || s[i] == ')')) {
             return false;
+        }
+        else if(s[i] == '['){
+            return true; // 表达式出现在数组偏移量当中，不一定非法变量
         }
     }
     return true;
@@ -857,6 +860,8 @@ std::string ProcedureCallNode::trans() const {
         }
         if (cites.at(k) >= CITE) {
             res += "&";
+            if(k == 0)
+                last_expr = expr_list;
             if(!is_var(last_expr)){ // 如果传引用调用不为变量
                 Token error_token = this->id->token;
                 fprintf(stderr, "Error: In line %d column %d, The parameters of a reference call must be variables\n", error_token.line, error_token.column);
@@ -1091,6 +1096,8 @@ std::string FactorNode::trans() const {
         }
         if (cites.at(k) >= CITE) {
             res += "&";
+            if(k == 0)
+                last_expr = expr_list;
             if(!is_var(last_expr)){ // 如果传引用调用不为变量
                 Token error_token = this->id->token;
                 fprintf(stderr, "Error: In line %d column %d, The parameters of a reference call must be variables\n", error_token.line, error_token.column);

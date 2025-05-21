@@ -121,7 +121,7 @@ begin
   write(a, b, c, d, e);
 end;
 
-function funcall(a, b, c, d, e: integer): real;
+function funcall(a, b, c, d, e: integer): integer;
 begin
   funcall := a + b + c + d + e;
 end;
@@ -203,7 +203,7 @@ begin
   varproc(a, a);
   tmp := varfunc(a, a);
 
-  f := funcall(a, b[1], bx[1, 2], tmp, input);
+  a := funcall(a, b[1], bx[1, 2], tmp, input);
   write(f);
 
   a := 2;
@@ -217,13 +217,13 @@ begin
   func(a);
   a := (func(func(func(a))));
   aaa(bbb(ccc(5), ccc(5)));
-  bbb(a, a);
+  bbb(f, f);
   bbb(ccc(5), ccc(5));
   ccc(5);
 
   a := func(funcall(a, a, a, a, a));
-  a := func(funcall(a, bbb(a, a), a, a, a));
-  func(funcall(a, bbb(a, a), a, a, a));
+  a := func(funcall(a, bbb(f, f), a, a, a));
+  func(funcall(a, bbb(f, f), a, a, a));
 
   typetest(f, f);
   write(readfunc);

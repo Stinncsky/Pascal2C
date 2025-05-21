@@ -9,7 +9,7 @@ end;
 
 function typeerr(p: real; q: integer): integer;
 begin
-  p := p - 1;
+  p := p - 1.0;
   typeerr := p;
 end;
 
@@ -27,4 +27,5 @@ begin
   typeerr(a, 1.0);
 
   f(1);
+  f(a + 2);
 end.
