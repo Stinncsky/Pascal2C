@@ -2,8 +2,9 @@
 #include <algorithm>
 
 #include "AST.cc"
+#include "test/output_AST.cc"
 Table t;
-std::string LINE_FORMAT = "";
+static std::string LINE_FORMAT = "";
 std::string FinalNode::trans() const{
     switch(this->token.type){
         case TokenType::Number:
@@ -81,6 +82,7 @@ std::string ProgramBodyNode::trans() const{
     LINE_FORMAT += "\t";
     std::string main_func_body = this->compound_statement->trans();
     res += "{\n" + main_func_body + LINE_FORMAT + "return 0;\n}";
+    LINE_FORMAT = LINE_FORMAT.substr(0, LINE_FORMAT.size()-1);
     return res;
 }
 
@@ -94,6 +96,10 @@ std::string IdListNode::trans(const std::string type, const std::string tmp, con
         res += this->id_list->trans(type, tmp, end, dim, is_cite, func_p_is_cite);
     }
     res += LINE_FORMAT + type + this->id->trans() + tmp + end;
+    // if (!t.table.count(*this->id)) { // 如果当前变量未声明过
+    //     Token error_token = this->id->token;
+    //     fprintf(stderr, "Error: In line %d column %d, the identifier is not defined yet\n", error_token.line, error_token.column);
+    // }
     if (is_cite){
         if (type == "int *"){
             t.table[*(this->id)] = std::make_tuple(ID_INT, std::vector<int>(1,CITE), *dim);
@@ -137,6 +143,10 @@ std::string ConstDeclarationNode::trans() const{
     }
     res += "const ";
     int type = 0;
+    // if (!t.table.count(*this->id)) { // 如果当前变量未声明过
+    //     Token error_token = this->id->token;
+    //     fprintf(stderr, "Error: In line %d column %d, the identifier is not defined yet\n", error_token.line, error_token.column);
+    // }
     if (this->const_value->numletter->token.type == TokenType::Number){
         if (this->const_value->numletter->token.property.find(".") != std::string::npos){
             res += "float ";
@@ -323,6 +333,10 @@ std::string SubprogramBodyNode::trans() const {
     std::string constDecl = this->const_declarations->trans();
     std::string varDecl = this->var_declarations->trans();
     std::string com_state = this->compound_statement->trans();
+    // if (!t.table.count(*t.now_funcid)) { // 如果当前变量未声明过
+    //     Token error_token = t.now_funcid->token;
+    //     fprintf(stderr, "Error: In line %d column %d, the identifier is not defined yet\n", error_token.line, error_token.column);
+    // }
     if (t.now_funcid != nullptr && std::get<0>(t.table[*t.now_funcid]) != FUNC_VOID) {
         std::string ret_type;
         if (std::get<0>(t.table[*t.now_funcid]) == FUNC_INT) {
@@ -367,6 +381,10 @@ std::string StatementNode::trans() const {
             Token error_token = this->variable->id->token;
             fprintf(stderr, "Error: In line %d column %d, string assignment error\n", error_token.line, error_token.column);
         }
+        if (var_kind != exp_kind) { // 如果赋值符号两边类型不一致
+            Token error_token = this->variable->id->token;
+            fprintf(stderr, "Warning: In line %d column %d, type mismatch\n", error_token.line, error_token.column);
+        }
         return LINE_FORMAT + var + " = " + exp + ";\n";
     }
     else if (this->kind == 3){
@@ -380,12 +398,35 @@ std::string StatementNode::trans() const {
             std::string id_str = this->id->trans();
             std::string exp = this->expression->trans();
             size_t space_pos = exp.find(' ');
+            auto exp_kind = exp.substr(space_pos);
+            exp_kind = " " + exp_kind.substr(exp_kind.find('%'));
+            std::string id_kind;
             if(exp[exp.size() - 1] == ')'){
                 exp = exp.substr(0, space_pos) + ")";
             } else {
                 exp = exp.substr(0, space_pos);
             }
+            if (!t.table.count(*this->id)) { // 如果当前变量未声明过
+                Token error_token = this->id->token;
+                fprintf(stderr, "Error: In line %d column %d, the identifier is not defined yet\n", error_token.line, error_token.column);
+            }
             auto info = t.table[*id];
+            if (std::get<0>(info) == ID_INT) {
+                id_kind = " %d";
+            }
+            else if (std::get<0>(info) == ID_FLOAT) {
+                id_kind = " %f";
+            }
+            else if (std::get<0>(info) == ID_CHAR) {
+                id_kind = " %c";
+            }
+            else if (std::get<0>(info) == ID_STRING) {
+                id_kind = " %s";
+            }
+            if (id_kind != exp_kind) { // 如果赋值符号两边类型不一致
+                Token error_token = this->id->token;
+                fprintf(stderr, "Warning: In line %d column %d, type mismatch\n", error_token.line, error_token.column);
+            }
             if (!std::get<1>(info).empty() && std::get<1>(info).back() >= CITE)
                 id_str = "(*" + id_str + ")";
             return LINE_FORMAT + id_str + " = " + exp + ";\n";
@@ -532,13 +573,25 @@ std::string VariableListNode::trans() const {
 }
 
 bool isInteger(const std::string& str) {
-    // TODO: 目前不充分的考量，只要不是小数常量就认为是整数
+    // TODO: 目前不充分的考量，只要不是小数常量就认为是整数，变量也被允许
     if(str.empty()) return false;
     if(std::find(str.begin(), str.end(), '.') != str.end()) return false;
     return true;
 }
 
+bool is_int(const std::string& str) {
+    // TODO: 判断是否为纯粹的整数，而不是变量
+    if (str[0] != '+' && str[0] != '-' && !isdigit(str[0])) return false;
+    for (std::string::size_type i = 1; i < str.length(); i++)
+        if (!isdigit(str[i])) return false;
+    return true;
+}
+
 std::string VariableNode::trans() const {
+    if (!t.table.count(*this->id)) { // 如果当前变量未声明过
+        Token error_token = this->id->token;
+        fprintf(stderr, "Error: In line %d column %d, the identifier is not defined yet\n", error_token.line, error_token.column);
+    }
     auto info = t.table[*id];
     std::string res = this->id->trans();
     std::string raw_index = this->id_varpart->trans();
@@ -546,21 +599,35 @@ std::string VariableNode::trans() const {
     size_t space_pos = raw_index.find(' ');
     while (space_pos != std::string::npos) {
         int start_i = std::get<2>(info)[i];
-        if (!(isInteger(raw_index.substr(0, space_pos)))) { // 如果索引不为整数
+        std::string raw_index_content = raw_index.substr(0, space_pos);
+        if (!(isInteger(raw_index_content))) { // 如果索引不为整数
             Token error_token = this->id->token;
             fprintf(stderr, "Error: In line %d column %d, index of array is not integer\n", error_token.line, error_token.column);
         }
         std::string index = "";
-        if (start_i > 0)
-            index = raw_index.substr(0, space_pos) + "-" + std::to_string(start_i);
-        else if (start_i < 0)
-            index = raw_index.substr(0, space_pos) + "+" + std::to_string(-start_i);
-        else
-            index = raw_index.substr(0, space_pos);
+        if (is_int(raw_index_content)) {
+            index = std::to_string(std::stoi(raw_index_content) - start_i);
+            if (index[0] == '-') { // 如果数组下标为负数
+                Token error_token = this->id->token;
+                fprintf(stderr, "Error: In line %d column %d, index of array is out of range\n", error_token.line, error_token.column);
+            }
+        }
+        else {
+            if (start_i > 0)
+                index = raw_index_content + "-" + std::to_string(start_i);
+            else if (start_i < 0)
+                index = raw_index_content + "+" + std::to_string(-start_i);
+            else
+                index = raw_index_content;
+        }
         res += "[" + index + "]";
         i++;
         raw_index.erase(0, space_pos + 1);
         space_pos = raw_index.find(' ');
+    }
+    if (i != int(std::get<2>(info).size())) { // 如果数组维度不匹配
+        Token error_token = this->id->token;
+        fprintf(stderr, "Error: In line %d column %d, the dimensions of the arrays do not match\n", error_token.line, error_token.column);
     }
     if (std::get<0>(info) == ID_INT) {
         res += " %d";
@@ -614,7 +681,7 @@ std::string IdVarpartNode::trans() const {
             space_pos = expr_list.find(' ');
         }
         return res;
-        // eg: 1 2 3(相当于[1][2][3])
+        // eg: 1 2 3 (相当于[1][2][3])
     }
 }
 
@@ -630,8 +697,13 @@ static bool is_expr(std::string s) {
 }
 
 std::string ProcedureCallNode::trans() const {
-    if (this->expression_list == nullptr)
+    if (this->expression_list == nullptr) {
+        if (!t.table.count(*this->id)) { // 如果当前函数未声明过
+            Token error_token = this->id->token;
+            fprintf(stderr, "Error: In line %d column %d, the identifier is not defined yet\n", error_token.line, error_token.column);
+        }
         return this->id->trans() + "()";
+    }
     else { // 找到每一个空格，从空格开始到逗号前的部分都去掉
         std::string expr_list = this->expression_list->trans();
         std::string expr1 = "";
@@ -655,6 +727,10 @@ std::string ProcedureCallNode::trans() const {
         }
         if (temp[int(temp.size()) - 1] == ',') temp.erase(int(temp.size()) - 1);
         expr_list = temp;
+        if (!t.table.count(*this->id)) { // 如果当前函数未声明过
+            Token error_token = this->id->token;
+            fprintf(stderr, "Error: In line %d column %d, the identifier is not defined yet\n", error_token.line, error_token.column);
+        }
         auto info = t.table[*id];
         std::string res = this->id->trans() + "(";
         std::vector<int> cites = std::get<1>(t.table[*this->id]);
@@ -673,8 +749,10 @@ std::string ProcedureCallNode::trans() const {
             if(k >= arg_num - 1){
                 Token error_token = this->id->token;
                 fprintf(stderr, "Error: In line %d column %d, Too many arguments in function call\n", error_token.line, error_token.column);
-                expr += ")";
-                return res + expr;
+                if(arg_num == 0 && k == 0)
+                    return res + ")";
+                else
+                    return res + expr + ")";
             }
             if (cites.at(k) >= CITE)
                 res += "&";
@@ -685,8 +763,15 @@ std::string ProcedureCallNode::trans() const {
             del_pos = expr_list.find(",");
         }
         if (k + 1 != arg_num) {
-            Token error_token = this->id->token;
-            fprintf(stderr, "Error: In line %d column %d, function call argument number error. %d expected, %d given\n", error_token.line, error_token.column, arg_num, k + 1);
+            if(arg_num == 0 && k == 0){
+                Token error_token = this->id->token;
+                fprintf(stderr, "Error: In line %d column %d, Too many arguments in function call\n", error_token.line, error_token.column);
+                return res + ")";
+            }
+            else{
+                Token error_token = this->id->token;
+                fprintf(stderr, "Error: In line %d column %d, function call argument number error. %d expected, %d given\n", error_token.line, error_token.column, arg_num, k + 1);
+            }
         }
         if (cites.at(k) >= CITE)
             res += "&";
@@ -749,6 +834,7 @@ std::string SimpleExpressionNode::trans() const {
         std::string simple_expr_content = simple_expr.substr(0, simple_expr_space_pos);
         std::string simple_expr_kind = simple_expr.substr(simple_expr_space_pos + 1);
         std::string kind = "";
+        std::string res_num = "";
         if (op == "+" || op == "-") {
             if (term_kind == "%f" || simple_expr_kind == "%f") // error: 这里应该按符号具体判断种类，可能会有错误处理
                 kind = "%f";
@@ -756,12 +842,21 @@ std::string SimpleExpressionNode::trans() const {
                 kind = "%d";
             else
                 kind = "%c";
+            if (is_int(simple_expr_content) && is_int(term_content)) {
+                if (op == "+")
+                    res_num = std::to_string(std::stoi(simple_expr_content) + std::stoi(term_content));
+                else
+                    res_num = std::to_string(std::stoi(simple_expr_content) - std::stoi(term_content));
+            }
         }
         else
             kind = "%d";
         if (term_content != "" && term_content.substr(0, 1) == op)
             return simple_expr_content + op + "(" + term_content + ") " + kind;
-        return simple_expr_content + op + term_content + " " + kind;
+        if (res_num == "")
+            return simple_expr_content + op + term_content + " " + kind;
+        else
+            return res_num  + " " + kind;
     }
 }
 
@@ -778,6 +873,7 @@ std::string TermNode::trans() const {
         std::string factor_content = factor_expr.substr(0, factor_space_pos);
         std::string factor_kind = factor_expr.substr(factor_space_pos + 1);
         std::string kind = "";
+        std::string res_num = "";
         std::string op = this->mulop->trans(); // * / % &&
         if (op == "*" || op == "/") {
             if (term_kind == "%f" || factor_kind == "%f") // error: 这里应该按符号具体判断种类，可能会有错误处理
@@ -786,11 +882,20 @@ std::string TermNode::trans() const {
                 kind = "%d";
             else
                 kind = "%c";
+            if (is_int(term_content) && is_int(factor_content)) {
+                if (op == "*")
+                    res_num = std::to_string(std::stoi(term_content) * std::stoi(factor_content));
+                else
+                    res_num = std::to_string(std::stoi(term_content) / std::stoi(factor_content));
+            }
         }
         else
             kind = "%d";
         // return term_content + this->mulop->trans() + factor_content + " " + kind;
-        return term_content + op + factor_content + " " + kind;
+        if (res_num == "")
+            return term_content + op + factor_content + " " + kind;
+        else
+            return res_num  + " " + kind;
         // eg: "1 * 2 %d" -> "1*2 %d"
     }
 }
@@ -856,7 +961,10 @@ std::string FactorNode::trans() const {
             if(k >= arg_num - 1){
                 Token error_token = this->id->token;
                 fprintf(stderr, "Error: In line %d column %d, Too many arguments in function call\n", error_token.line, error_token.column);
-                res += expr + ")";
+                if(arg_num == 0 && k == 0)
+                    res += ")";
+                else
+                    res += expr + ")";
                 goto ret_kind_check;
             }
             if (cites.at(k) >= CITE)
@@ -868,14 +976,26 @@ std::string FactorNode::trans() const {
             del_pos = expr_list.find(",");
         }
         if (k + 1 != arg_num) {
-            Token error_token = this->id->token;
-            fprintf(stderr, "Error: In line %d column %d, function call argument number error. %d expected, %d given\n", error_token.line, error_token.column, arg_num, k + 1);
+            if (arg_num == 0 && k == 0){
+                res += ")";
+                Token error_token = this->id->token;
+                fprintf(stderr, "Error: In line %d column %d, Too many arguments in function call\n", error_token.line, error_token.column);
+                goto ret_kind_check;
+            }
+            else{
+                Token error_token = this->id->token;
+                fprintf(stderr, "Error: In line %d column %d, function call argument number error. %d expected, %d given\n", error_token.line, error_token.column, arg_num, k + 1);
+            }
         }
         if (cites.at(k) >= CITE)
             res += "&";
         res += expr + expr_list + ")";
         // 判断函数返回值类型
         ret_kind_check:
+        if (!t.table.count(*this->id)) { // 如果当前变量未声明过
+            Token error_token = this->id->token;
+            fprintf(stderr, "Error: In line %d column %d, the identifier is not defined yet\n", error_token.line, error_token.column);
+        }
         auto info = t.table[*id];
         std::string kind = "";
         if (std::get<0>(info) == ID_INT) {

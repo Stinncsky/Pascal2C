@@ -54,9 +54,10 @@ ProgramStructNode: ProgramHeadNode SEMI ProgramBodyNode DOT {
         yychar = yylex();
     }
     $$ = nullptr; 
-} | ProgramHeadNode ProgramBodyNode error {
-    syntax->tree = new ProgramStructNode(dynamic_cast<ProgramHeadNode*>($1), dynamic_cast<ProgramBodyNode*>($2));
+} | ProgramHeadNode SEMI ProgramBodyNode error {
+    syntax->tree = new ProgramStructNode(dynamic_cast<ProgramHeadNode*>($1), dynamic_cast<ProgramBodyNode*>($3));
     yyerror("Expected '.' at the end of the program");
+    yyerrok;
 }
 
 ProgramHeadNode: PROGRAM ID {
@@ -199,16 +200,20 @@ TypeNode:
     | ARRAY LBRA PeriodNode RBRA OF BasicTypeNode {
         $$ = new TypeNode(dynamic_cast<BasicTypeNode*>($6), dynamic_cast<PeriodNode*>($3));
     } | error LBRA PeriodNode RBRA OF BasicTypeNode {
+        $$ = new TypeNode(dynamic_cast<BasicTypeNode*>($6), dynamic_cast<PeriodNode*>($3));
         yyerror_at("Expected 'array' keyword", $2->line, $2->column, $2);
         yyerrok;
     } | ARRAY error PeriodNode RBRA OF BasicTypeNode {
+        $$ = new TypeNode(dynamic_cast<BasicTypeNode*>($6), dynamic_cast<PeriodNode*>($3));
         yyerror_at("Expected '['", $4->line, $4->column, $4);
         yyerrok;
     } | ARRAY LBRA PeriodNode error OF BasicTypeNode {
+        $$ = new TypeNode(dynamic_cast<BasicTypeNode*>($6), dynamic_cast<PeriodNode*>($3));
         yyerror_at("Expected ']'", $5->line, $5->column, $5);
         yyerrok;
     } | ARRAY LBRA PeriodNode RBRA error BasicTypeNode {
         yyerror("Expected 'of'");
+        $$ = new TypeNode(dynamic_cast<BasicTypeNode*>($6), dynamic_cast<PeriodNode*>($3));
         yyerrok;
     } 
 
@@ -327,18 +332,28 @@ SubprogramHeadNode: PROCEDURE ID FormalParameterNode {
     FinalNode* id = new FinalNode(*$2);
     $$ = new SubprogramHeadNode(id, dynamic_cast<FormalParameterNode*>($3), dynamic_cast<BasicTypeNode*>($5));
 } | error ID FormalParameterNode {
+    FinalNode* id = new FinalNode(*$2);
+    $$ = new SubprogramHeadNode(id, dynamic_cast<FormalParameterNode*>($3));
     yyerror_at("Expected 'procedure' before ID", $2->line, $2->column, $2);
     yyerrok;
 } | PROCEDURE error FormalParameterNode {
+    FinalNode* id = new FinalNode(*$1);
+    $$ = new SubprogramHeadNode(id, dynamic_cast<FormalParameterNode*>($3));
     yyerror("Expected 'ID' after 'procedure' keyword");
     yyerrok;
 } | error ID FormalParameterNode COLON BasicTypeNode {
+    FinalNode* id = new FinalNode(*$2);
+    $$ = new SubprogramHeadNode(id, dynamic_cast<FormalParameterNode*>($3), dynamic_cast<BasicTypeNode*>($5));
     yyerror_at("Expected 'procedure' before ID", $2->line, $2->column, $2);
     yyerrok;
 } | FUNCTION error FormalParameterNode COLON BasicTypeNode {
+    FinalNode* id = new FinalNode(*$1);
+    $$ = new SubprogramHeadNode(id, dynamic_cast<FormalParameterNode*>($3), dynamic_cast<BasicTypeNode*>($5));
     yyerror("Expected 'ID' after 'function' keyword");
     yyerrok;
 } | FUNCTION ID FormalParameterNode error BasicTypeNode {
+    FinalNode* id = new FinalNode(*$2);
+    $$ = new SubprogramHeadNode(id, dynamic_cast<FormalParameterNode*>($3), dynamic_cast<BasicTypeNode*>($5));
     yyerror("Expected ':' after 'function' keyword");
     yyerrok;
 } 

@@ -24,7 +24,7 @@ for pas_file in pas_files:
         result = subprocess.run(["main.exe", "-ii", input_file], 
                               capture_output=True, text=True, check=False)
 
-        if result.returncode != 0 or result.stderr:
+        if result.returncode != 0 or (result.stderr and "error" in result.stderr.lower()):
             print(f"处理{input_file}时出错: returncode = {result.returncode}")
             print(result.stderr)
             print(result.stdout)
