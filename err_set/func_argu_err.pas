@@ -7,8 +7,17 @@ begin
   func := p;
 end;
 
+function typeerr(p: real; q: integer): integer;
+begin
+  p := p - 1;
+  typeerr := p;
+end;
+
 begin
   func(a);
   func(1, 2);
   func(1, 2, 3);
+
+  typeerr(1, 2);
+  typeerr(a, 1.0);
 end.

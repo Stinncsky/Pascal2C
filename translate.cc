@@ -2,7 +2,7 @@
 #include <algorithm>
 
 #include "AST.cc"
-#include "test/output_AST.cc"
+#include "output_AST.cc"
 Table t;
 static std::string LINE_FORMAT = "";
 std::string FinalNode::trans() const{
@@ -102,26 +102,40 @@ std::string IdListNode::trans(const std::string type, const std::string tmp, con
     // }
     if (is_cite){
         if (type == "int *"){
-            t.table[*(this->id)] = std::make_tuple(ID_INT, std::vector<int>(1,CITE), *dim);
+            t.table[*(this->id)] = std::make_tuple(ID_INT, std::vector<int>(1,CITE+ID_INT), *dim);
         } else if (type == "float *") {
-            t.table[*(this->id)] = std::make_tuple(ID_FLOAT, std::vector<int>(1,CITE), *dim);
+            t.table[*(this->id)] = std::make_tuple(ID_FLOAT, std::vector<int>(1,CITE+ID_FLOAT), *dim);
         } else if (type == "char *"){
-            t.table[*(this->id)] = std::make_tuple(ID_CHAR, std::vector<int>(1,CITE), *dim);
+            t.table[*(this->id)] = std::make_tuple(ID_CHAR, std::vector<int>(1,CITE+ID_STRING), *dim);
         }
     } else if (type == "int "){
-        t.table[*(this->id)] = std::make_tuple(ID_INT, std::vector<int>(1,0), *dim);
+        t.table[*(this->id)] = std::make_tuple(ID_INT, std::vector<int>(1,ID_INT), *dim);
     } else if (type == "float ") {
-        t.table[*(this->id)] = std::make_tuple(ID_FLOAT, std::vector<int>(1,0), *dim);
+        t.table[*(this->id)] = std::make_tuple(ID_FLOAT, std::vector<int>(1,ID_FLOAT), *dim);
     } else if (type == "char "){
-        t.table[*(this->id)] = std::make_tuple(ID_CHAR, std::vector<int>(1,0), *dim);
+        t.table[*(this->id)] = std::make_tuple(ID_CHAR, std::vector<int>(1,ID_CHAR), *dim);
     } else if (type == "string "){
-        t.table[*(this->id)] = std::make_tuple(ID_STRING, std::vector<int>(1,0), *dim);
+        t.table[*(this->id)] = std::make_tuple(ID_STRING, std::vector<int>(1,ID_STRING), *dim);
     }
     if (func_p_is_cite != nullptr){
         if (is_cite) {
-            func_p_is_cite->push_back(CITE);
+            if (type == "int *"){
+                func_p_is_cite->push_back(CITE+ID_INT);
+            } else if (type == "float *") {
+                func_p_is_cite->push_back(CITE+ID_FLOAT);
+            } else if (type == "char *"){
+                func_p_is_cite->push_back(CITE+ID_STRING);
+            }
         } else {
-            func_p_is_cite->push_back(0);
+            if (type == "int "){
+                func_p_is_cite->push_back(ID_INT);
+            } else if (type == "float ") {
+                func_p_is_cite->push_back(ID_FLOAT);
+            } else if (type == "char "){
+                func_p_is_cite->push_back(ID_CHAR);
+            } else if (type == "string "){
+                func_p_is_cite->push_back(ID_STRING);
+            }
         }
         
     }
@@ -572,6 +586,58 @@ std::string VariableListNode::trans() const {
         return this->variable->trans() + "," + this->variable_list->trans();
 }
 
+static std::string get_type(const int& type){
+    int real_type;
+    if (type >= CITE) {
+        real_type = type - CITE;
+    } else {
+        real_type = type;
+    }
+    if (real_type == ID_INT) {
+        return "int";
+    } else if (real_type == ID_FLOAT) {
+        return "float";
+    } else if (real_type == ID_CHAR) {
+        return "char";
+    } else if (real_type == ID_STRING) {
+        return "string";
+    }
+    return "";
+}
+
+static void type_is_match(const int& line, const int& col,const std::string& kind, const int& type){
+    int real_type;
+    if (type >= CITE) {
+        real_type = type - CITE;
+    } else {
+        real_type = type;
+    }
+    if (kind == "%d") {
+        if (real_type != ID_INT) {
+            if (real_type == ID_FLOAT) {
+                fprintf(stderr, "Warning: In line %d column %d, type mismatch, float expected, int given\n", line, col);
+            } else {
+                fprintf(stderr, "Error: In line %d column %d, type mismatch, %s expected, int given\n", line, col, get_type(real_type).c_str());
+            }
+        }
+    } else if (kind == "%f") {
+        if (real_type != ID_FLOAT) {
+            if (real_type == ID_INT) {
+                fprintf(stderr, "Warning: In line %d column %d, type mismatch, int expected, float given\n", line, col);
+            } else {
+                fprintf(stderr, "Error: In line %d column %d, type mismatch, %s expected, float given\n", line, col, get_type(real_type).c_str());
+            }
+        }
+    } else if (kind == "%c") {
+        if (real_type != ID_CHAR) {
+            fprintf(stderr, "Error: In line %d column %d, type mismatch, %s expected, char given\n", line, col, get_type(real_type).c_str());
+        }
+    } else if (kind == "%s") {
+        if (real_type != ID_STRING) {
+            fprintf(stderr, "Error: In line %d column %d, type mismatch, %s expected, char given\n", line, col, get_type(real_type).c_str());
+        }
+    }
+}
 bool isInteger(const std::string& str) {
     // TODO: 目前不充分的考量，只要不是小数常量就认为是整数，变量也被允许
     if(str.empty()) return false;
@@ -708,6 +774,7 @@ std::string ProcedureCallNode::trans() const {
         std::string expr_list = this->expression_list->trans();
         std::string expr1 = "";
         std::string temp = "";
+        std::vector<std::string> arg_kind;
         size_t space_pos = expr_list.find(' ');
         while (space_pos != std::string::npos) {
             expr1 += expr_list.substr(0, space_pos);
@@ -719,6 +786,7 @@ std::string ProcedureCallNode::trans() const {
             size_t del_pos = expr_list.find(',');
             temp += expr1 + ",";
             expr1 = "";
+            arg_kind.push_back(expr_list.substr(1, 2));
             if (del_pos != std::string::npos)
                 expr_list = expr_list.erase(0, del_pos + 1);
             else
@@ -756,6 +824,8 @@ std::string ProcedureCallNode::trans() const {
             }
             if (cites.at(k) >= CITE)
                 res += "&";
+            // 参数类型检测
+            type_is_match(this->id->token.line, this->id->token.column, arg_kind[k], cites.at(k));
             res += expr + ",";
             expr = "";
             k++;
@@ -775,6 +845,8 @@ std::string ProcedureCallNode::trans() const {
         }
         if (cites.at(k) >= CITE)
             res += "&";
+        // 参数类型检测
+        type_is_match(this->id->token.line, this->id->token.column, arg_kind[k], cites.at(k));
         res += expr + expr_list + ")";
         return res; // eg: f(a,&b)
     }
@@ -925,6 +997,7 @@ std::string FactorNode::trans() const {
         std::string expr_list = this->expression_list->trans();
         std::string expr = "";
         std::string temp = "";
+        std::vector<std::string> arg_kind;
         size_t space_pos = expr_list.find(' ');
         while (space_pos != std::string::npos) {
             expr += expr_list.substr(0, space_pos);
@@ -936,6 +1009,7 @@ std::string FactorNode::trans() const {
             size_t del_pos = expr_list.find(',');
             temp += expr + ",";
             expr = "";
+            arg_kind.push_back(expr_list.substr(1, 2));
             if (del_pos != std::string::npos)
                 expr_list = expr_list.erase(0, del_pos + 1);
             else
@@ -969,6 +1043,8 @@ std::string FactorNode::trans() const {
             }
             if (cites.at(k) >= CITE)
                 res += "&";
+            // 参数类型检查
+            type_is_match(this->id->token.line, this->id->token.column, arg_kind[k], cites.at(k));
             res += expr + ",";
             expr = "";
             k++;
@@ -989,6 +1065,8 @@ std::string FactorNode::trans() const {
         }
         if (cites.at(k) >= CITE)
             res += "&";
+        // 参数类型检查
+        type_is_match(this->id->token.line, this->id->token.column, arg_kind[k], cites.at(k));
         res += expr + expr_list + ")";
         // 判断函数返回值类型
         ret_kind_check:
