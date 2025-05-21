@@ -25,6 +25,7 @@ FinalNode* not_kw = new FinalNode(Token("not", TokenType::Keyword)); // Pascal: 
 FinalNode* uminus_op = new FinalNode(Token("-", TokenType::Operator)); // Pascal: -
 FinalNode* read_kw = new FinalNode(Token("read", TokenType::Keyword)); // Pascal: read
 FinalNode* write_kw = new FinalNode(Token("write", TokenType::Keyword)); // Pascal: write
+FinalNode* main_kw = new FinalNode(Token("main", TokenType::Keyword)); // Pascal: main
 
 // ================== 基本表达式节点 ==================
 FactorNode* factor_num_3 = new FactorNode(num_3); // Pascal: 3
@@ -134,9 +135,9 @@ SubprogramNode* subprogram_2 = new SubprogramNode(subprogram_head_2, subprogram_
 SubprogramDeclarationsNode* subprogram_declarations = new SubprogramDeclarationsNode(new SubprogramDeclarationsNode(new SubprogramDeclarationsNode(), subprogram), subprogram_2); // Pascal: 多个子程序声明
 
 // ================== Program 相关节点 ==================
-ProgramHeadNode* program_head = new ProgramHeadNode(a); // Pascal: program a
-ProgramBodyNode* program_body = new ProgramBodyNode(const_declarations_1, new VarDeclarationsNode(var_declaration), new SubprogramDeclarationsNode(), new CompoundStatementNode(new StatementListNode(statement_2))); // Pascal: const ...; var ...; begin a := 3; end
-ProgramStructNode* program_struct = new ProgramStructNode(program_head, program_body); // Pascal: program a; ...
+ProgramHeadNode* program_head = new ProgramHeadNode(main_kw); // Pascal: program main
+ProgramBodyNode* program_body = new ProgramBodyNode(new ConstDeclarationsNode(), new VarDeclarationsNode(new VarDeclarationNode(id_a_b,type_integer)), new SubprogramDeclarationsNode(), new CompoundStatementNode(new StatementListNode(statement_b_assign))); // Pascal:  var ...; begin b:=3; end
+ProgramStructNode* program_struct = new ProgramStructNode(program_head, program_body); // Pascal: program main; ...
 
 // ================== 语义错误相关声明 ==================
 // 
