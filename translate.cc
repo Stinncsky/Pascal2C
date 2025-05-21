@@ -96,10 +96,6 @@ std::string IdListNode::trans(const std::string type, const std::string tmp, con
         res += this->id_list->trans(type, tmp, end, dim, is_cite, func_p_is_cite);
     }
     res += LINE_FORMAT + type + this->id->trans() + tmp + end;
-    // if (!t.table.count(*this->id)) { // 如果当前变量未声明过
-    //     Token error_token = this->id->token;
-    //     fprintf(stderr, "Error: In line %d column %d, the identifier is not defined yet\n", error_token.line, error_token.column);
-    // }
     if (is_cite){
         if (type == "int *"){
             t.table[*(this->id)] = std::make_tuple(ID_INT, std::vector<int>(1,CITE+ID_INT), *dim);
@@ -157,10 +153,6 @@ std::string ConstDeclarationNode::trans() const{
     }
     res += "const ";
     int type = 0;
-    // if (!t.table.count(*this->id)) { // 如果当前变量未声明过
-    //     Token error_token = this->id->token;
-    //     fprintf(stderr, "Error: In line %d column %d, the identifier is not defined yet\n", error_token.line, error_token.column);
-    // }
     if (this->const_value->numletter->token.type == TokenType::Number){
         if (this->const_value->numletter->token.property.find(".") != std::string::npos){
             res += "float ";
@@ -347,10 +339,6 @@ std::string SubprogramBodyNode::trans() const {
     std::string constDecl = this->const_declarations->trans();
     std::string varDecl = this->var_declarations->trans();
     std::string com_state = this->compound_statement->trans();
-    // if (!t.table.count(*t.now_funcid)) { // 如果当前变量未声明过
-    //     Token error_token = t.now_funcid->token;
-    //     fprintf(stderr, "Error: In line %d column %d, the identifier is not defined yet\n", error_token.line, error_token.column);
-    // }
     if (t.now_funcid != nullptr && std::get<0>(t.table[*t.now_funcid]) != FUNC_VOID) {
         std::string ret_type;
         if (std::get<0>(t.table[*t.now_funcid]) == FUNC_INT) {
@@ -762,6 +750,17 @@ static bool is_expr(std::string s) {
     return false; // 可能是函数的一部分
 }
 
+bool is_var(std::string s) {
+    if (s.empty()) return false;
+    if (!(std::isalpha(s[0]) || s[0] == '_')) return false;
+    for (size_t i = 1; i < s.size(); ++i) {
+        if (!(std::isalnum(s[i]) || s[i] == '_')) {
+            return false;
+        }
+    }
+    return true;
+}
+
 std::string ProcedureCallNode::trans() const {
     if (this->expression_list == nullptr) {
         if (!t.table.count(*this->id)) { // 如果当前函数未声明过
@@ -822,8 +821,13 @@ std::string ProcedureCallNode::trans() const {
                 else
                     return res + expr + ")";
             }
-            if (cites.at(k) >= CITE)
+            if (cites.at(k) >= CITE) {
                 res += "&";
+                if(!is_var(expr)){ // 如果传引用调用不为变量
+                    Token error_token = this->id->token;
+                    fprintf(stderr, "Error: In line %d column %d, The parameters of a reference call must be variables\n", error_token.line, error_token.column);
+                }
+            }
             // 参数类型检测
             type_is_match(this->id->token.line, this->id->token.column, arg_kind[k], cites.at(k));
             res += expr + ",";
@@ -843,8 +847,13 @@ std::string ProcedureCallNode::trans() const {
                 fprintf(stderr, "Error: In line %d column %d, function call argument number error. %d expected, %d given\n", error_token.line, error_token.column, arg_num, k + 1);
             }
         }
-        if (cites.at(k) >= CITE)
+        if (cites.at(k) >= CITE) {
             res += "&";
+            if(!is_var(expr)){ // 如果传引用调用不为变量
+                Token error_token = this->id->token;
+                fprintf(stderr, "Error: In line %d column %d, The parameters of a reference call must be variables\n", error_token.line, error_token.column);
+            }
+        }
         // 参数类型检测
         type_is_match(this->id->token.line, this->id->token.column, arg_kind[k], cites.at(k));
         res += expr + expr_list + ")";
@@ -1041,8 +1050,13 @@ std::string FactorNode::trans() const {
                     res += expr + ")";
                 goto ret_kind_check;
             }
-            if (cites.at(k) >= CITE)
+            if (cites.at(k) >= CITE) {
                 res += "&";
+                if(!is_var(expr)){ // 如果传引用调用不为变量
+                    Token error_token = this->id->token;
+                    fprintf(stderr, "Error: In line %d column %d, The parameters of a reference call must be variables\n", error_token.line, error_token.column);
+                }
+            }
             // 参数类型检查
             type_is_match(this->id->token.line, this->id->token.column, arg_kind[k], cites.at(k));
             res += expr + ",";
@@ -1063,8 +1077,13 @@ std::string FactorNode::trans() const {
                 fprintf(stderr, "Error: In line %d column %d, function call argument number error. %d expected, %d given\n", error_token.line, error_token.column, arg_num, k + 1);
             }
         }
-        if (cites.at(k) >= CITE)
+        if (cites.at(k) >= CITE) {
             res += "&";
+            if(!is_var(expr)){ // 如果传引用调用不为变量
+                Token error_token = this->id->token;
+                fprintf(stderr, "Error: In line %d column %d, The parameters of a reference call must be variables\n", error_token.line, error_token.column);
+            }
+        }
         // 参数类型检查
         type_is_match(this->id->token.line, this->id->token.column, arg_kind[k], cites.at(k));
         res += expr + expr_list + ")";
