@@ -13,8 +13,9 @@ Token: 0	 Type: Number	 Line: 3	 Column: 18
 Token: ..	 Type: Operator	 Line: 3	 Column: 19
 Token: 9	 Type: Number	 Line: 3	 Column: 21
 Token: ]	 Type: Delimiters	 Line: 3	 Column: 22
-Token: integer	 Type: Keyword	 Line: 3	 Column: 25
-Token: ;	 Type: Delimiters	 Line: 3	 Column: 32
+Token: of	 Type: Keyword	 Line: 3	 Column: 24
+Token: integer	 Type: Keyword	 Line: 3	 Column: 27
+Token: ;	 Type: Delimiters	 Line: 3	 Column: 34
 Token: begin	 Type: Keyword	 Line: 4	 Column: 1
 Token: write	 Type: Keyword	 Line: 5	 Column: 3
 Token: (	 Type: Delimiters	 Line: 5	 Column: 8
