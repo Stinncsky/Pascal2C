@@ -1,5 +1,5 @@
-#include "../header/AST.hh"
-#include "../AST.cc"
+#include "./header/AST.hh"
+#include "./AST.cc"
 
 static std::string LINE_FORMAT_OUT = "";
 void FinalNode::output() const{
